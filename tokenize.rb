@@ -318,3 +318,12 @@ for each_line in get_lines(tokens)
     lines.push(Line.new(bundle(each_line)))
 end
 
+#
+# todo
+#
+    # parse the unparsed blocks
+    # parse the commas
+    # handle the first variable mention
+    # every literal corrispond to a function call
+    # create a system for scoping
+    # create function call bindings, and scope bindings
