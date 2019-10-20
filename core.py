@@ -80,25 +80,26 @@ class GlobalBuiltInFuncs():
                 scope_stack = args
             
             *scope_stack, name = scope_stack
-            
-            item = None
             scope = GlobalBuiltInFuncs.root_scope
+            item = None
+            if name in scope:
+                item = scope[name]
             for each in scope_stack:
                 if name in scope:
                     item = scope[name]
                 scope = scope[each]
             if not item:
-                scope[name] = Item(is_fresh=True)
+                scope[name] = Item()
                 return scope[name]
             else:
                 return item
-
+G = GlobalBuiltInFuncs
 
 class Operators:
     @classmethod
     def assign(self, value1, value2):
         return value1.weakly_assign(value2)
-
+O = Operators
 
 class BasicItem():
     pass
@@ -107,22 +108,26 @@ class Undefined(BasicItem):
     pass
 
 class Item(BasicItem):
-    def __init__(self, is_fresh=False):
+    def __init__(self):
         self.data = {}
-        if is_fresh:
-            self.is_fresh = is_fresh
-        else:
-            self.ancestors = []
-            self.function = None
+        self.ancestors = []
+        self.function = None
+        self.reference = None
+    
+    def is_fresh(self):
+        if self.function == None and len(self.data.keys()) == 0:
+            return True
+        return False
     
     # this is the getting of sub-things #access
-    def access(*args):
+    def access(self, *args):
         # TODO: add ancestors lookup
-        
+        print('self.reference = ', self.reference)
+        print('self.data = ', self.data)
         if len(args) == 1:
             # check for system keys
             if isinstance(args[0], SystemKey):
-                value = getattr(self,key,None)
+                value = getattr(self, args[0].name, None)
                 if callable(value):
                     return value
                 else:
@@ -135,7 +140,11 @@ class Item(BasicItem):
                 if self.reference:
                     return GlobalBuiltInFuncs.get_item(self.reference).access(*args)
                 # otherwise try checking the local data
-                return self.data.get(args[0], Item(is_fresh=True))
+                sub_data = self.data.get(args[0], None)
+                if sub_data == None:
+                    new_item = Item()
+                    self.data[args[0]] = new_item
+                return new_item
         
         # if no other case then try 
         if self.function:
@@ -152,6 +161,7 @@ class Item(BasicItem):
     def weakly_assign(self, arg):
         # basically only points to the new value
         self.reference = arg
+        print('self.reference = ', self.reference)
         return self
     
     def __str__(self):
@@ -162,7 +172,10 @@ class Item(BasicItem):
         return str(self.data)
     
     def __repr__(self):
-        return self.__str__()
+        if self.reference:
+            reference = GlobalBuiltInFuncs.get_item(self.reference)
+            return reference.__repr__()
+        return f'Item{{{self.__str__()}}}' 
         
 # for assigning functions
 class BuiltInFunctionLink(BasicItem):
@@ -174,6 +187,8 @@ class BuiltInFunctionLink(BasicItem):
         return self
 
 class SystemKey(BasicItem):
+    def __init__(self, name):
+        self.name = name
     def weakly_assign(self, arg):
         raise Exception("Most SystemKeys cannot be assigned")
 
@@ -223,8 +238,17 @@ class String(Primitive):
 
 
 # Hello World Attempt
-GlobalBuiltInFuncs.say(String("hello world"))
-GlobalBuiltInFuncs.say(Atom("hello"))
-GlobalBuiltInFuncs.log(Atom("hello"))
-GlobalBuiltInFuncs.log(String("hello world"), Atom("hello"))
-GlobalBuiltInFuncs.say(Operators.assign(GlobalBuiltInFuncs.get_item("bob"), String("hello world")))
+G.say(String("hello world"))
+G.say(Atom("hello"))
+G.log(Atom("hello"))
+G.log(String("hello world"), Atom("hello"))
+G.say(O.assign(G.get_item("bob"), String("hello world")))
+print(" ")
+G.say(G.get_item("bob"))
+G.say(G.get_item("bob").access('nickname'))
+print(" ")
+G.say(O.assign(G.get_item("bob").access('nickname'), String("bobby")))
+print('G. = ', G.root_scope)
+print(" ")
+G.say(G.get_item("bob"))
+G.say(G.get_item("bob").access('nickname'))
