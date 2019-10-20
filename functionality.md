@@ -45,6 +45,21 @@ However, because this is ambigious, it is not allowed
 However-however, `aFunc: 10 + 10` is allowed and it is interpreted as `aFunc(10 + 10)`
 To run a function with no arguments, you can do `aFunc!`
 
+edgecases to consider:
+`var(aFunc(10))`
+`var aFunc 10`
+`var+var2(aFunc(10))`
+`(var+var2)(aFunc(10))`
+`(var+var2)aFunc(10)`
+`(var1+var2) aFunc 10`
+
+`var(add(10))`
+`var add 10`
+`var+var2(add(10))`
+`(var+var2)(add(10))`
+`(var+var2)add(10)`
+`(var1+var2) add 10`
+
 
 
 There are no keywords in XD, only functions/variables. The block syntax can be called with the value on an indented newline similar to yaml values. Functions also have a special ability to have their arguments be visually split up. For example:

@@ -1,22 +1,5 @@
-# core features
-    # literal handlers
-        # atom
-        # string
-        # number
-        # pair
-        # list
-        # hash
-    # variable retrieval (controls scope)
-    # assignment
-    # primitives
-        # atom
-        # string
-        # number
-        # list
-        # hash
-    # output
-    # input
-    # compile time
+
+# TODO: make everything work with asyncio
 
 
 
@@ -108,6 +91,8 @@ class Undefined(BasicItem):
     pass
 
 class Item(BasicItem):
+    # TODO: create the deep_copy method
+    # TODO: make reference assignment do a shallow copy
     def __init__(self):
         self.data = {}
         self.ancestors = []
@@ -118,12 +103,62 @@ class Item(BasicItem):
         if self.function == None and len(self.data.keys()) == 0:
             return True
         return False
+        
+    def base_access(self, *args):
+        # TODO: add ancestors lookup
+        if len(args) == 1:
+            # check for system keys
+            if isinstance(args[0], SystemKey):
+                value = getattr(self, args[0].name, None)
+                if callable(value):
+                    return value
+                else:
+                    # called object with a system method 
+                    # this is almost certainly unintentional, which is why it raises an error
+                    raise Exception(f"The system key {args[0]} was trying to be accessed, however that isn't a key for this kind of data")
+            # simple hash map access
+            elif not self.function:
+                # always follow references for access
+                if self.reference:
+                    return GlobalBuiltInFuncs.get_item(self.reference).access(*args)
+                # otherwise try checking the local data
+                sub_data = self.data.get(args[0], None)
+                if sub_data == None:
+                    return None
+                else:
+                    return sub_data
+        # if no other case then try 
+        if self.function:
+            return self.function(args)
+        else:
+            # called object access with multiple arguments with no function to handle the case  
+            # this is almost certainly unintentional, which is why it raises an error
+            print("An object was trying to be accessed, it was given muliple arguments, but it doesn't have an function for hanlding multiple arguments")
+            print("The arguments are\n")
+            GlobalBuiltInFuncs.log(*args)
+            raise Exception("[see message above]")
     
     # this is the getting of sub-things #access
     def access(self, *args):
         # TODO: add ancestors lookup
-        print('self.reference = ', self.reference)
+        print('args = ', args)
         print('self.data = ', self.data)
+        value = self.base_access(*args)
+        if value == None:
+            for each in self.ancestors:
+                try:
+                    value = each.base_access(*args)
+                    if value:
+                        return value
+                except:
+                    pass
+            # if no ancestors have it, then create a value on the current object
+            new_item = Item()
+            self.data[args[0]] = new_item
+            return new_item
+        else:
+            return value
+        
         if len(args) == 1:
             # check for system keys
             if isinstance(args[0], SystemKey):
@@ -144,7 +179,9 @@ class Item(BasicItem):
                 if sub_data == None:
                     new_item = Item()
                     self.data[args[0]] = new_item
-                return new_item
+                    return new_item
+                else:
+                    return sub_data
         
         # if no other case then try 
         if self.function:
@@ -160,8 +197,13 @@ class Item(BasicItem):
     # the item itself is being assigned
     def weakly_assign(self, arg):
         # basically only points to the new value
-        self.reference = arg
-        print('self.reference = ', self.reference)
+        if isinstance(arg, Primitive):
+            wrapped = Item()
+            wrapped.ancestors.append(arg)
+            self.reference = wrapped
+        else:
+            self.reference = arg
+            
         return self
     
     def __str__(self):
@@ -237,12 +279,21 @@ class String(Primitive):
         return '"'+self.__str__()+'"'
 
 
+# TODO: create a Pair class
+# TODO: create a Map class
+# TODO: create a List class
+
+class Function():
+    # TODO: figure out how to represent a function as list/mapping of literals
+    # TODO: make all functions async using asyncio, 
+    pass
 # Hello World Attempt
 G.say(String("hello world"))
 G.say(Atom("hello"))
 G.log(Atom("hello"))
 G.log(String("hello world"), Atom("hello"))
 G.say(O.assign(G.get_item("bob"), String("hello world")))
+print('G. = ', G.root_scope)
 print(" ")
 G.say(G.get_item("bob"))
 G.say(G.get_item("bob").access('nickname'))
