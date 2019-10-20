@@ -1,0 +1,3 @@
+#say: hello world
+#log: "hello world"
+#send: "hello world\n"

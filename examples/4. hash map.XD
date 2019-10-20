@@ -1,0 +1,23 @@
+# the most generic: uses anything as keys
+details_about_reby << #mapping:
+    @name; 'Reby'
+    @age; @unknown
+    @favorite_color; @silver
+    [1,2,3]; 'blah'
+
+# uses strings as keys, still a hash map though (all of these are hash maps)
+details_about_jeff << #namedList:
+    name; 'Jeff'
+    age; 23
+    favorite_language; @XD
+
+# can't embed variables
+misc_details << #yaml:
+    name: idk
+    values: [1,2,3]
+    nested:
+        anotherValue: 100
+        aList:
+            - 1
+            - 2
+            - 3

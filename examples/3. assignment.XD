@@ -1,0 +1,13 @@
+
+
+thing << 10
+# is the same as
+#local@thing << 10
+#global@thing << 10
+
+other_thing('name') << 20
+
+thing@name << 11
+thing@name << 12
+11 << 12 
+thing << 10
