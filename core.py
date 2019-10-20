@@ -221,11 +221,6 @@ class String(Primitive):
     def __repr__(self):
         return '"'+self.__str__()+'"'
 
-# var = GlobalBuiltInFuncs.log
-# @siphon("var", locals(), lambda *values: isinstance(value, String))
-# def literal_string(value):
-#     print(f'"{value}"')
-# GlobalBuiltInFuncs.log = var
 
 # Hello World Attempt
 GlobalBuiltInFuncs.say(String("hello world"))
