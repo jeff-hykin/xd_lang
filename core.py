@@ -1,9 +1,4 @@
 
-# TODO: make everything work with asyncio
-
-
-
-
 def siphon(var_name, the_locals, lambda_true_false):
     def level2(new_func):
         old_func = the_locals[var_name]

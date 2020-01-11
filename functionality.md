@@ -7,7 +7,6 @@
 - operators (syntatical sugar for function)
 
 # Challenges
-- assignment mutating the correct thing
 - how functions access their parent (#ancestors@1?) 
 - how to create an inline hash map (semicolons?) {value; 10, other; 11}
 - named optional arguments
