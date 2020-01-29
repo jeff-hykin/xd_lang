@@ -95,11 +95,11 @@ Items are names with letters and underscores and must start with a lowercase let
 # operators
 Operators are symbolic; they cannot contain any letters. There are no special operators. There's no "and", "or", or "new" operator. Operators get converted into function calls at compile time, they just have additional information about where to place the ()'s based on the order of operations (Eval compiles the code before running it). The colon, comma, square brackets, and parentheses are the only symbols that are both not-literals and not-operators. Operators have to be declared at compile time. Operators can be user defined. There is a simple infix-operator definition with a fixed precedence and also an advanced definition. Operators must work on valid XD code, they can't perform magic like functions with block syntax. Operators have their precedence defined as a floating point number and a direction of either left or right. A decimal number is used for precedence because it is an absolute scale (no need to know what other operators are placed at) but, unlike an integer, it also allows putting any operator between any other two operators.
 
-#
-#
+#  
+# 
 # concepts
-#
-#
+# 
+#  
 
 
 # external code
@@ -119,18 +119,18 @@ However, both #import and #include will only run their files once.
 #paste should be a rarely used option, but it is identical to copying and pasting the external code in that exact location. This can produce some very unexpected results.
 The #activate is just like #import, but it will run the file every time. The #run is just like #include but it runs the file every time rather than only once.
 
-#
+# 
 # functions
-#
+# 
 Basic functions are just a block of code that have access to #input and #output, however all values are passed by deep copy. There is no return statement, to return a value you have to assign it to the #output variable. Basic functions also have access to the external scope. Advanced functions let you handle things like mutating arguments, or enforcing purity. Functions also have access to #this which only works when it is a member value of a variable. Functions also have access to #this_function which is used for static variables and generator-like functions. Functions can have guards (super-type safety) and documentation built into them. In the future, functions will be capable of having compile-time guards for efficiently getting type safety. Functions can also be started and not be required to finish. They can be started with #schedule which returns a task-variable (similar to a JavaScript promise) and then the task can be waited on anywhere else in the program. Functions can continuously perform output by using #OUTPUT.send(), which sends data to external code without ending/stopping the function. For example:
 task << readFiles#schedule("file1", "file2")
 first_value << task#receive
 second_value << task#receive
 The function is doing work asynchronously, it could finish everything immediately, and then the #receive just pops it off the stack, or the code could get to the #receive first, and need to wait for the function to finish sending its first value. The task can be cancelled or scheduled with a delay. 
 
-#
+# 
 # control flow
-#
+# 
 Control flow is just a set of functions and operators. In the geko foundation they're defined like this.
 if: condition
 Then:
@@ -145,15 +145,15 @@ loop:
     #exit_loop
 
 
-#
+# 
 # assignment
-#
+# 
 There are lots of assignment operators. The deep copy assignment << first follows any references on the left-side and right-side object, then it creates a deep copy of the attributes of the right side (the #data, #call, #ancestors, etc) and overwrites those values on the left-side object.
 
 
 # 
 # other things to discuss
-#
+# 
 - how adjectives work, isNull, isNumber
 - built in tools
     - #this_variable for self-reassignment
@@ -164,9 +164,9 @@ There are lots of assignment operators. The deep copy assignment << first follow
 - item-based optimization rules
 
 
-#
+# 
 # parsing
-#
+# 
 step 1: tokenize
 - nothing is destroyed, only labeled
 - everything is broken into variables, literals, blocks, operators, and non-functional tokens
