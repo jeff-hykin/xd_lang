@@ -197,3 +197,16 @@ All XD functions and XD literals are given a direct equivalent within a target l
 - every dynamic function is a sequence of function calls
 - every nested function call is recursively un-nested and replaced with a unique variable holding it's output
 - all dynamic XD functions would be represented by a vector of function calls, each call would have a pointer which would either be a pointer to another dynamic function or a function pointer to a turtle function, then it would have the name of where it's output should be stored (scope name and variable name), then it would have a list of all of its arguments. The function would have a "run" method that would accept arguments and put them on the scope/stack, then it would perform each call in succession, fetching the argument values, and recursively drilling down until a turtle function was found and called with the argument and the value was stored in a variable and returned up the chain.
+
+
+
+
+# 
+# Advanced/Future optimizations
+# 
+
+
+# file-storage as cache
+Have a optimization process where
+if a variable is a result of a long manipulation on a file
+then cache the result into storage, and then (if the code and files don't change) just load the storage cache
