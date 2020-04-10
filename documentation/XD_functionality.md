@@ -14,6 +14,18 @@
 - how to handle the unrary `-` operator
 - a way to dynamically get a atom-method
 
+# Considerations
+- allow the `if 1 = 2 Then:` syntax by searching for the next caps-word and not allowing lowercase words inbetween unless inside ()'s
+- remove the _ from variable names and atoms
+- add the "key" literal such as \key where each one is perfectly unique. Or maybe better, find a way to pervent/detect/report library overlaps by seeing what a library changes
+- ask people: 
+  - what is a good variable name that contains a number 
+  - when would interpolation not work as a replacement for backslash-escape
+- unevaled code syntax, maybe {}, if (1 = 2)then{ a << 10 }
+- deconstruction syntax
+  { a , b } = listThingy
+  [ a , b ] = listThingy
+
 # Punctuation
 All of the punctuation can be changed/swapped, but can't be removed.
 This includes comments, list start/end, hashmap start/end, function calls, and line separators.
@@ -42,7 +54,6 @@ would be equivlent to
 `aFunc(10) + 10`
 However, because this is ambigious, it is not allowed
 However-however, `aFunc: 10 + 10` is allowed and it is interpreted as `aFunc(10 + 10)`
-To run a function with no arguments, you can do `aFunc!`
 
 edgecases to consider:
 `var(aFunc(10))`
@@ -80,7 +91,7 @@ The basic literals are
 - quotes "hello"
 - atoms @true
 - special keys #reference
-- comments
+
 
 # items
 Items are what'd you'd typically think of as a variable.
