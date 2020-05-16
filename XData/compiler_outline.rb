@@ -173,6 +173,49 @@ loop do
     # 
     # list
     # 
+    regex = /\A( *\n)*(?<indent> *)#{list_element_start}/
+    match = remaining_contents.match(regex)
+    if match
+        indent_of_key = match['indent']
+        # if more-indented, then its the first key in a new mapping
+        if indent_of_key.length > current_indent.length
+            # set the current value to be a map
+            puts "\nassignment 4"
+            assign_to_key[ [] ]
+        # if less-indented, then its the end of one or more lists/maps
+        # if equally indented, then the key_stack won't be adjusted
+        else
+            # remove keys to get back
+            number_of_indents = current_indent.scan(/ /).size / STANDARD_INDENT_SIZE
+            # the +1 is because of the root key
+            key_stack = key_stack.first(number_of_indents + 1)
+            # now add the key 
+            
+            # this should always be a hash, something weird like mixing maps an sequences would have to happen to trigger it
+            if (not output_object.dig(*key_stack).is_a?(Hash))
+                # only exception is the inital (root) key
+                if key_stack.length > 1
+                    raise <<~HEREDOC
+                        
+                        
+                        When I'm parsing at #{key_stack} there's a new key, but the value at #{key_stack} isn't a map
+                        its: #{output_object.dig(*key_stack).inspect}
+                    HEREDOC
+                else
+                    puts "\nassignment 5"
+                    assign_to_key[ [] ]
+                end
+            end
+            # TODO: keep a counter
+            output_object.dig(*key_stack).push(value)
+            # fill in the key with a pending (nil) value
+            assign_to_key[nil]
+        end
+        indent = match['indent']
+        # remove what has already been processed
+        remaining_contents.sub!(mapping_regex,"")
+        next
+    end
     # TODO
     
     # 
