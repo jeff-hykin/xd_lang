@@ -1,0 +1,334 @@
+categories:
+    - control over the shell:
+        - history
+        - "!!"
+        - clear
+    - language features of shell:
+        - for
+        - if
+    - file exploration:
+        - cd
+        - ls
+        - dirname
+        - find
+    - file maniputlation:
+        - mv
+        - cp
+    - process management:
+        - thing && thing | thing
+        - ps
+        - kill
+        - cron
+    - stream tools:
+        - "yes"
+        - grep
+        - tee
+    - users and permissions:
+        - whoami
+        - sudo
+        - chmod
+        - chown
+    - external tools:
+        - zip 
+        - netstat
+        - curl
+        
+
+
+
+shell-language based:
+    read      : Read a line from standard input •
+    alias     : Create an alias •
+    bind      : Set or display readline key and function bindings •
+    break     : Exit from a loop •
+    builtin   : Run a shell builtin
+    case      : Conditionally perform a command
+    continue  : Resume the next iteration of a loop •
+    declare   : Declare variables and give them attributes •
+    echo      : Display message on screen •
+    expr      : Evaluate expressions
+    export    : Set an environment variable
+    env       : Environment variables
+    "false"   : Do nothing, unsuccessfully
+    for       : Expand words, and execute commands
+    function  : Define Function Macros
+    xargs     : Execute utility, passing constructed argument list(s)
+
+shell control:
+    cd        : Change Directory
+    chroot    : Run a command with a different root directory
+    clear     : Clear terminal screen
+    dircolors :  Colour setup for 'ls'
+    enable    : Enable and disable builtin shell commands •
+    eval      : Evaluate several commands/arguments
+    exec      : Execute a command
+    exit      : Exit the shell
+    help      : Display help for a built-in command •
+    history   : Command History
+    pwd       : Print Working Directory
+    "!!"      : Run the last command again
+    
+basic file tools:
+    ls        : List information about file(s)
+    mv        : Move or rename files or directories
+    cat       : Concatenate and print (display) the content of files
+    basename  : Strip directory and suffix from filenames
+    dirname   : Convert a full pathname to just a path
+    cmp       : Compare two files
+    cp        : Copy one or more files to another location
+    file      : Determine file type
+    rm        : Remove files
+    rmdir     : Remove folder(s)
+
+baisc generic tools:
+    "yes"     : Print a string until interrupted
+    logname   : Print current login name
+    find      : Search for files that meet a desired criteria
+    locate    : Find files
+    head      : Output the first part of file(s)
+    curl      : Transfer data  from or to a server
+    date      : Display or change the date & time
+
+quick tools:
+    hostname  : Print or set system name
+    gzip      : Compress or decompress named file(s)
+    hash      : Remember the full pathname of a name argument
+    awk       : Find and Replace text, database sort/validate/index
+    comm      : Compare two sorted files line by line
+    csplit    : Split a file into context-determined pieces
+    cut       : Divide a file into several parts
+    df        : Display free disk space
+    dig       : DNS lookup
+    dir       : Briefly list directory contents
+    du        : Estimate file space usage
+    fgrep     : Search file(s) for lines that match a fixed string
+    egrep     : Search file(s) for lines that match an extended expression
+    
+fancy tools:
+    htop      : Interactive process viewer
+    dd        : Data Duplicator - convert and copy a file, write disk headers, boot records
+    ddrescue  : Data recovery tool
+    bc        : Arbitrary precision calculator language 
+    cal       : Display a calendar
+    diff      : Display the differences between two files
+    diff3     : Show differences among three files
+    dirs      : Display list of remembered directories
+
+should be a function:
+    base32    : Base32 encode/decode data and print to standard output
+    base64    : Base64 encode/decode data and print to standard output
+    bzip2     : Compress or decompress named file(s)
+
+operating system:
+    bg        : Send to background
+    chmod     : Change access permissions
+    chown     : Change file owner and group
+    chgrp     : Change group ownership
+    chattr    : Change file attributes on a Linux file system 
+    cfdisk    : Partition table manipulator for Linux
+    chkconfig :  System services (runlevel)
+    cron      : Daemon to execute scheduled commands
+    crontab   : Schedule a command to run at a later time
+    eject     : Eject removable media
+    fdformat  : Low-level format a floppy disk
+    fdisk     : Partition table manipulator for Linux
+    fg        : Send job to foreground 
+
+user management:
+    chpasswd  : Update passwords in batch mode
+    
+
+
+idk:
+    cksum     : Print CRC checksum and byte counts
+    cpio      : Copy files to and from archives
+    dc        : Desk Calculator
+    dmesg     : Print kernel & driver messages 
+    ethtool   : Ethernet card settings
+    expect    : Automate arbitrary applications accessed over a terminal
+    expand    : Convert tabs to spaces
+    fmt       : Reformat paragraph text
+    fold      : Wrap text to fit a specified width.
+
+
+
+relevent commands:
+    su        : Substitute user identity
+    sudo      : Execute a command as another user
+    tail      : Output the last part of file
+    tar       : Store, list or extract files in an archive
+    grep      : Search file(s) for lines that match a given pattern
+    ifconfig  : Configure a network interface
+    jobs      : List active jobs •
+    kill      : Kill a process by specifying its PID
+    link      : Create a link to a file 
+    ln        : Create a symbolic link to a file
+    mkdir     : Create new folder(s)
+    mkfifo    : Make FIFOs (named pipes)
+    mkfile    : Make a file
+    nc        : Netcat, read and write data across networks
+    netstat   : Networking connections/stats
+    ping      : Test a network connection
+    open      : Open a file in its default application
+    ps        : Process status
+    lsof      : List open files
+    mktemp    : Make a temporary file
+    reboot    : Reboot the system
+    rename    : Rename files
+    sed       : Stream Editor
+    shutdown  : Shutdown or restart linux
+    sleep     : Delay for a specified time
+    sort      : Sort text files
+    source    : Run commands from a file '.'
+    ssh       : Secure Shell client (remote login program)
+    tee       : Redirect output to multiple files
+    time      : Measure Program running time
+    timeout   : Run a command with a time limit
+    touch     : Change file timestamps
+    top       : List processes running on the system
+    "true"    : Do nothing, successfully
+    wc        : Print byte, word, and line counts
+    which     : Search the user's $path for a program file
+    whoami    : Print the current user id and name ('id -un')
+
+unsorted: 
+    format    : Format disks or tapes
+    free      : Display memory usage
+    fsck      : File system consistency check and repair
+    ftp       : File Transfer Protocol
+    fuser     : Identify/kill the process that is accessing a file
+    gawk      : Find and Replace text within file(s)
+    getopts   : Parse positional parameters
+    groupadd  : Add a user security group
+    groupdel  : Delete a group
+    groupmod  : Modify a group
+    groups    : Print group names a user is in
+    iconv     : Convert the character set of a file
+    id        : Print user and group id's
+    if        : Conditionally perform a command
+    ifdown    : Stop a network interface 
+    ifup      : Start a network interface up
+    import    : Capture an X server screen and save the image to file
+    install   : Copy files and set attributes
+    iostat    : Report CPU and i/o statistics
+    ip        : Routing, devices and tunnels
+    join      : Join lines on a common field
+    killall   : Kill processes by name
+    less      : Display output one screen at a time
+    let       : Perform arithmetic on shell variables •
+    local     : Create a function variable •
+    logout    : Exit a login shell •
+    look      : Display lines beginning with a given string
+    lpc       : Line printer control program
+    lpr       : Off line print
+    lprint    : Print a file
+    lprintd   : Delete a print job
+    lprintq   : List the print queue
+    lprm      : Remove jobs from the print queue
+    lsattr    : List file attributes on a Linux second extended file system
+    lsblk     : List block devices
+    lspci     : List all PCI devices
+    make      : Recompile a group of programs
+    man       : Help manual
+    mapfile   : Read lines from standard input into an indexed array variable
+    mkisofs   : Create an hybrid ISO9660/JOLIET/HFS filesystem
+    mknod     : Make block or character special files
+    more      : Display output one screen at a time
+    most      : Browse or page through a text file
+    mount     : Mount a file system
+    mtools    : Manipulate MS-DOS files
+    mtr       : Network diagnostics (traceroute/ping)
+    mmv       : Mass Move and rename (files)
+    nft       : nftables for packet filtering and classification
+    nice      : Set the priority of a command or job
+    nl        : Number lines and write files
+    nohup     : Run a command immune to hangups
+    notify-se : nd  Send desktop notifications
+    nslookup  : Query Internet name servers interactively
+    op        : Operator access 
+    passwd    : Modify a user password
+    paste     : Merge lines of files
+    pathchk   : Check file name portability
+    Perf      : Performance analysis tools for Linux 
+    pgrep     : List processes by name
+    pkill     : Kill processes by name
+    popd      : Restore the previous value of the current directory
+    pr        : Prepare files for printing
+    printcap  : Printer capability database
+    printenv  : Print environment variables
+    printf    : Format and print data •
+    pushd     : Save and then change the current directory
+    pv        : Monitor the progress of data through a pipe 
+    quota     : Display disk usage and limits
+    quotachec : k Scan a file system for disk usage
+    ram       : ram disk device
+    rar       : Archive files with compression
+    rcp       : Copy files between two machines
+    readarray :  Read from stdin into an array variable •
+    readonly  : Mark variables/functions as readonly
+    renice    : Alter priority of running processes 
+    remsync   : Synchronize remote files via email
+    return    : Exit a shell function
+    rev       : Reverse lines of a file
+    rsync     : Remote file copy (Synchronize file trees)
+    screen    : Multiplex terminal, run remote shells via ssh
+    scp       : Secure copy (remote file copy)
+    sdiff     : Merge two files interactively
+    select    : Accept keyboard input
+    seq       : Print numeric sequences
+    set       : Manipulate shell variables and functions
+    sftp      : Secure File Transfer Program
+    shift     : Shift positional parameters
+    shopt     : Shell Options
+    slocate   : Find files
+    split     : Split a file into fixed-size pieces
+    ss        : Socket Statistics
+    stat      : Display file or file system status 
+    strace    : Trace system calls and signals
+    sum       : Print a checksum for a file
+    suspend   : Suspend execution of this shell •
+    sync      : Synchronize data on disk with memory
+    test      : Evaluate a conditional expression
+    times     : User and system times
+    tput      : Set terminal-dependent capabilities, color, position
+    tracerout : e Trace Route to Host
+    trap      :  Execute a command when the shell receives a signal •
+    tr        : Translate, squeeze, and/or delete characters
+    tsort     : Topological sort
+    tty       : Print filename of terminal on stdin
+    type      : Describe a command •
+    ulimit    : Limit user resources •
+    umask     : Users file creation mask
+    umount    : Unmount a device
+    unalias   : Remove an alias •
+    uname     : Print system information
+    unexpand  : Convert spaces to tabs
+    uniq      : Uniquify files
+    units     : Convert units from one scale to another
+    unrar     : Extract files from a rar archive 
+    unset     : Remove variable or function names
+    unshar    : Unpack shell archive scripts
+    until     : Execute commands (until error)
+    uptime    : Show uptime
+    useradd   : Create new user account
+    userdel   : Delete a user account
+    usermod   : Modify user account
+    users     : List users currently logged in
+    uuencode  : Encode a binary file
+    uudecode  : Decode a file created by uuencode
+    v         : Verbosely list directory contents ('ls -l -b')
+    vdir      : Verbosely list directory contents ('ls -l -b')
+    vi        : Text Editor
+    vmstat    : Report virtual memory statistics
+    w         : Show who is logged on and what they are doing
+    wait      : Wait for a process to complete •
+    watch     : Execute/display a program periodically
+    whereis   : Search the user's $path, man pages and source files for a program
+    while     : Execute commands
+    who       : Print all usernames currently logged in
+    wget      : Retrieve web pages or files via HTTP, HTTPS or FTP
+    write     : Send a message to another user 
+    xdg-open  : Open a file or URL in the user's preferred application.
+    xz        : Compress or decompress .xz and .lzma files
+    zip       : Package and compress (archive) files.
+    

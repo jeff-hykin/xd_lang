@@ -5,7 +5,7 @@ thing << 10
 #local@thing << 10
 #global@thing << 10
 
-other_thing['name']å << 20
+other_thing['name'] << 20
 
 thing@name << 11
 thing@name << 12
