@@ -14,6 +14,13 @@ STANDARD_INDENT_SIZE = 4
         # double
         # single
 
+
+# TODO: add
+    # tags for things like \set or \json
+    # references
+    # interpolation
+    # comments
+
 # 
 # number
 # 
@@ -179,9 +186,11 @@ loop do
         indent_of_key = match['indent']
         # if more-indented, then its the first key in a new mapping
         if indent_of_key.length > current_indent.length
-            # set the current value to be a map
+            # set the current value to be a list
             puts "\nassignment 4"
             assign_to_key[ [] ]
+            # first element
+            key_stack.push(0)
         # if less-indented, then its the end of one or more lists/maps
         # if equally indented, then the key_stack won't be adjusted
         else
@@ -206,8 +215,10 @@ loop do
                     assign_to_key[ [] ]
                 end
             end
-            # TODO: keep a counter
-            output_object.dig(*key_stack).push(value)
+            # remove the old index
+            key_stack.pop()
+            # push the key (index) of the current element
+            key_stack.push(output_object.dig(*key_stack).length)
             # fill in the key with a pending (nil) value
             assign_to_key[nil]
         end
