@@ -1,0 +1,3 @@
+Syntax errors and missing files are handled at compile time
+
+Errors at runtime are objects just like anything else. Unlike other objects though, they remeber where they were created. Any default operation (e.g. - + *) or normally-made function that gets an error as an argument will add some data to the error and then return it without printing it. (You can override this for your own function/operator if you want). If an error ends up in a place it shouldn't, like in an if statement, or if it is returned and not used, then the error will print out where it originated and the path it followed to end up where is was.

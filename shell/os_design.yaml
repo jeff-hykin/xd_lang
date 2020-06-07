@@ -1,0 +1,199 @@
+# this is just wistful thinking, but here's how I'd design an ideal OS
+file system:
+    - unix has "ordinary" files, directories, and special files
+      To be straightforward though, when we say "file", we always mean "ordinary file"
+      We will use "node" (or file-system node) as the more general term refering to
+      an ordinary file, folder, or special file
+    - nodes have all the typical linux capabilites except those mentioned below (permissions, metadata, execution, etc)
+    - naming:
+        - node names can contain any non-whitespace character
+        - node names can have spaces (but can't have any other whitespace tabs/newlines/etc)
+        - tabs (in the shell) are made faintly visible with the → character and are only the width of two characters
+        - paths are seperated by tabs instead of /
+    - permissions:
+        permissions are not stored on the node, permissions are instead related to
+        processes and users. There are rules for editing metadata, but they are only
+        validity checks against corrupt data. 
+    - metadata:
+        format:
+            the metadata can be thought like a JSON/YAML file
+            (it is compressed so it isn't actually in that format)
+            even data such
+        changing the metadata:
+            programs can add any amount of custom fields/keys to 
+            the metadata of an node. However any key starting with "#" 
+            is reserved for system use.
+        standard structure:
+            "#id":
+                a unique number for this node
+            "#adjectives":
+                the "#adjectives" key describes what the node is. For example
+                [ "file", "plaintext" ] or ["folder", "app"] or ["file", "image"].
+                The approved keys are kept in a global online repo to prevent
+                naming conflicts or misuse.
+            "adjectives":
+                the non-system adjectives key is where programs can attach 
+                unofficial adjectives like "excel-2009". Conflicts are not guarenteed
+            "#paths":
+                Folders can only have one path. Meaning there are no recursive folders
+                (folders that somehow contain themselves)
+                
+                Files however can "be" in multiple places at the same time.
+                A different way of looking at it is that a file simply has multiple
+                paths you can take to get to it, but it exists outside of the paths.
+                In the same line of thought, there is no direct way to delete a file,
+                you can only delete paths. Once all paths to a file are deleted, the
+                OS will delete the actual file itself.
+            "#icon":
+                This can be:
+                - a path to an icon file
+                - the data for an icon itself
+                - a method for auto-generating an icon 
+            "#dependencies":
+                this can be used when there are other known files that require this file.
+                When the file is being completely deleted, it can generate warnings that
+                something else might break.
+            "#event_hooks":
+                "#before_update":
+                    a list of executables to be called right before the file is saved
+                "#after_update":
+                    a list of executables to be called right after the file is saved
+                "#before_delete":
+                    a list of executables to be called right before the file is deleted
+                "#after_delete":
+                    a list of executables to be called right before the file is deleted
+                etc:
+                    these hooks are just examples, they would be thought out in more detail
+                    and there would be hooks for things such as adding/removing a node in a folder
+
+users, permissions, and processes:
+    - every user has their own (home) folder
+    - users have a settings folder in their home folder that
+      specifies everything that makes them different from
+      another user
+    - user restrictions:
+        - every user has a restrictions settings file
+        - there is a "super" user that has almost no restrictions
+        - the only restriction on a super user is the last super user
+        cannot delete themselves or throw away their super-user status.
+        However they can do anything else including delete/edit the code
+        that enforces this protective measure.
+        - every non-super user can't edit their restrictions at all
+    - permissions:
+        - A "permissions set" is a special kind of file that can describe permissions
+          in a dynamic or static way. For example, it can provide file/folder access,
+          it can provide file access 1 time, it can require approval from specific users,
+          and it can provide access only during certain days of the week.
+        - in behavior; every system call made by a process is first evaluated 
+          however in pratice; custom rectricted system calls are premade and injected
+          accordingly
+        - every running process has its own copy of a permission set 
+        - every user has a permissions setting (home→settings→) which handles
+          the default permissions given to programs/processes when they try to run them
+        - users can customize the exact permissions they give processes
+        - pure processes (arguments, standard input, and standard output only) can be run
+          by any user without any permissions
+        - processes can request permission escalation at runtime, which the user can approve
+          (if the user does not have a restriction)
+        - processes can restrict the permissions given to any child-processes they start
+        - child processes can ask their parent process for permission-escalation
+        - child processes can also bypass their parent process and ask the user directly
+          for permission escalation.
+        - granting additional permissions to a child process does NOT escalate the permissions 
+          of the parent process
+        
+
+shell:
+ - stdin is a stream of objects (XData), not just a stream of characters
+ - stdout is also a stream of objects (XData), not just a stream of characters
+ - no direct stderr, instead the process can send error objects through
+   the stdout stream
+ - no direct signals, instead another process can send a signal object
+   through the stdin stream
+ - every command accessible to the shell is in the programs folder
+ - every command in the shell is tracked to a specific version of every program in the programs file
+   which exact version must be specified in the user's settings
+ - there are no enviornment variables
+ 
+
+programs:
+    - every program for every user is stored in the →programs folder
+    - every official program name must be part of the global names list to avoid naming conflicts
+    - unofficial programs can be used to temporarily get around this
+    - for programs to use other programs they must specify a version
+    - programs do not have access to the user's shell
+    - programs have many different options about how thier code can interact with the os:
+        - executables
+        - GUI apps
+        - after_boot scripts
+        - after_login scripts
+        - file callbacks
+        - modifying operating system UI elements
+        - continually running services (like servers)
+        - drivers
+    - programs cannot write data anywhere other than:
+        - the user's home folder
+        - the temp folder
+        - the →system→settings
+
+file structure:
+    →users
+        # there must be at least one user
+        # if there isnt then the OS will create one
+        →[username]
+            →settings
+                →shell settings
+                →app settings
+                →on-login settings
+            →program_data
+    # hardware that is avalible
+    →hardware
+        [network adapters]
+        [hard drives]
+        [webcams]
+        [flash drives]
+        [mounted file systems]
+    →programs # every executable is stored in here, even system executables
+              # the OS will 
+        →official
+            →[universally-unique-name]
+                →[version _ [hash]]
+            # uses a universal naming scheme, they m
+        →unofficial
+            # creating 
+    →temporary
+        →for_1min
+        →for_1hour
+        →for_1day
+        →until_logout
+        →until_reboot
+        →indefinite
+    →system
+        # configuration files, things users and programs can set
+        →settings
+            [source for keeping time synchronized]
+            [source for pulling updates]
+            [boot drive preference]
+            [which screen to boot from]
+            [what graphics card to display from]
+            [default network settings]
+            [dns lookup]
+            [startup programs]
+            [default user settings]
+        
+        →encrypted # a place managed by the OS for storing passwords 
+                   # and other sensitive information
+        
+        # everthing in "vitals" *should* not be edited unless
+        # it is a direct user who knows how to modify their os
+        # (no 3rd party app should be trying to automate/edit this)
+        # (modifying this will cause a "corrupt system" check)
+        →vitals  
+            →machine_specific # anything that is written in assembly
+                →boot
+                →interpreter
+            →static_information
+            →api
+            →processes
+            →permissions
+        

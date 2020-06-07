@@ -12,7 +12,6 @@
 - named optional arguments
 - how to handle the `...`
 - how to handle the unrary `-` operator
-- a way to dynamically get a atom-method
 
 # Considerations
 - allow the `if 1 = 2 Then:` syntax by searching for the next caps-word and not allowing lowercase words inbetween unless inside ()'s
@@ -25,6 +24,10 @@
 - deconstruction syntax
   { a , b } = listThingy
   [ a , b ] = listThingy
+- use @ as a reverse access operator, `print@console["hello"]`
+- have `🐉` as the activation of Dragon mode
+- should there be a way to stack multiple commands on a single line
+
 
 # Punctuation
 All of the punctuation can be changed/swapped, but can't be removed.
