@@ -1,4 +1,5 @@
 # Config file
+.emscripten
 .emscripten_backup
 .emscripten_sanity
 .emscripten_sanity_wasm

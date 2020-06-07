@@ -3,7 +3,6 @@
 	filemode = true
 	bare = false
 	logallrefupdates = true
-	ignorecase = true
 	precomposeunicode = true
 [remote "origin"]
 	url = https://github.com/emscripten-core/emsdk.git
