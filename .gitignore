@@ -3,6 +3,7 @@
 # 
 *.nosync*
 
+
 # 
 # Linux
 # 
@@ -221,7 +222,6 @@ bower_components
 build/Release
 
 # Dependency directories
-node_modules/
 jspm_packages/
 
 # TypeScript v1 declaration files
@@ -274,7 +274,6 @@ typings/
 # Python
 # 
 # Byte-compiled / optimized / DLL files
-__pycache__/
 *.py[cod]
 *$py.class
 
@@ -289,7 +288,6 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
 lib64/
 parts/
 sdist/
