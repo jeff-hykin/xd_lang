@@ -3,6 +3,7 @@
 # 
 *.nosync*
 **/cache/is_vanilla.txt
+.emscripten_sanity
 
 # 
 # Linux
