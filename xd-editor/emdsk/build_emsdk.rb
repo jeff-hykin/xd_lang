@@ -14,4 +14,9 @@ def save_file_tree_structure_to_file()
     FS.write(Dir.glob('**/*').join("\n"), to: "./file_structure.txt")
 end
 
-save_file_tree_structure_to_file()
+def compare_differences()
+    filepaths = FS.read("./file_structure.txt").split("\n")
+    FS.write((filepaths - Dir.glob('**/*')).join("\n"), to: "./different_files.txt")
+end
+
+compare_differences
