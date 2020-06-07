@@ -2,7 +2,7 @@
 # My own
 # 
 *.nosync*
-
+**/cache/is_vanilla.txt
 
 # 
 # Linux
