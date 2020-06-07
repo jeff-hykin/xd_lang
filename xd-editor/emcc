@@ -1,0 +1,2 @@
+#!/bin/bash
+./emdsk/emsdk_mac/upstream/emscripten/emcc  "$@"

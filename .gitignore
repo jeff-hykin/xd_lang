@@ -2,6 +2,7 @@
 # My own
 # 
 *.nosync*
+**/emdsk
 
 # 
 # Linux
