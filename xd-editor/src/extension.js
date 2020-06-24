@@ -46,7 +46,7 @@ exports.activate = (contextArgument) => {
             <html lang="en">
             <head>
                 <script src="${getHtmlFilePath("src", "vs_code_comm.js")}"></script>
-                <script src="${getHtmlFilePath("src", "index.js")}"></script>
+                <script src="${getHtmlFilePath("src", "main_webview.js")}"></script>
             </head>
             <body>
                 Hello World!

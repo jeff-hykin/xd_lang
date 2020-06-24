@@ -1,19 +1,14 @@
 {
-  "name": "polacode-2019",
-  "displayName": "Polacode-2020",
+  "name": "xd_editor",
+  "displayName": "XD Editor",
   "description": "📸  Polaroid for your code",
   "version": "0.5.2",
   "repository": {
     "type": "git",
-    "url": "https://github.com/jeff-hykin/polacode.git"
+    "url": "https://github.com/jeff-hykin/xd_lang.git"
   },
   "publisher": "jeff-hykin",
   "keywords": [
-    "polacode",
-    "polaroid",
-    "screenshot",
-    "snippet",
-    "share"
   ],
   "galleryBanner": {
     "color": "#fbfbfb",
@@ -27,14 +22,14 @@
     "vscode": "^1.33.0"
   },
   "activationEvents": [
-    "onCommand:polacode.activate"
+    "onCommand:xd.activate"
   ],
   "main": "./src/extension",
   "contributes": {
     "commands": [
       {
-        "command": "polacode.activate",
-        "title": "Polacode 📸"
+        "command": "xd.activate",
+        "title": "Open XD Editor"
       }
     ]
   },
