@@ -42,6 +42,7 @@ someFibonacciDigits(9) << 21
 someFibonacciDigits(10) << 34
 ```
 Those are all numbers but we could also just as easily map them to strings
+NOTE: storing at a string is different place then saving at a number
 ```
 someFibonacciDigits("1") << 0
 someFibonacciDigits("2") << 1
