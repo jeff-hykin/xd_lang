@@ -68,7 +68,7 @@ exports.activate = (contextArgument) => {
         // 
         panel.onDidDispose(
             () => {
-                shouldCopyEverything = false
+                // cleanup listeners i guess
             },
             null,
             context.subscriptions
