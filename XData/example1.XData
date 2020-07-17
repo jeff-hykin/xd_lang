@@ -1,0 +1,23 @@
+# imma comment
+
+> 'something'
+@true         (boolean): "  "
+10            (int)    : (string) 'hello world C:\Users ' 
+"Hello World" (string) : hello world
+helloWorld: '
+    hello world
+    so I was thinking
+    what if things just didn't suck?
+    
+    "wouldn't": that be cool
+
+    
+myListOfLists:
+    >
+        > 1
+        > 2
+        > 3
+    >
+        > 1
+        > 2
+        > 3

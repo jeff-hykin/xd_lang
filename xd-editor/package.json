@@ -1,8 +1,8 @@
 {
-  "name": "xd_editor",
-  "displayName": "XD Editor",
-  "description": "📸  Polaroid for your code",
-  "version": "0.5.2",
+  "name": "XD Editor Extension",
+  "displayName": "XDEE",
+  "description": "An editor that compiles to wasm executables",
+  "version": "0.0.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/jeff-hykin/xd_lang.git"

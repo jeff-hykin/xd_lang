@@ -1,0 +1,331 @@
+{
+    "information_for_contributors": [
+    ],
+    "version": "https://github.com/textmate/yaml.tmbundle/commit/e54ceae3b719506dba7e481a77cea4a8b576ae46",
+    "name": "XData",
+    "scopeName": "source.xdata",
+    "patterns": [
+        {
+            "include" : "#key"
+        },
+        {
+            "include": "#stringBlock"
+        },
+        {
+            "include" : "#type"
+        },
+        {
+            "include" : "#atom"
+        },
+        {
+            "include" : "#number"
+        },
+        {
+            "include" : "#comment"
+        },
+        {
+            "include" : "#inlineString"
+        }
+    ],
+    "repository": {
+        "range": {
+            "begin": "\\(",
+            "beginCaptures": {
+                "0": {
+                    "name": "punctuation.type.xdata"
+                }
+            },
+            "end": "\\)",
+            "endCaptures": {
+                "0": {
+                    "name": "punctuation.type.xdata"
+                }
+            },
+            "name": "meta.type.xdata",
+            "patterns": [
+                {
+                    "include": "#block-node"
+                }
+            ]
+        },
+        "type": {
+            "match": "(\\()([\\w\\/]+)(\\))",
+            "captures" : {
+                "1": {
+                    "name": "punctuation.type.xdata storage.type.xdata"
+                },
+                "2": {
+                    "name": "type-name.xdata storage.type.xdata"
+                },
+                "3": {
+                    "name": "punctuation.type.xdata storage.type.xdata"
+                }
+            }
+        },
+        "atom": {
+            "match": "(@)([\\w]+)",
+            "captures" : {
+                "1": {
+                    "name": "punctuation.type.xdata constant.language.atom.xdata"
+                },
+                "2": {
+                    "name": "constant.language.atom.xdata"
+                }
+            }
+        },
+        "number": {
+            "name": "constant.numeric.xdata",
+            "match": "(-?)(\\d+)(?:(\\.)\\d+)?",
+            "captures" : {
+                "3": {
+                    "name": "constant.numeric.decimal.xdata"
+                }
+            }
+        },
+        "comment": {
+            "name": "comment.line.number-sign.xdata",
+            "match": "(#) .+",
+            "captures" : {
+                "1": {
+                    "name": "punctuation.definition.comment.xdata"
+                }
+            }
+        },
+        "inlineString": {
+            "patterns": [
+                {
+                    "include" : "#inlineStringLiteral"
+                },
+                {
+                    "include" : "#inlineStringLiteralTriple"
+                },
+                {
+                    "include" : "#inlineStringEscapable"
+                }
+            ]
+        },
+        "escapeCharacter": {
+            "match": "\\\\.",
+            "name": "constant.character.escape.xdata"
+        },
+        "inlineStringLiteral": {
+            "name": "",
+            "match": "(')([^']+)(')",
+            "captures": {
+                "1": {
+                    "name": "punctuation.definition.string.xdata string.quoted.single.xdata"
+                },
+                "2": {
+                    "name": "string.quoted.single.xdata"
+                },
+                "3": {
+                    "name": "punctuation.definition.string.xdata string.quoted.single.xdata"
+                }
+            }
+        },
+        "inlineStringLiteralTriple": {
+            "name": "",
+            "match": "(''')(.+?'?'?)(''')",
+            "captures": {
+                "1": {
+                    "name": "punctuation.definition.string.xdata string.quoted.single.xdata"
+                },
+                "2": {
+                    "name": "string.quoted.single.xdata"
+                },
+                "3": {
+                    "name": "punctuation.definition.string.xdata string.quoted.single.xdata"
+                }
+            }
+        },
+        "inlineStringEscapable": {
+            "name": "",
+            "match": "(\")((?:[^\"\\\\]|\\\\.)*)(\")",
+            "captures": {
+                "1": {
+                    "name": "punctuation.definition.string.xdata string.quoted.double.xdata"
+                },
+                "2": {
+                    "name": "string.quoted.double.xdata",
+                    "patterns": [
+                        {
+                            "include": "#escapeCharacter",
+                            "comment": "TODO: include interpolation below me"
+                        }
+                    ]
+                },
+                "3": {
+                    "name": "punctuation.definition.string.xdata string.quoted.double.xdata"
+                }
+            }
+        },
+        "key": {
+            "name": "meta.key",
+            "match": "(?:(@)([\\w]+)|((-?)(\\d+)(?:(\\.)\\d+)?)|(')([^']+)(')|(\")((?:[^\"\\\\]|\\\\.)*)(\")|(\\w+))\\s*(?:(\\()([\\w\\/]+)(\\)))?\\s*(:)",
+            "captures": {
+                "1": {
+                    "comment" : "atom",
+                    "name": "punctuation.type.xdata constant.language.atom.xdata"
+                },
+                "2": {
+                    "comment" : "atom",
+                    "name": "constant.language.atom.xdata"
+                },
+                "3": {
+                    "comment" : "number",
+                    "name": "constant.numeric.xdata"
+                },
+                "4":{
+                    "comment" : "number",
+                    "name":""
+                },
+                "5":{
+                    "comment" : "number",
+                    "name":""
+                },
+                "6": {
+                    "comment" : "number",
+                    "name": "constant.numeric.decimal.xdata"
+                },
+                "7": {
+                    "comment" : "inline string single",
+                    "name": "punctuation.definition.string.xdata string.quoted.single.xdata"
+                },
+                "8": {
+                    "comment" : "inline string single",
+                    "name": "string.quoted.single.xdata"
+                },
+                "9": {
+                    "comment" : "inline string single",
+                    "name": "punctuation.definition.string.xdata string.quoted.single.xdata"
+                },
+                "10": {
+                    "comment" : "inline string double",
+                    "name": "punctuation.definition.string.xdata string.quoted.double.xdata"
+                },
+                "11": {
+                    "comment" : "inline string double",
+                    "name": "string.quoted.double.xdata",
+                    "patterns": [
+                        {
+                            "include": "#escapeCharacter",
+                            "comment": "TODO: include interpolation below me"
+                        }
+                    ]
+                },
+                "12": {
+                    "comment" : "inline string double",
+                    "name": "punctuation.definition.string.xdata string.quoted.double.xdata"
+                },
+                "13": {
+                    "comment" : "word-key",
+                    "name": "string.unquoted.xdata"
+                },
+                "14": {
+                    "comment" : "type",
+                    "name": "punctuation.type.xdata storage.type.xdata"
+                },
+                "15": {
+                    "comment" : "type",
+                    "name": "type-name.xdata storage.type.xdata"
+                },
+                "16": {
+                    "comment" : "type",
+                    "name": "punctuation.type.xdata storage.type.xdata"
+                },
+                "17": {
+                    "comment" : "colon",
+                    "name": "punctuation.separator.key-value.xdata"
+                }
+            }
+        },
+        "stringBlock": {
+            "patterns": [
+                {
+                    "include": "#stringBlockLiteral"
+                },
+                {
+                    "include": "#stringBlockEscapable"
+                }
+            ]
+        },
+        "stringBlockLiteral": {
+            "comment": "this is actually a string block wrapper. FIXME: allow type before string quote",
+            "begin": "(?<=:) *(')( *\\n)",
+            "beginCaptures": {
+                "1": {
+                    "name": "punctuation.definition.string.xdata string.quoted.single.xdata"
+                },
+                "2": {
+                    "patterns": [
+                        {
+                            "include": "#type"
+                        }
+                    ]
+                }
+            },
+            "applyEndPatternLast": 1,
+            "end": "(?=.|\\n)",
+            "patterns": [
+                {
+                    "comment": "this is the actual string block finder",
+                    "name": "meta.block.string.inner.xdata",
+                    "begin": "\\G(\\s*)",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "indentation.start.xdata"
+                        }
+                    },
+                    "while": "\\1",
+                    "patterns": [
+                        {
+                            "match": ".*\\n",
+                            "name": "string.quoted.single.block.xdata"
+                        }
+                    ]
+                }
+            ]           
+        },
+        "stringBlockEscapable": {
+            "comment": "this is actually a string block wrapper FIXME: allow type before string quote",
+            "begin": "(?<=:) *(\")( *\\n)",
+            "beginCaptures": {
+                "1": {
+                    "name": "punctuation.definition.string.xdata string.quoted.single.xdata"
+                },
+                "2": {
+                    "patterns": [
+                        {
+                            "include": "#type"
+                        }
+                    ]
+                }
+            },
+            "applyEndPatternLast": 1,
+            "end": "(?=.|\\n)",
+            "patterns": [
+                {
+                    "comment": "this is the actual string block finder",
+                    "name": "meta.block.string.inner.xdata",
+                    "begin": "\\G(\\s*)",
+                    "beginCaptures": {
+                        "0": {
+                            "name": "indentation.start.xdata"
+                        }
+                    },
+                    "while": "\\1",
+                    "patterns": [
+                        {
+                            "include": "#escapeCharacter",
+                            "comment" : "TODO: also add the references!"
+                        },
+                        {
+                            "match": ".*\\n",
+                            "name": "string.quoted.double.block.xdata"
+                        }
+                    ]
+                }
+            ]           
+        }
+    }
+}

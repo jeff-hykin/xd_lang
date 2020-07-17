@@ -1,0 +1,98 @@
+{
+    "type": "#list",
+    // FUTURE: list will be given additional keys such subType: "pureList" or "length" or "pureMapping" etc
+    "value": [
+        { "type": "#comment", "asString": "# imma comment" },
+        { "type": "#string",  "asString": "something" },
+        {
+            "type": "#keyValue", 
+            "key": {
+                "type": "(boolean)",
+                "asString": "@true",
+            },
+            "value": {
+                "type": "#string",
+                "asString": "  ",
+            }
+        },
+        {
+            "type": "#keyValue", 
+            "key": {
+                "type": "(int)",
+                "asString": "10",
+            },
+            "value": {
+                "type": "(string)",
+                "asString": "hello world C:\\Users ",
+            }
+        },
+        {
+            "type": "#keyValue", 
+            "key": {
+                "type": "(string)",
+                "asString": "Hello World",
+            },
+            "value": {
+                "type": "(string)",
+                "asString": "hello world",
+            }
+        },
+        {
+            "type": "#keyValue", 
+            "key": {
+                "type": "#string",
+                "asString": "helloWorld",
+            },
+            "value": {
+                "type": "#string",
+                "asString": "hello world\nso I was thinking\nwhat if things just didn't suck?\n\"wouldn't\": that be cool",
+            }
+        },
+        {
+            "type": "#keyValue", 
+            "key": {
+                "type": "#string",
+                "asString": "myListOfLists",
+            },
+            "value": {
+                "type": "#list",
+                "value": [
+                    {
+                        "type": "#list",
+                        "value": [
+                            {
+                                "type": "#number",
+                                "asString": "1",
+                            },
+                            {
+                                "type": "#number",
+                                "asString": "2",
+                            },
+                            {
+                                "type": "#number",
+                                "asString": "3",
+                            },
+                        ]
+                    },
+                    {
+                        "type": "#list",
+                        "value": [
+                            {
+                                "type": "#number",
+                                "asString": "1",
+                            },
+                            {
+                                "type": "#number",
+                                "asString": "2",
+                            },
+                            {
+                                "type": "#number",
+                                "asString": "3",
+                            },
+                        ]
+                    }
+                ]
+            }
+        },
+    ]
+}

@@ -19,7 +19,7 @@ const writeSerializedBlobToFile = (serializeBlob, fileName) => {
 
 exports.activate = (contextArgument) => {
     context = contextArgument
-    vscode.commands.registerCommand("xd_editor.activate", () => {
+    vscode.commands.registerCommand("xd.activate", () => {
         
         // 
         // tell VS Code how it should create the panel
