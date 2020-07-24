@@ -15,7 +15,7 @@ inline_patterns = [
     $empty_container_pattern = /\A(\{\}|\[\])/i,
     $special_term_pattern = /\A(null|true|false)\b/i, 
     $number_pattern = /\A(-?)(infinite\b|(\d+)(?:(\.)\d+)?)/i, # PROBLEM: NaN
-    $atom_pattern = /\A(@)([\\w]+)/,
+    $atom_pattern = /\A(@)([\w]+)/,
     $string_single_single_pattern = /\A(')([^']+)(')/,
     $string_single_triple_pattern = /\A(''')(.+?'?'?)(''')/,
     $string_double_single_pattern = /\A(")((?:[^"\\]|\\.)*)(")/, # allows escaped newlines
@@ -32,7 +32,7 @@ inline_patterns = [
 # debugging
 #
 
-DEBUG = false
+DEBUG = true
 $indent_amount = 0
 def debug_block( name, block)
     dp("START: #{name}\n") if name
@@ -192,6 +192,8 @@ end
 
 def pullOffAtom!(string)
     debug_block "pullOffAtom!", ->() do
+        dp "string is: #{string.inspect} "
+        dp "string.match(#{$atom_pattern.inspect}) is: #{string.match($atom_pattern)} "
         pullOff! $atom_pattern, string, ->(indent: nil, match: nil) do
             {
                 type: "#atom",
@@ -269,7 +271,7 @@ def pullOffStringBlock!(string)
                 return {
                     type: "#string",
                     value: block,
-                    indent: actual_indent,
+                    indent: '',
                 }
             end
         end

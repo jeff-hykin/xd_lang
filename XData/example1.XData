@@ -10,7 +10,7 @@
 
 
 # block-string and interpolation
-introduction: "
+introduction: '
     This is a double quote string
     This intro is for the $projectName project
     I can also use C-style escapes like \t and \n here

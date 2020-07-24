@@ -1,3 +1,2024 @@
+START: processContainerBlock!
+    "block at start is: \"# imma comment\\n'my list':\\n    - 1\\n    - 2\\n    - 3\\n    - 4\\n\\n'my map':\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
+        "block before:"
+        # imma comment
+        'my list':
+            - 1
+            - 2
+            - 3
+            - 4
+        
+        'my map':
+            hello: 'world'
+        
+        
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            ---
+            :type: "#comment"
+            :value: imma comment
+            :indent: ''
+    END: pullOffComment!
+        "block after:"
+        
+        'my list':
+            - 1
+            - 2
+            - 3
+            - 4
+        
+        'my map':
+            hello: 'world'
+        
+        
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+        "block before:"
+        'my list':
+            - 1
+            - 2
+            - 3
+            - 4
+        
+        'my map':
+            hello: 'world'
+        
+        
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            nil
+    END: pullOffComment!
+    START: pullOffListElement!
+        OUTPUT:
+            nil
+    END: pullOffListElement!
+    START: pullOffKeyedElement!
+        START: pullOffKey!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                "string is: \"'my list':\\n    - 1\\n    - 2\\n    - 3\\n    - 4\\n\\n'my map':\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
+                "string.match(/\\A(@)([\\w]+)/) is:  "
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                "single_quotes_match is: ' "
+                OUTPUT:
+                    ---
+                    :type: "#string"
+                    :value: my list
+                    :indent: ''
+            END: pullOffInlineString!
+            OUTPUT:
+                ---
+                :type: "#string"
+                :value: my list
+                :indent: ''
+        END: pullOffKey!
+        "key is: {:type=>\"#string\", :value=>\"my list\", :indent=>\"\"} "
+        START: pullOffValue!
+            START: pullOffInlineTypedValue!
+                START: pullOffType!
+                    OUTPUT:
+                        nil
+                END: pullOffType!
+                OUTPUT:
+                    nil
+            END: pullOffInlineTypedValue!
+            START: pullOffEmptyContainer!
+                OUTPUT:
+                    nil
+            END: pullOffEmptyContainer!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                "string is: \"\\n    - 1\\n    - 2\\n    - 3\\n    - 4\\n\\n'my map':\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
+                "string.match(/\\A(@)([\\w]+)/) is:  "
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                OUTPUT:
+                    nil
+            END: pullOffInlineString!
+            START: pullOffStringBlock!
+                OUTPUT:
+                    nil
+            END: pullOffStringBlock!
+            pullOffContainerBlock! string before is: 
+                - 1
+                - 2
+                - 3
+                - 4
+            
+            'my map':
+                hello: 'world'
+            
+            
+            # block-string and interpolation
+            introduction: '
+                This is a double quote string
+                This intro is for the $projectName project
+                I can also use C-style escapes like \t and \n here
+            
+            # block-string literal
+            literalIntroduction: '
+                This is a single quote string
+                This intro is for the $projectName project
+                C-style escapes don't work at all \t and \n
+                however I type here, is exactly how its going to show up
+            eyeColors:
+                - @blue
+                - @green
+                - @brown 
+            START: pullOffBlock!
+                string_clone is: 
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+                
+                'my map':
+                    hello: 'world'
+                
+                
+                # block-string and interpolation
+                introduction: '
+                    This is a double quote string
+                    This intro is for the $projectName project
+                    I can also use C-style escapes like \t and \n here
+                
+                # block-string literal
+                literalIntroduction: '
+                    This is a single quote string
+                    This intro is for the $projectName project
+                    C-style escapes don't work at all \t and \n
+                    however I type here, is exactly how its going to show up
+                eyeColors:
+                    - @blue
+                    - @green
+                    - @brown 
+                after sub string_clone is: 
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+                
+                'my map':
+                    hello: 'world'
+                
+                
+                # block-string and interpolation
+                introduction: '
+                    This is a double quote string
+                    This intro is for the $projectName project
+                    I can also use C-style escapes like \t and \n here
+                
+                # block-string literal
+                literalIntroduction: '
+                    This is a single quote string
+                    This intro is for the $projectName project
+                    C-style escapes don't work at all \t and \n
+                    however I type here, is exactly how its going to show up
+                eyeColors:
+                    - @blue
+                    - @green
+                    - @brown 
+                "next_line is: - 1 "
+                "next_line is: - 2 "
+                "next_line is: - 3 "
+                "next_line is: - 4 "
+                "next_line is:  "
+                OUTPUT:
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+            END: pullOffBlock!
+            pullOffContainerBlock! string after is: 
+            
+            'my map':
+                hello: 'world'
+            
+            
+            # block-string and interpolation
+            introduction: '
+                This is a double quote string
+                This intro is for the $projectName project
+                I can also use C-style escapes like \t and \n here
+            
+            # block-string literal
+            literalIntroduction: '
+                This is a single quote string
+                This intro is for the $projectName project
+                C-style escapes don't work at all \t and \n
+                however I type here, is exactly how its going to show up
+            eyeColors:
+                - @blue
+                - @green
+                - @brown 
+            START: processContainerBlock!
+                "block at start is: \"- 1\\n- 2\\n- 3\\n- 4\" "
+                    "block before:"
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffSpecialTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffSpecialTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                ---
+                                :type: "#atom/number"
+                                :value: '1'
+                                :indent: ''
+                        END: pullOffNumber!
+                        OUTPUT:
+                            ---
+                            :type: "#atom/number"
+                            :value: '1'
+                            :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#atom/number"
+                          :value: '1'
+                          :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    
+                    - 2
+                    - 3
+                    - 4
+                    OUTPUT:
+                        nil
+                    "block before:"
+                    - 2
+                    - 3
+                    - 4
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffSpecialTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffSpecialTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                ---
+                                :type: "#atom/number"
+                                :value: '2'
+                                :indent: ''
+                        END: pullOffNumber!
+                        OUTPUT:
+                            ---
+                            :type: "#atom/number"
+                            :value: '2'
+                            :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#atom/number"
+                          :value: '2'
+                          :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    
+                    - 3
+                    - 4
+                    OUTPUT:
+                        nil
+                    "block before:"
+                    - 3
+                    - 4
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffSpecialTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffSpecialTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                ---
+                                :type: "#atom/number"
+                                :value: '3'
+                                :indent: ''
+                        END: pullOffNumber!
+                        OUTPUT:
+                            ---
+                            :type: "#atom/number"
+                            :value: '3'
+                            :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#atom/number"
+                          :value: '3'
+                          :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    
+                    - 4
+                    OUTPUT:
+                        nil
+                    "block before:"
+                    "- 4"
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffSpecialTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffSpecialTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                ---
+                                :type: "#atom/number"
+                                :value: '4'
+                                :indent: ''
+                        END: pullOffNumber!
+                        OUTPUT:
+                            ---
+                            :type: "#atom/number"
+                            :value: '4'
+                            :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#atom/number"
+                          :value: '4'
+                          :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    ''
+                    OUTPUT:
+                        nil
+                OUTPUT:
+                    ---
+                    :type: "#container"
+                    :value:
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '1'
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '2'
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '3'
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '4'
+                        :indent: ''
+            END: processContainerBlock!
+            OUTPUT:
+                ---
+                :type: "#container"
+                :value:
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '1'
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '2'
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '3'
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '4'
+                    :indent: ''
+        END: pullOffValue!
+        "value is: {:type=>\"#container\", :value=>[{:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"1\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"2\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"3\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"4\", :indent=>\"\"}}]} "
+        string_clone after pullOffValue! is: 
+        
+        'my map':
+            hello: 'world'
+        
+        
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        string before is: 'my list':
+            - 1
+            - 2
+            - 3
+            - 4
+        
+        'my map':
+            hello: 'world'
+        
+        
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        string after is: 
+        
+        'my map':
+            hello: 'world'
+        
+        
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        OUTPUT:
+            ---
+            :type: "#keyValue"
+            :key:
+              :type: "#string"
+              :value: my list
+              :indent: ''
+            :value:
+              :type: "#container"
+              :value:
+              - :type: "#listValue"
+                :value:
+                  :type: "#atom/number"
+                  :value: '1'
+                  :indent: ''
+              - :type: "#listValue"
+                :value:
+                  :type: "#atom/number"
+                  :value: '2'
+                  :indent: ''
+              - :type: "#listValue"
+                :value:
+                  :type: "#atom/number"
+                  :value: '3'
+                  :indent: ''
+              - :type: "#listValue"
+                :value:
+                  :type: "#atom/number"
+                  :value: '4'
+                  :indent: ''
+    END: pullOffKeyedElement!
+        "block after:"
+        
+        
+        'my map':
+            hello: 'world'
+        
+        
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+        "block before:"
+        'my map':
+            hello: 'world'
+        
+        
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            nil
+    END: pullOffComment!
+    START: pullOffListElement!
+        OUTPUT:
+            nil
+    END: pullOffListElement!
+    START: pullOffKeyedElement!
+        START: pullOffKey!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                "string is: \"'my map':\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
+                "string.match(/\\A(@)([\\w]+)/) is:  "
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                "single_quotes_match is: ' "
+                OUTPUT:
+                    ---
+                    :type: "#string"
+                    :value: my map
+                    :indent: ''
+            END: pullOffInlineString!
+            OUTPUT:
+                ---
+                :type: "#string"
+                :value: my map
+                :indent: ''
+        END: pullOffKey!
+        "key is: {:type=>\"#string\", :value=>\"my map\", :indent=>\"\"} "
+        START: pullOffValue!
+            START: pullOffInlineTypedValue!
+                START: pullOffType!
+                    OUTPUT:
+                        nil
+                END: pullOffType!
+                OUTPUT:
+                    nil
+            END: pullOffInlineTypedValue!
+            START: pullOffEmptyContainer!
+                OUTPUT:
+                    nil
+            END: pullOffEmptyContainer!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                "string is: \"\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
+                "string.match(/\\A(@)([\\w]+)/) is:  "
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                OUTPUT:
+                    nil
+            END: pullOffInlineString!
+            START: pullOffStringBlock!
+                OUTPUT:
+                    nil
+            END: pullOffStringBlock!
+            pullOffContainerBlock! string before is: 
+                hello: 'world'
+            
+            
+            # block-string and interpolation
+            introduction: '
+                This is a double quote string
+                This intro is for the $projectName project
+                I can also use C-style escapes like \t and \n here
+            
+            # block-string literal
+            literalIntroduction: '
+                This is a single quote string
+                This intro is for the $projectName project
+                C-style escapes don't work at all \t and \n
+                however I type here, is exactly how its going to show up
+            eyeColors:
+                - @blue
+                - @green
+                - @brown 
+            START: pullOffBlock!
+                string_clone is: 
+                    hello: 'world'
+                
+                
+                # block-string and interpolation
+                introduction: '
+                    This is a double quote string
+                    This intro is for the $projectName project
+                    I can also use C-style escapes like \t and \n here
+                
+                # block-string literal
+                literalIntroduction: '
+                    This is a single quote string
+                    This intro is for the $projectName project
+                    C-style escapes don't work at all \t and \n
+                    however I type here, is exactly how its going to show up
+                eyeColors:
+                    - @blue
+                    - @green
+                    - @brown 
+                after sub string_clone is: 
+                    hello: 'world'
+                
+                
+                # block-string and interpolation
+                introduction: '
+                    This is a double quote string
+                    This intro is for the $projectName project
+                    I can also use C-style escapes like \t and \n here
+                
+                # block-string literal
+                literalIntroduction: '
+                    This is a single quote string
+                    This intro is for the $projectName project
+                    C-style escapes don't work at all \t and \n
+                    however I type here, is exactly how its going to show up
+                eyeColors:
+                    - @blue
+                    - @green
+                    - @brown 
+                "next_line is: hello: 'world' "
+                "next_line is:  "
+                OUTPUT:
+                    "hello: 'world'"
+            END: pullOffBlock!
+            pullOffContainerBlock! string after is: 
+            
+            
+            # block-string and interpolation
+            introduction: '
+                This is a double quote string
+                This intro is for the $projectName project
+                I can also use C-style escapes like \t and \n here
+            
+            # block-string literal
+            literalIntroduction: '
+                This is a single quote string
+                This intro is for the $projectName project
+                C-style escapes don't work at all \t and \n
+                however I type here, is exactly how its going to show up
+            eyeColors:
+                - @blue
+                - @green
+                - @brown 
+            START: processContainerBlock!
+                "block at start is: \"hello: 'world'\" "
+                    "block before:"
+                    "hello: 'world'"
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    OUTPUT:
+                        nil
+                END: pullOffListElement!
+                START: pullOffKeyedElement!
+                    START: pullOffKey!
+                        START: pullOffSpecialTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffSpecialTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                nil
+                        END: pullOffNumber!
+                        START: pullOffAtom!
+                            "string is: \"hello: 'world'\" "
+                            "string.match(/\\A(@)([\\w]+)/) is:  "
+                            OUTPUT:
+                                nil
+                        END: pullOffAtom!
+                        START: pullOffInlineString!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineString!
+                        OUTPUT:
+                            ---
+                            :type: "#string"
+                            :value: hello
+                            :indent: ''
+                    END: pullOffKey!
+                    "key is: {:type=>\"#string\", :value=>\"hello\", :indent=>\"\"} "
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffSpecialTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffSpecialTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                nil
+                        END: pullOffNumber!
+                        START: pullOffAtom!
+                            "string is: \" 'world'\" "
+                            "string.match(/\\A(@)([\\w]+)/) is:  "
+                            OUTPUT:
+                                nil
+                        END: pullOffAtom!
+                        START: pullOffInlineString!
+                            "single_quotes_match is: ' "
+                            OUTPUT:
+                                ---
+                                :type: "#string"
+                                :value: world
+                                :indent: " "
+                        END: pullOffInlineString!
+                        OUTPUT:
+                            ---
+                            :type: "#string"
+                            :value: world
+                            :indent: " "
+                    END: pullOffValue!
+                    "value is: {:type=>\"#string\", :value=>\"world\", :indent=>\" \"} "
+                    "string_clone after pullOffValue! is:  "
+                    "string before is: hello: 'world' "
+                    "string after is:  "
+                    OUTPUT:
+                        ---
+                        :type: "#keyValue"
+                        :key:
+                          :type: "#string"
+                          :value: hello
+                          :indent: ''
+                        :value:
+                          :type: "#string"
+                          :value: world
+                          :indent: " "
+                END: pullOffKeyedElement!
+                    "block after:"
+                    ''
+                    OUTPUT:
+                        nil
+                OUTPUT:
+                    ---
+                    :type: "#container"
+                    :value:
+                    - :type: "#keyValue"
+                      :key:
+                        :type: "#string"
+                        :value: hello
+                        :indent: ''
+                      :value:
+                        :type: "#string"
+                        :value: world
+                        :indent: " "
+            END: processContainerBlock!
+            OUTPUT:
+                ---
+                :type: "#container"
+                :value:
+                - :type: "#keyValue"
+                  :key:
+                    :type: "#string"
+                    :value: hello
+                    :indent: ''
+                  :value:
+                    :type: "#string"
+                    :value: world
+                    :indent: " "
+        END: pullOffValue!
+        "value is: {:type=>\"#container\", :value=>[{:type=>\"#keyValue\", :key=>{:type=>\"#string\", :value=>\"hello\", :indent=>\"\"}, :value=>{:type=>\"#string\", :value=>\"world\", :indent=>\" \"}}]} "
+        string_clone after pullOffValue! is: 
+        
+        
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        string before is: 'my map':
+            hello: 'world'
+        
+        
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        string after is: 
+        
+        
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        OUTPUT:
+            ---
+            :type: "#keyValue"
+            :key:
+              :type: "#string"
+              :value: my map
+              :indent: ''
+            :value:
+              :type: "#container"
+              :value:
+              - :type: "#keyValue"
+                :key:
+                  :type: "#string"
+                  :value: hello
+                  :indent: ''
+                :value:
+                  :type: "#string"
+                  :value: world
+                  :indent: " "
+    END: pullOffKeyedElement!
+        "block after:"
+        
+        
+        
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+        "block before:"
+        # block-string and interpolation
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            ---
+            :type: "#comment"
+            :value: block-string and interpolation
+            :indent: ''
+    END: pullOffComment!
+        "block after:"
+        
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+        "block before:"
+        introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            nil
+    END: pullOffComment!
+    START: pullOffListElement!
+        OUTPUT:
+            nil
+    END: pullOffListElement!
+    START: pullOffKeyedElement!
+        START: pullOffKey!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                "string is: \"introduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
+                "string.match(/\\A(@)([\\w]+)/) is:  "
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                OUTPUT:
+                    nil
+            END: pullOffInlineString!
+            OUTPUT:
+                ---
+                :type: "#string"
+                :value: introduction
+                :indent: ''
+        END: pullOffKey!
+        "key is: {:type=>\"#string\", :value=>\"introduction\", :indent=>\"\"} "
+        START: pullOffValue!
+            START: pullOffInlineTypedValue!
+                START: pullOffType!
+                    OUTPUT:
+                        nil
+                END: pullOffType!
+                OUTPUT:
+                    nil
+            END: pullOffInlineTypedValue!
+            START: pullOffEmptyContainer!
+                OUTPUT:
+                    nil
+            END: pullOffEmptyContainer!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                "string is: \" '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
+                "string.match(/\\A(@)([\\w]+)/) is:  "
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                "single_quotes_match is: ' "
+                OUTPUT:
+                    nil
+            END: pullOffInlineString!
+            START: pullOffStringBlock!
+                START: pullOffBlock!
+                    string_clone is: 
+                        This is a double quote string
+                        This intro is for the $projectName project
+                        I can also use C-style escapes like \t and \n here
+                    
+                    # block-string literal
+                    literalIntroduction: '
+                        This is a single quote string
+                        This intro is for the $projectName project
+                        C-style escapes don't work at all \t and \n
+                        however I type here, is exactly how its going to show up
+                    eyeColors:
+                        - @blue
+                        - @green
+                        - @brown 
+                    after sub string_clone is: 
+                        This is a double quote string
+                        This intro is for the $projectName project
+                        I can also use C-style escapes like \t and \n here
+                    
+                    # block-string literal
+                    literalIntroduction: '
+                        This is a single quote string
+                        This intro is for the $projectName project
+                        C-style escapes don't work at all \t and \n
+                        however I type here, is exactly how its going to show up
+                    eyeColors:
+                        - @blue
+                        - @green
+                        - @brown 
+                    "next_line is: This is a double quote string "
+                    "next_line is: This intro is for the $projectName project "
+                    "next_line is: I can also use C-style escapes like \\t and \\n here "
+                    "next_line is:  "
+                    OUTPUT:
+                        This is a double quote string
+                        This intro is for the $projectName project
+                        I can also use C-style escapes like \t and \n here
+                END: pullOffBlock!
+                OUTPUT:
+                    ---
+                    :type: "#string"
+                    :value: |-
+                      This is a double quote string
+                      This intro is for the $projectName project
+                      I can also use C-style escapes like \t and \n here
+                    :indent: ''
+            END: pullOffStringBlock!
+            OUTPUT:
+                ---
+                :type: "#string"
+                :value: |-
+                  This is a double quote string
+                  This intro is for the $projectName project
+                  I can also use C-style escapes like \t and \n here
+                :indent: ''
+        END: pullOffValue!
+        "value is: {:type=>\"#string\", :value=>\"This is a double quote string\\nThis intro is for the $projectName project\\nI can also use C-style escapes like \\\\t and \\\\n here\", :indent=>\"\"} "
+        string_clone after pullOffValue! is: 
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        string before is: introduction: '
+            This is a double quote string
+            This intro is for the $projectName project
+            I can also use C-style escapes like \t and \n here
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        string after is: 
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        OUTPUT:
+            ---
+            :type: "#keyValue"
+            :key:
+              :type: "#string"
+              :value: introduction
+              :indent: ''
+            :value:
+              :type: "#string"
+              :value: |-
+                This is a double quote string
+                This intro is for the $projectName project
+                I can also use C-style escapes like \t and \n here
+              :indent: ''
+    END: pullOffKeyedElement!
+        "block after:"
+        
+        
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+        "block before:"
+        # block-string literal
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            ---
+            :type: "#comment"
+            :value: block-string literal
+            :indent: ''
+    END: pullOffComment!
+        "block after:"
+        
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+        "block before:"
+        literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            nil
+    END: pullOffComment!
+    START: pullOffListElement!
+        OUTPUT:
+            nil
+    END: pullOffListElement!
+    START: pullOffKeyedElement!
+        START: pullOffKey!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                "string is: \"literalIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
+                "string.match(/\\A(@)([\\w]+)/) is:  "
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                OUTPUT:
+                    nil
+            END: pullOffInlineString!
+            OUTPUT:
+                ---
+                :type: "#string"
+                :value: literalIntroduction
+                :indent: ''
+        END: pullOffKey!
+        "key is: {:type=>\"#string\", :value=>\"literalIntroduction\", :indent=>\"\"} "
+        START: pullOffValue!
+            START: pullOffInlineTypedValue!
+                START: pullOffType!
+                    OUTPUT:
+                        nil
+                END: pullOffType!
+                OUTPUT:
+                    nil
+            END: pullOffInlineTypedValue!
+            START: pullOffEmptyContainer!
+                OUTPUT:
+                    nil
+            END: pullOffEmptyContainer!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                "string is: \" '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
+                "string.match(/\\A(@)([\\w]+)/) is:  "
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                "single_quotes_match is: ' "
+                OUTPUT:
+                    nil
+            END: pullOffInlineString!
+            START: pullOffStringBlock!
+                START: pullOffBlock!
+                    string_clone is: 
+                        This is a single quote string
+                        This intro is for the $projectName project
+                        C-style escapes don't work at all \t and \n
+                        however I type here, is exactly how its going to show up
+                    eyeColors:
+                        - @blue
+                        - @green
+                        - @brown 
+                    after sub string_clone is: 
+                        This is a single quote string
+                        This intro is for the $projectName project
+                        C-style escapes don't work at all \t and \n
+                        however I type here, is exactly how its going to show up
+                    eyeColors:
+                        - @blue
+                        - @green
+                        - @brown 
+                    "next_line is: This is a single quote string "
+                    "next_line is: This intro is for the $projectName project "
+                    "next_line is: C-style escapes don't work at all \\t and \\n "
+                    "next_line is: however I type here, is exactly how its going to show up "
+                    "next_line is:  "
+                    OUTPUT:
+                        This is a single quote string
+                        This intro is for the $projectName project
+                        C-style escapes don't work at all \t and \n
+                        however I type here, is exactly how its going to show up
+                END: pullOffBlock!
+                OUTPUT:
+                    ---
+                    :type: "#string"
+                    :value: |-
+                      This is a single quote string
+                      This intro is for the $projectName project
+                      C-style escapes don't work at all \t and \n
+                      however I type here, is exactly how its going to show up
+                    :indent: ''
+            END: pullOffStringBlock!
+            OUTPUT:
+                ---
+                :type: "#string"
+                :value: |-
+                  This is a single quote string
+                  This intro is for the $projectName project
+                  C-style escapes don't work at all \t and \n
+                  however I type here, is exactly how its going to show up
+                :indent: ''
+        END: pullOffValue!
+        "value is: {:type=>\"#string\", :value=>\"This is a single quote string\\nThis intro is for the $projectName project\\nC-style escapes don't work at all \\\\t and \\\\n\\nhowever I type here, is exactly how its going to show up\", :indent=>\"\"} "
+        string_clone after pullOffValue! is: 
+        eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        string before is: literalIntroduction: '
+            This is a single quote string
+            This intro is for the $projectName project
+            C-style escapes don't work at all \t and \n
+            however I type here, is exactly how its going to show up
+        eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        string after is: 
+        eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        OUTPUT:
+            ---
+            :type: "#keyValue"
+            :key:
+              :type: "#string"
+              :value: literalIntroduction
+              :indent: ''
+            :value:
+              :type: "#string"
+              :value: |-
+                This is a single quote string
+                This intro is for the $projectName project
+                C-style escapes don't work at all \t and \n
+                however I type here, is exactly how its going to show up
+              :indent: ''
+    END: pullOffKeyedElement!
+        "block after:"
+        
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+        "block before:"
+        eyeColors:
+            - @blue
+            - @green
+            - @brown
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            nil
+    END: pullOffComment!
+    START: pullOffListElement!
+        OUTPUT:
+            nil
+    END: pullOffListElement!
+    START: pullOffKeyedElement!
+        START: pullOffKey!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                "string is: \"eyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
+                "string.match(/\\A(@)([\\w]+)/) is:  "
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                OUTPUT:
+                    nil
+            END: pullOffInlineString!
+            OUTPUT:
+                ---
+                :type: "#string"
+                :value: eyeColors
+                :indent: ''
+        END: pullOffKey!
+        "key is: {:type=>\"#string\", :value=>\"eyeColors\", :indent=>\"\"} "
+        START: pullOffValue!
+            START: pullOffInlineTypedValue!
+                START: pullOffType!
+                    OUTPUT:
+                        nil
+                END: pullOffType!
+                OUTPUT:
+                    nil
+            END: pullOffInlineTypedValue!
+            START: pullOffEmptyContainer!
+                OUTPUT:
+                    nil
+            END: pullOffEmptyContainer!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                "string is: \"\\n    - @blue\\n    - @green\\n    - @brown\" "
+                "string.match(/\\A(@)([\\w]+)/) is:  "
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                OUTPUT:
+                    nil
+            END: pullOffInlineString!
+            START: pullOffStringBlock!
+                OUTPUT:
+                    nil
+            END: pullOffStringBlock!
+            pullOffContainerBlock! string before is: 
+                - @blue
+                - @green
+                - @brown 
+            START: pullOffBlock!
+                string_clone is: 
+                    - @blue
+                    - @green
+                    - @brown 
+                after sub string_clone is: 
+                    - @blue
+                    - @green
+                    - @brown 
+                "next_line is: - @blue "
+                "next_line is: - @green "
+                "next_line is: - @brown "
+                "next_line is:  "
+                OUTPUT:
+                    - @blue
+                    - @green
+                    - @brown
+            END: pullOffBlock!
+            "pullOffContainerBlock! string after is:  "
+            START: processContainerBlock!
+                "block at start is: \"- @blue\\n- @green\\n- @brown\" "
+                    "block before:"
+                    - @blue
+                    - @green
+                    - @brown
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffSpecialTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffSpecialTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                nil
+                        END: pullOffNumber!
+                        START: pullOffAtom!
+                            "string is: \"@blue\\n- @green\\n- @brown\" "
+                            "string.match(/\\A(@)([\\w]+)/) is: @blue "
+                            OUTPUT:
+                                ---
+                                :type: "#atom"
+                                :value: "@blue"
+                                :indent: ''
+                        END: pullOffAtom!
+                        OUTPUT:
+                            ---
+                            :type: "#atom"
+                            :value: "@blue"
+                            :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#atom"
+                          :value: "@blue"
+                          :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    
+                    - @green
+                    - @brown
+                    OUTPUT:
+                        nil
+                    "block before:"
+                    - @green
+                    - @brown
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffSpecialTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffSpecialTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                nil
+                        END: pullOffNumber!
+                        START: pullOffAtom!
+                            "string is: \"@green\\n- @brown\" "
+                            "string.match(/\\A(@)([\\w]+)/) is: @green "
+                            OUTPUT:
+                                ---
+                                :type: "#atom"
+                                :value: "@green"
+                                :indent: ''
+                        END: pullOffAtom!
+                        OUTPUT:
+                            ---
+                            :type: "#atom"
+                            :value: "@green"
+                            :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#atom"
+                          :value: "@green"
+                          :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    
+                    - @brown
+                    OUTPUT:
+                        nil
+                    "block before:"
+                    "- @brown"
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffSpecialTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffSpecialTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                nil
+                        END: pullOffNumber!
+                        START: pullOffAtom!
+                            "string is: \"@brown\" "
+                            "string.match(/\\A(@)([\\w]+)/) is: @brown "
+                            OUTPUT:
+                                ---
+                                :type: "#atom"
+                                :value: "@brown"
+                                :indent: ''
+                        END: pullOffAtom!
+                        OUTPUT:
+                            ---
+                            :type: "#atom"
+                            :value: "@brown"
+                            :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#atom"
+                          :value: "@brown"
+                          :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    ''
+                    OUTPUT:
+                        nil
+                OUTPUT:
+                    ---
+                    :type: "#container"
+                    :value:
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom"
+                        :value: "@blue"
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom"
+                        :value: "@green"
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom"
+                        :value: "@brown"
+                        :indent: ''
+            END: processContainerBlock!
+            OUTPUT:
+                ---
+                :type: "#container"
+                :value:
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom"
+                    :value: "@blue"
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom"
+                    :value: "@green"
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom"
+                    :value: "@brown"
+                    :indent: ''
+        END: pullOffValue!
+        "value is: {:type=>\"#container\", :value=>[{:type=>\"#listValue\", :value=>{:type=>\"#atom\", :value=>\"@blue\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom\", :value=>\"@green\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom\", :value=>\"@brown\", :indent=>\"\"}}]} "
+        "string_clone after pullOffValue! is:  "
+        string before is: eyeColors:
+            - @blue
+            - @green
+            - @brown 
+        "string after is:  "
+        OUTPUT:
+            ---
+            :type: "#keyValue"
+            :key:
+              :type: "#string"
+              :value: eyeColors
+              :indent: ''
+            :value:
+              :type: "#container"
+              :value:
+              - :type: "#listValue"
+                :value:
+                  :type: "#atom"
+                  :value: "@blue"
+                  :indent: ''
+              - :type: "#listValue"
+                :value:
+                  :type: "#atom"
+                  :value: "@green"
+                  :indent: ''
+              - :type: "#listValue"
+                :value:
+                  :type: "#atom"
+                  :value: "@brown"
+                  :indent: ''
+    END: pullOffKeyedElement!
+        "block after:"
+        ''
+        OUTPUT:
+            nil
+    OUTPUT:
+        ---
+        :type: "#container"
+        :value:
+        - :type: "#comment"
+          :value: imma comment
+          :indent: ''
+        - :type: "#keyValue"
+          :key:
+            :type: "#string"
+            :value: my list
+            :indent: ''
+          :value:
+            :type: "#container"
+            :value:
+            - :type: "#listValue"
+              :value:
+                :type: "#atom/number"
+                :value: '1'
+                :indent: ''
+            - :type: "#listValue"
+              :value:
+                :type: "#atom/number"
+                :value: '2'
+                :indent: ''
+            - :type: "#listValue"
+              :value:
+                :type: "#atom/number"
+                :value: '3'
+                :indent: ''
+            - :type: "#listValue"
+              :value:
+                :type: "#atom/number"
+                :value: '4'
+                :indent: ''
+        - :type: "#keyValue"
+          :key:
+            :type: "#string"
+            :value: my map
+            :indent: ''
+          :value:
+            :type: "#container"
+            :value:
+            - :type: "#keyValue"
+              :key:
+                :type: "#string"
+                :value: hello
+                :indent: ''
+              :value:
+                :type: "#string"
+                :value: world
+                :indent: " "
+        - :type: "#comment"
+          :value: block-string and interpolation
+          :indent: ''
+        - :type: "#keyValue"
+          :key:
+            :type: "#string"
+            :value: introduction
+            :indent: ''
+          :value:
+            :type: "#string"
+            :value: |-
+              This is a double quote string
+              This intro is for the $projectName project
+              I can also use C-style escapes like \t and \n here
+            :indent: ''
+        - :type: "#comment"
+          :value: block-string literal
+          :indent: ''
+        - :type: "#keyValue"
+          :key:
+            :type: "#string"
+            :value: literalIntroduction
+            :indent: ''
+          :value:
+            :type: "#string"
+            :value: |-
+              This is a single quote string
+              This intro is for the $projectName project
+              C-style escapes don't work at all \t and \n
+              however I type here, is exactly how its going to show up
+            :indent: ''
+        - :type: "#keyValue"
+          :key:
+            :type: "#string"
+            :value: eyeColors
+            :indent: ''
+          :value:
+            :type: "#container"
+            :value:
+            - :type: "#listValue"
+              :value:
+                :type: "#atom"
+                :value: "@blue"
+                :indent: ''
+            - :type: "#listValue"
+              :value:
+                :type: "#atom"
+                :value: "@green"
+                :indent: ''
+            - :type: "#listValue"
+              :value:
+                :type: "#atom"
+                :value: "@brown"
+                :indent: ''
+END: processContainerBlock!
 ---
 :type: "#container"
 :value:
@@ -44,7 +2065,62 @@
       :key:
         :type: "#string"
         :value: hello
+        :indent: ''
       :value:
         :type: "#string"
         :value: world
         :indent: " "
+- :type: "#comment"
+  :value: block-string and interpolation
+  :indent: ''
+- :type: "#keyValue"
+  :key:
+    :type: "#string"
+    :value: introduction
+    :indent: ''
+  :value:
+    :type: "#string"
+    :value: |-
+      This is a double quote string
+      This intro is for the $projectName project
+      I can also use C-style escapes like \t and \n here
+    :indent: ''
+- :type: "#comment"
+  :value: block-string literal
+  :indent: ''
+- :type: "#keyValue"
+  :key:
+    :type: "#string"
+    :value: literalIntroduction
+    :indent: ''
+  :value:
+    :type: "#string"
+    :value: |-
+      This is a single quote string
+      This intro is for the $projectName project
+      C-style escapes don't work at all \t and \n
+      however I type here, is exactly how its going to show up
+    :indent: ''
+- :type: "#keyValue"
+  :key:
+    :type: "#string"
+    :value: eyeColors
+    :indent: ''
+  :value:
+    :type: "#container"
+    :value:
+    - :type: "#listValue"
+      :value:
+        :type: "#atom"
+        :value: "@blue"
+        :indent: ''
+    - :type: "#listValue"
+      :value:
+        :type: "#atom"
+        :value: "@green"
+        :indent: ''
+    - :type: "#listValue"
+      :value:
+        :type: "#atom"
+        :value: "@brown"
+        :indent: ''
