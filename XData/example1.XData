@@ -7,3 +7,21 @@
 
 'my map':
     hello: 'world'
+
+
+# block-string and interpolation
+introduction: "
+    This is a double quote string
+    This intro is for the $projectName project
+    I can also use C-style escapes like \t and \n here
+
+# block-string literal
+literalIntroduction: '
+    This is a single quote string
+    This intro is for the $projectName project
+    C-style escapes don't work at all \t and \n
+    however I type here, is exactly how its going to show up
+eyeColors:
+    - @blue
+    - @green
+    - @brown
