@@ -1,12 +1,71 @@
 file_contents = IO.read(ARGV[0])
 STANDARD_INDENT_SIZE = 4
 
+# 
+# problems
+# 
+    # [solved] special-term keys:
+    #    - all keys are either strings or atoms
+    #    - treat all numbers as number atoms
+    #    - treat all word keys as strings
+    #    - require word-atoms (includeing infinite/null/nan) to have @
+    #    - allow for negative symbols infront of atoms for -@infinite
+    # [partly solved] type casting
+    #    - use #as() or #as:  
+    #    - BUT what about custom typing a block string vs a block
+    #        - maybe look ahead to see if there is a block, if there is a block then ' or " tells what the block is, if no " then regular container
+    # [solved?] interpolation of globals
+    #    - use *#root[term1][term2][@term3]*
+    # [solved?] interpolation of locals
+    #    - just don't for now, not very XD-like
+    # should errors be thrown escaping something that doesn't ever need to be escaped?
+    # should a better system for units be created?
+    # how can typing handle mixins, number/integer + storage/64bit + base/hex
 #
 # overview
 #
-# everything is represented as nodes inside of lists
-# > comments are nodes
-# > key-value pairs are nodes
+    # everything is represented as nodes inside of lists
+    # - comments are nodes
+    # - key-value pairs are nodes
+    # - nodes have an optional style, along with spacing options (front/back indent, space between type declare)
+
+    # have different format options
+    # - strictness levels
+    #     - machine XData (strict XData + no comments)
+    #     - strict XData (all atoms need @, all indents are tabs, all strings follow standard style, deterministic whitespace)
+    #     - standard XData (strict XData - deterministic whitespace) 
+    #     - loose XData (some keywords auto-converted into atoms, indents can be 4-spaces or tabs, strings can be any style)
+    #     - fault-tolerant XData (tries its absolute best to make sense of absolutely any garbage text thrown it's way)
+    # - translation levels (can be combined with any strictness level)
+    #     - json compressed (needs decoder)
+    #     - json human
+    
+    # currently used starter symbols:
+    #     @ # - ' " { [ \d \w 
+    # currently unused starter symbols:
+    #     \ ~ ` . ! $ ^ ? , ; * + =  / < > & | %
+
+    # possible different additional types
+    # - path
+    # - url
+    # - date
+    # - time
+    # - regex/PRCE,ruby,javascript,etc
+    # - version
+    # - code
+    # - function
+    # - hex
+    # - octal
+    # - binary
+    # - set
+    # - que
+    # - stack
+    # - enum
+    # - range
+    # - storage/float,integer,32bit,64bit
+    # - number/real,rational,irrational,imaginary
+    # - units/min,sec,hour,day,year,pounds,feet,miles,cm,in,km,yards,degrees,kelvin,radians,newtons,mols,
+    # - math # for @pi or @e
 
 $comment_pattern = /\A# (.*)/
 $list_element_pattern = /\A- /
