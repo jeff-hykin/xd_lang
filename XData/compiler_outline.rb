@@ -28,6 +28,11 @@ inline_patterns = [
 # FUTURE: allow inline comments inside of string-blocks
 # PROBLEM: completely empty value sections
 
+# 
+# debugging
+#
+
+DEBUG = false
 $indent_amount = 0
 def debug_block( name, block)
     dp("START: #{name}\n") if name
@@ -42,6 +47,7 @@ def debug_block( name, block)
     return output
 end
 def dp(args)
+    return if !DEBUG 
     if args == nil 
         puts (' '*$indent_amount)+"nil"
     elsif args == ""
@@ -59,7 +65,6 @@ def dp(args)
 end
 
 
-output = {}
 
 class String
     def extract!(regex, group=0)
@@ -69,42 +74,32 @@ class String
             return output
         end
     end
-end
-
-
-def pullOffWhiteSpace(string)
-    precedingWhitespacePattern = /^[ \t]*/
-    return string.match(precedingWhitespacePattern)[0]
-end
-def pullOffWhiteSpace!(string)
-    precedingWhitespacePattern = /^[ \t]*/
-    output = string.match(precedingWhitespacePattern)[0]
-    string.sub!(precedingWhitespacePattern, "")
-    return output
-end
-
-def pullOff!(pattern, string, trim: true, response: nil)
-    string_copy = string.clone
     
-    indent = ""
-    indent = pullOffWhiteSpace!(string_copy) if trim
-    match = string_copy.match(pattern)
-    if match
-        output = response[indent: indent, match: match]
-        if output
-            pullOffWhiteSpace!(string)
-            # pull it off the string
-            string.sub!(pattern, "")
-            # return the hash if successful
-            return output
-        end
+    def replace_with!(new_string)
+        self.sub!(/[\w\W]*/, new_string)
     end
-    nil
+end
+
+def pullOffWhiteSpace!(string)
+    string.extract!(/\A[ \t]*/)
+end
+
+def pullOff!(pattern, string, response)
+    string_copy = string.clone
+    indent = pullOffWhiteSpace!(string_copy)
+    return nil if (match = string_copy.match(pattern)) == nil
+    return nil if (output = response[indent: indent, match: match]) == nil 
+    
+    pullOffWhiteSpace!(string)
+    # pull it off the string
+    string.sub!(pattern, "")
+    # return the hash if successful
+    return output
 end
 
 def pullOffComment!(string)
     debug_block "pullOffComment!", ->() do
-        pullOff! $comment_pattern, string,  response: ->(indent: nil, match: nil) do
+        pullOff! $comment_pattern, string, ->(indent: nil, match: nil) do
             {
                 type: "#comment",
                 value: match[1],
@@ -116,7 +111,7 @@ end
 
 def pullOffType!(string)
     debug_block "pullOffType!", ->() do
-        pullOff! $type_pattern, string, response: ->(indent: nil, match: nil) do
+        pullOff! $type_pattern, string, ->(indent: nil, match: nil) do
             {
                 value: match[2],
                 indent: indent,
@@ -128,18 +123,16 @@ end
 def pullOffInlineTypedValue!(string)
     debug_block "pullOffInlineTypedValue!", ->() do
         string_clone = string.clone
-        type = pullOffType!(string_clone)
-        output = nil
-        if type
-            output = pullOff! /:(.*)/, string, response: ->(indent: nil, match: nil) do
-                {
-                    type: type[:asString],
-                    indent: type[:indent],
-                    value: indent+match[1],
-                }
-            end
+        return nil if (type = pullOffType!(string_clone)) == nil
+        output = pullOff! /:(.*)/, string_clone, ->(indent: nil, match: nil) do
+            {
+                type: type[:asString],
+                indent: type[:indent],
+                value: indent+match[1],
+            }
         end
-        output
+        string.replace_with!(string_clone)
+        return output
     end
 end
 # TODO: also cover the typed value without the colon
@@ -147,7 +140,7 @@ end
 
 def pullOffEmptyContainer!(string)
     debug_block "pullOffEmptyContainer!", ->() do
-        pullOff! $empty_container_pattern, string, response: ->(indent: nil, match: nil) do
+        pullOff! $empty_container_pattern, string, ->(indent: nil, match: nil) do
             container_symbol = match[0]
             if container_symbol == "{}"
                 type = "#container/map"
@@ -163,9 +156,9 @@ def pullOffEmptyContainer!(string)
     end
 end
 
-def pullOffKeyTerm!(string)
-    debug_block "pullOffKeyTerm!", ->() do
-        pullOff! $special_term_pattern, string, response: ->(indent: nil, match: nil) do
+def pullOffSpecialTerm!(string)
+    debug_block "pullOffSpecialTerm!", ->() do
+        pullOff! $special_term_pattern, string, ->(indent: nil, match: nil) do
             special_term = match[0].downcase
             if special_term == "null"
                 type = "#atom/null"
@@ -187,7 +180,7 @@ end
 
 def pullOffNumber!(string)
     debug_block "pullOffNumber!", ->() do
-        pullOff! $number_pattern, string, response: ->(indent: nil, match: nil) do
+        pullOff! $number_pattern, string, ->(indent: nil, match: nil) do
             {
                 type: "#atom/number",
                 value: match[0],
@@ -199,7 +192,7 @@ end
 
 def pullOffAtom!(string)
     debug_block "pullOffAtom!", ->() do
-        pullOff! $atom_pattern, string, response: ->(indent: nil, match: nil) do
+        pullOff! $atom_pattern, string, ->(indent: nil, match: nil) do
             {
                 type: "#atom",
                 value: match[0],
@@ -227,7 +220,7 @@ def pullOffInlineString!(string)
             valid_quote_start_size = 1
             # find the size of the starting quote, which can be any power of three
             largest_power_of_3_that_fits = 3**(Math::log(number_of_quotes, 3)).floor
-            pullOff! /\A('{#{largest_power_of_3_that_fits}})(.*?)\1/, string, response: ->(indent: nil, match: nil) do
+            pullOff! /\A('{#{largest_power_of_3_that_fits}})(.*?)\1/, string, ->(indent: nil, match: nil) do
                 {
                     type: "#string",
                     value: match[2],
@@ -256,7 +249,7 @@ def pullOffBlock!(string)
                 break if !next_line
                 block += "\n"+next_line
             end
-            string.sub!(/[\w\W]*/, string_clone)
+            string.replace_with!(string_clone)
             return block.sub(/\A\n/,"")
         end
         nil
@@ -272,7 +265,7 @@ def pullOffStringBlock!(string)
         if string_clone.extract!(/\A'/)
             if block = pullOffBlock!(string_clone)
                 # replace string with the string clone
-                string.sub!(/[\w\W]/, string_clone)
+                string.replace_with!(string_clone)
                 return {
                     type: "#string",
                     value: block,
@@ -289,14 +282,12 @@ def pullOffValue!(string)
         string_clone = string.clone
         result ||= pullOffInlineTypedValue!(string)
         result ||= pullOffEmptyContainer!(string)  
-        result ||= pullOffKeyTerm!(string)         
+        result ||= pullOffSpecialTerm!(string)         
         result ||= pullOffNumber!(string)          
         result ||= pullOffAtom!(string)            
         result ||= pullOffInlineString!(string)    
-        result ||= pullOffStringBlock!(string)     
-        dp "pullOffContainerBlock!(string) is: #{result ||= pullOffContainerBlock!(string)} "
-        dp "result is:"
-        dp result
+        result ||= pullOffStringBlock!(string)
+        result ||= pullOffContainerBlock!(string)
         return result
     end
 end
@@ -309,7 +300,7 @@ def pullOffListElement!(string)
         return nil if (value = pullOffValue!(string_clone)) == nil
         
         # replace string with the clone
-        string.sub!(/[\w\W]*/, string_clone)
+        string.replace_with!(string_clone)
         {
             type: "#listValue", 
             value: value,
@@ -321,10 +312,19 @@ def pullOffKey!(string)
     debug_block "pullOffKey!", ->() do
         # PROBLEM: what about special_terms as keys
         # FIXME: add smart keys
-        pullOffKeyTerm!(string) || 
-        pullOffNumber!(string) ||
-        pullOffAtom!(string) ||
-        pullOffInlineString!(string)
+        results = nil
+        results ||= pullOffSpecialTerm!(string)
+        results ||= pullOffNumber!(string)
+        results ||= pullOffAtom!(string)
+        results ||= pullOffInlineString!(string)
+        return results if results != nil
+        if short_hand_key = string.extract!(/\A\w+\b/)
+            return {
+                type: "#string",
+                value: short_hand_key,
+                indent: '',
+            }
+        end
     end
 end
 
@@ -342,7 +342,7 @@ def pullOffKeyedElement!(string)
         dp "string_clone after pullOffValue! is: #{string_clone} "
         # perform the replacement
         dp "string before is: #{string} "
-        string.sub!(/[\w\W]*/, string_clone)
+        string.replace_with!(string_clone)
         dp "string after is: #{string} "
         {
             type: "#keyValue", 

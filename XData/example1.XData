@@ -6,4 +6,4 @@
     - 4
 
 'my map':
-    'hello': 'world'
+    hello: 'world'
