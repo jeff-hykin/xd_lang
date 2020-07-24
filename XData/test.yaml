@@ -1,5 +1,5 @@
 START: processContainerBlock!
-    "block at start is: \"# imma comment\\n'my list':\\n    - 1\\n    - 2\\n    - 3\\n    - 4\\n\\n'my map':\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
+    "block at start is: \"# imma comment\\n'my list':\\n    - 1\\n    - 2\\n    - 3\\n    - 4\\n\\n'my map':\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\\n\\n\\n\\n'list of lists':\\n    - \\n        - 1.1\\n        - 1.2\\n        - 1.3\\n    -\\n        - 2.1\\n        - 2.2\\n        - 2.3\\n        - 2.4\" "
         "block before:"
         # imma comment
         'my list':
@@ -28,6 +28,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
     START: pullOffComment!
@@ -65,6 +78,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
         "block before:"
@@ -94,6 +120,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
     START: pullOffComment!
@@ -115,8 +154,6 @@ START: processContainerBlock!
                     nil
             END: pullOffNumber!
             START: pullOffAtom!
-                "string is: \"'my list':\\n    - 1\\n    - 2\\n    - 3\\n    - 4\\n\\n'my map':\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
-                "string.match(/\\A(@)([\\w]+)/) is:  "
                 OUTPUT:
                     nil
             END: pullOffAtom!
@@ -157,8 +194,6 @@ START: processContainerBlock!
                     nil
             END: pullOffNumber!
             START: pullOffAtom!
-                "string is: \"\\n    - 1\\n    - 2\\n    - 3\\n    - 4\\n\\n'my map':\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
-                "string.match(/\\A(@)([\\w]+)/) is:  "
                 OUTPUT:
                     nil
             END: pullOffAtom!
@@ -195,7 +230,20 @@ START: processContainerBlock!
             eyeColors:
                 - @blue
                 - @green
-                - @brown 
+                - @brown
+            
+            
+            
+            'list of lists':
+                - 
+                    - 1.1
+                    - 1.2
+                    - 1.3
+                -
+                    - 2.1
+                    - 2.2
+                    - 2.3
+                    - 2.4 
             START: pullOffBlock!
                 string_clone is: 
                     - 1
@@ -222,7 +270,20 @@ START: processContainerBlock!
                 eyeColors:
                     - @blue
                     - @green
-                    - @brown 
+                    - @brown
+                
+                
+                
+                'list of lists':
+                    - 
+                        - 1.1
+                        - 1.2
+                        - 1.3
+                    -
+                        - 2.1
+                        - 2.2
+                        - 2.3
+                        - 2.4 
                 after sub string_clone is: 
                     - 1
                     - 2
@@ -248,7 +309,20 @@ START: processContainerBlock!
                 eyeColors:
                     - @blue
                     - @green
-                    - @brown 
+                    - @brown
+                
+                
+                
+                'list of lists':
+                    - 
+                        - 1.1
+                        - 1.2
+                        - 1.3
+                    -
+                        - 2.1
+                        - 2.2
+                        - 2.3
+                        - 2.4 
                 "next_line is: - 1 "
                 "next_line is: - 2 "
                 "next_line is: - 3 "
@@ -281,7 +355,20 @@ START: processContainerBlock!
             eyeColors:
                 - @blue
                 - @green
-                - @brown 
+                - @brown
+            
+            
+            
+            'list of lists':
+                - 
+                    - 1.1
+                    - 1.2
+                    - 1.3
+                -
+                    - 2.1
+                    - 2.2
+                    - 2.3
+                    - 2.4 
             START: processContainerBlock!
                 "block at start is: \"- 1\\n- 2\\n- 3\\n- 4\" "
                     "block before:"
@@ -572,7 +659,20 @@ START: processContainerBlock!
         eyeColors:
             - @blue
             - @green
-            - @brown 
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         string before is: 'my list':
             - 1
             - 2
@@ -598,7 +698,20 @@ START: processContainerBlock!
         eyeColors:
             - @blue
             - @green
-            - @brown 
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         string after is: 
         
         'my map':
@@ -620,7 +733,20 @@ START: processContainerBlock!
         eyeColors:
             - @blue
             - @green
-            - @brown 
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         OUTPUT:
             ---
             :type: "#keyValue"
@@ -675,6 +801,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
         "block before:"
@@ -698,6 +837,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
     START: pullOffComment!
@@ -719,8 +871,6 @@ START: processContainerBlock!
                     nil
             END: pullOffNumber!
             START: pullOffAtom!
-                "string is: \"'my map':\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
-                "string.match(/\\A(@)([\\w]+)/) is:  "
                 OUTPUT:
                     nil
             END: pullOffAtom!
@@ -761,8 +911,6 @@ START: processContainerBlock!
                     nil
             END: pullOffNumber!
             START: pullOffAtom!
-                "string is: \"\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
-                "string.match(/\\A(@)([\\w]+)/) is:  "
                 OUTPUT:
                     nil
             END: pullOffAtom!
@@ -793,7 +941,20 @@ START: processContainerBlock!
             eyeColors:
                 - @blue
                 - @green
-                - @brown 
+                - @brown
+            
+            
+            
+            'list of lists':
+                - 
+                    - 1.1
+                    - 1.2
+                    - 1.3
+                -
+                    - 2.1
+                    - 2.2
+                    - 2.3
+                    - 2.4 
             START: pullOffBlock!
                 string_clone is: 
                     hello: 'world'
@@ -814,7 +975,20 @@ START: processContainerBlock!
                 eyeColors:
                     - @blue
                     - @green
-                    - @brown 
+                    - @brown
+                
+                
+                
+                'list of lists':
+                    - 
+                        - 1.1
+                        - 1.2
+                        - 1.3
+                    -
+                        - 2.1
+                        - 2.2
+                        - 2.3
+                        - 2.4 
                 after sub string_clone is: 
                     hello: 'world'
                 
@@ -834,7 +1008,20 @@ START: processContainerBlock!
                 eyeColors:
                     - @blue
                     - @green
-                    - @brown 
+                    - @brown
+                
+                
+                
+                'list of lists':
+                    - 
+                        - 1.1
+                        - 1.2
+                        - 1.3
+                    -
+                        - 2.1
+                        - 2.2
+                        - 2.3
+                        - 2.4 
                 "next_line is: hello: 'world' "
                 "next_line is:  "
                 OUTPUT:
@@ -858,7 +1045,20 @@ START: processContainerBlock!
             eyeColors:
                 - @blue
                 - @green
-                - @brown 
+                - @brown
+            
+            
+            
+            'list of lists':
+                - 
+                    - 1.1
+                    - 1.2
+                    - 1.3
+                -
+                    - 2.1
+                    - 2.2
+                    - 2.3
+                    - 2.4 
             START: processContainerBlock!
                 "block at start is: \"hello: 'world'\" "
                     "block before:"
@@ -884,8 +1084,6 @@ START: processContainerBlock!
                                 nil
                         END: pullOffNumber!
                         START: pullOffAtom!
-                            "string is: \"hello: 'world'\" "
-                            "string.match(/\\A(@)([\\w]+)/) is:  "
                             OUTPUT:
                                 nil
                         END: pullOffAtom!
@@ -922,8 +1120,6 @@ START: processContainerBlock!
                                 nil
                         END: pullOffNumber!
                         START: pullOffAtom!
-                            "string is: \" 'world'\" "
-                            "string.match(/\\A(@)([\\w]+)/) is:  "
                             OUTPUT:
                                 nil
                         END: pullOffAtom!
@@ -1008,7 +1204,20 @@ START: processContainerBlock!
         eyeColors:
             - @blue
             - @green
-            - @brown 
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         string before is: 'my map':
             hello: 'world'
         
@@ -1028,7 +1237,20 @@ START: processContainerBlock!
         eyeColors:
             - @blue
             - @green
-            - @brown 
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         string after is: 
         
         
@@ -1047,7 +1269,20 @@ START: processContainerBlock!
         eyeColors:
             - @blue
             - @green
-            - @brown 
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         OUTPUT:
             ---
             :type: "#keyValue"
@@ -1088,6 +1323,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
         "block before:"
@@ -1107,6 +1355,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
     START: pullOffComment!
@@ -1133,6 +1394,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
         "block before:"
@@ -1151,6 +1425,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
     START: pullOffComment!
@@ -1172,8 +1459,6 @@ START: processContainerBlock!
                     nil
             END: pullOffNumber!
             START: pullOffAtom!
-                "string is: \"introduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
-                "string.match(/\\A(@)([\\w]+)/) is:  "
                 OUTPUT:
                     nil
             END: pullOffAtom!
@@ -1210,8 +1495,6 @@ START: processContainerBlock!
                     nil
             END: pullOffNumber!
             START: pullOffAtom!
-                "string is: \" '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
-                "string.match(/\\A(@)([\\w]+)/) is:  "
                 OUTPUT:
                     nil
             END: pullOffAtom!
@@ -1236,7 +1519,20 @@ START: processContainerBlock!
                     eyeColors:
                         - @blue
                         - @green
-                        - @brown 
+                        - @brown
+                    
+                    
+                    
+                    'list of lists':
+                        - 
+                            - 1.1
+                            - 1.2
+                            - 1.3
+                        -
+                            - 2.1
+                            - 2.2
+                            - 2.3
+                            - 2.4 
                     after sub string_clone is: 
                         This is a double quote string
                         This intro is for the $projectName project
@@ -1251,7 +1547,20 @@ START: processContainerBlock!
                     eyeColors:
                         - @blue
                         - @green
-                        - @brown 
+                        - @brown
+                    
+                    
+                    
+                    'list of lists':
+                        - 
+                            - 1.1
+                            - 1.2
+                            - 1.3
+                        -
+                            - 2.1
+                            - 2.2
+                            - 2.3
+                            - 2.4 
                     "next_line is: This is a double quote string "
                     "next_line is: This intro is for the $projectName project "
                     "next_line is: I can also use C-style escapes like \\t and \\n here "
@@ -1291,7 +1600,20 @@ START: processContainerBlock!
         eyeColors:
             - @blue
             - @green
-            - @brown 
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         string before is: introduction: '
             This is a double quote string
             This intro is for the $projectName project
@@ -1306,7 +1628,20 @@ START: processContainerBlock!
         eyeColors:
             - @blue
             - @green
-            - @brown 
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         string after is: 
         
         # block-string literal
@@ -1318,7 +1653,20 @@ START: processContainerBlock!
         eyeColors:
             - @blue
             - @green
-            - @brown 
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         OUTPUT:
             ---
             :type: "#keyValue"
@@ -1347,6 +1695,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
         "block before:"
@@ -1360,6 +1721,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
     START: pullOffComment!
@@ -1380,6 +1754,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
         "block before:"
@@ -1392,6 +1779,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
     START: pullOffComment!
@@ -1413,8 +1813,6 @@ START: processContainerBlock!
                     nil
             END: pullOffNumber!
             START: pullOffAtom!
-                "string is: \"literalIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
-                "string.match(/\\A(@)([\\w]+)/) is:  "
                 OUTPUT:
                     nil
             END: pullOffAtom!
@@ -1451,8 +1849,6 @@ START: processContainerBlock!
                     nil
             END: pullOffNumber!
             START: pullOffAtom!
-                "string is: \" '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
-                "string.match(/\\A(@)([\\w]+)/) is:  "
                 OUTPUT:
                     nil
             END: pullOffAtom!
@@ -1471,7 +1867,20 @@ START: processContainerBlock!
                     eyeColors:
                         - @blue
                         - @green
-                        - @brown 
+                        - @brown
+                    
+                    
+                    
+                    'list of lists':
+                        - 
+                            - 1.1
+                            - 1.2
+                            - 1.3
+                        -
+                            - 2.1
+                            - 2.2
+                            - 2.3
+                            - 2.4 
                     after sub string_clone is: 
                         This is a single quote string
                         This intro is for the $projectName project
@@ -1480,7 +1889,20 @@ START: processContainerBlock!
                     eyeColors:
                         - @blue
                         - @green
-                        - @brown 
+                        - @brown
+                    
+                    
+                    
+                    'list of lists':
+                        - 
+                            - 1.1
+                            - 1.2
+                            - 1.3
+                        -
+                            - 2.1
+                            - 2.2
+                            - 2.3
+                            - 2.4 
                     "next_line is: This is a single quote string "
                     "next_line is: This intro is for the $projectName project "
                     "next_line is: C-style escapes don't work at all \\t and \\n "
@@ -1517,7 +1939,20 @@ START: processContainerBlock!
         eyeColors:
             - @blue
             - @green
-            - @brown 
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         string before is: literalIntroduction: '
             This is a single quote string
             This intro is for the $projectName project
@@ -1526,12 +1961,38 @@ START: processContainerBlock!
         eyeColors:
             - @blue
             - @green
-            - @brown 
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         string after is: 
         eyeColors:
             - @blue
             - @green
-            - @brown 
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         OUTPUT:
             ---
             :type: "#keyValue"
@@ -1554,6 +2015,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
         "block before:"
@@ -1561,6 +2035,19 @@ START: processContainerBlock!
             - @blue
             - @green
             - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
         OUTPUT:
             nil
     START: pullOffComment!
@@ -1582,8 +2069,6 @@ START: processContainerBlock!
                     nil
             END: pullOffNumber!
             START: pullOffAtom!
-                "string is: \"eyeColors:\\n    - @blue\\n    - @green\\n    - @brown\" "
-                "string.match(/\\A(@)([\\w]+)/) is:  "
                 OUTPUT:
                     nil
             END: pullOffAtom!
@@ -1620,8 +2105,6 @@ START: processContainerBlock!
                     nil
             END: pullOffNumber!
             START: pullOffAtom!
-                "string is: \"\\n    - @blue\\n    - @green\\n    - @brown\" "
-                "string.match(/\\A(@)([\\w]+)/) is:  "
                 OUTPUT:
                     nil
             END: pullOffAtom!
@@ -1636,16 +2119,55 @@ START: processContainerBlock!
             pullOffContainerBlock! string before is: 
                 - @blue
                 - @green
-                - @brown 
+                - @brown
+            
+            
+            
+            'list of lists':
+                - 
+                    - 1.1
+                    - 1.2
+                    - 1.3
+                -
+                    - 2.1
+                    - 2.2
+                    - 2.3
+                    - 2.4 
             START: pullOffBlock!
                 string_clone is: 
                     - @blue
                     - @green
-                    - @brown 
+                    - @brown
+                
+                
+                
+                'list of lists':
+                    - 
+                        - 1.1
+                        - 1.2
+                        - 1.3
+                    -
+                        - 2.1
+                        - 2.2
+                        - 2.3
+                        - 2.4 
                 after sub string_clone is: 
                     - @blue
                     - @green
-                    - @brown 
+                    - @brown
+                
+                
+                
+                'list of lists':
+                    - 
+                        - 1.1
+                        - 1.2
+                        - 1.3
+                    -
+                        - 2.1
+                        - 2.2
+                        - 2.3
+                        - 2.4 
                 "next_line is: - @blue "
                 "next_line is: - @green "
                 "next_line is: - @brown "
@@ -1655,7 +2177,20 @@ START: processContainerBlock!
                     - @green
                     - @brown
             END: pullOffBlock!
-            "pullOffContainerBlock! string after is:  "
+            pullOffContainerBlock! string after is: 
+            
+            
+            
+            'list of lists':
+                - 
+                    - 1.1
+                    - 1.2
+                    - 1.3
+                -
+                    - 2.1
+                    - 2.2
+                    - 2.3
+                    - 2.4 
             START: processContainerBlock!
                 "block at start is: \"- @blue\\n- @green\\n- @brown\" "
                     "block before:"
@@ -1691,8 +2226,6 @@ START: processContainerBlock!
                                 nil
                         END: pullOffNumber!
                         START: pullOffAtom!
-                            "string is: \"@blue\\n- @green\\n- @brown\" "
-                            "string.match(/\\A(@)([\\w]+)/) is: @blue "
                             OUTPUT:
                                 ---
                                 :type: "#atom"
@@ -1751,8 +2284,6 @@ START: processContainerBlock!
                                 nil
                         END: pullOffNumber!
                         START: pullOffAtom!
-                            "string is: \"@green\\n- @brown\" "
-                            "string.match(/\\A(@)([\\w]+)/) is: @green "
                             OUTPUT:
                                 ---
                                 :type: "#atom"
@@ -1809,8 +2340,6 @@ START: processContainerBlock!
                                 nil
                         END: pullOffNumber!
                         START: pullOffAtom!
-                            "string is: \"@brown\" "
-                            "string.match(/\\A(@)([\\w]+)/) is: @brown "
                             OUTPUT:
                                 ---
                                 :type: "#atom"
@@ -1876,12 +2405,51 @@ START: processContainerBlock!
                     :indent: ''
         END: pullOffValue!
         "value is: {:type=>\"#container\", :value=>[{:type=>\"#listValue\", :value=>{:type=>\"#atom\", :value=>\"@blue\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom\", :value=>\"@green\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom\", :value=>\"@brown\", :indent=>\"\"}}]} "
-        "string_clone after pullOffValue! is:  "
+        string_clone after pullOffValue! is: 
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         string before is: eyeColors:
             - @blue
             - @green
-            - @brown 
-        "string after is:  "
+            - @brown
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
+        string after is: 
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
         OUTPUT:
             ---
             :type: "#keyValue"
@@ -1907,6 +2475,1022 @@ START: processContainerBlock!
                   :type: "#atom"
                   :value: "@brown"
                   :indent: ''
+    END: pullOffKeyedElement!
+        "block after:"
+        
+        
+        
+        
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
+        OUTPUT:
+            nil
+        "block before:"
+        'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            nil
+    END: pullOffComment!
+    START: pullOffListElement!
+        OUTPUT:
+            nil
+    END: pullOffListElement!
+    START: pullOffKeyedElement!
+        START: pullOffKey!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                "single_quotes_match is: ' "
+                OUTPUT:
+                    ---
+                    :type: "#string"
+                    :value: list of lists
+                    :indent: ''
+            END: pullOffInlineString!
+            OUTPUT:
+                ---
+                :type: "#string"
+                :value: list of lists
+                :indent: ''
+        END: pullOffKey!
+        "key is: {:type=>\"#string\", :value=>\"list of lists\", :indent=>\"\"} "
+        START: pullOffValue!
+            START: pullOffInlineTypedValue!
+                START: pullOffType!
+                    OUTPUT:
+                        nil
+                END: pullOffType!
+                OUTPUT:
+                    nil
+            END: pullOffInlineTypedValue!
+            START: pullOffEmptyContainer!
+                OUTPUT:
+                    nil
+            END: pullOffEmptyContainer!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                OUTPUT:
+                    nil
+            END: pullOffInlineString!
+            START: pullOffStringBlock!
+                OUTPUT:
+                    nil
+            END: pullOffStringBlock!
+            pullOffContainerBlock! string before is: 
+                - 
+                    - 1.1
+                    - 1.2
+                    - 1.3
+                -
+                    - 2.1
+                    - 2.2
+                    - 2.3
+                    - 2.4 
+            START: pullOffBlock!
+                string_clone is: 
+                    - 
+                        - 1.1
+                        - 1.2
+                        - 1.3
+                    -
+                        - 2.1
+                        - 2.2
+                        - 2.3
+                        - 2.4 
+                after sub string_clone is: 
+                    - 
+                        - 1.1
+                        - 1.2
+                        - 1.3
+                    -
+                        - 2.1
+                        - 2.2
+                        - 2.3
+                        - 2.4 
+                "next_line is: -  "
+                "next_line is:     - 1.1 "
+                "next_line is:     - 1.2 "
+                "next_line is:     - 1.3 "
+                "next_line is: - "
+                "next_line is:     - 2.1 "
+                "next_line is:     - 2.2 "
+                "next_line is:     - 2.3 "
+                "next_line is:     - 2.4 "
+                "next_line is:  "
+                OUTPUT:
+                    - 
+                        - 1.1
+                        - 1.2
+                        - 1.3
+                    -
+                        - 2.1
+                        - 2.2
+                        - 2.3
+                        - 2.4
+            END: pullOffBlock!
+            "pullOffContainerBlock! string after is:  "
+            START: processContainerBlock!
+                "block at start is: \"- \\n    - 1.1\\n    - 1.2\\n    - 1.3\\n-\\n    - 2.1\\n    - 2.2\\n    - 2.3\\n    - 2.4\" "
+                    "block before:"
+                    - 
+                        - 1.1
+                        - 1.2
+                        - 1.3
+                    -
+                        - 2.1
+                        - 2.2
+                        - 2.3
+                        - 2.4
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffSpecialTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffSpecialTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                nil
+                        END: pullOffNumber!
+                        START: pullOffAtom!
+                            OUTPUT:
+                                nil
+                        END: pullOffAtom!
+                        START: pullOffInlineString!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineString!
+                        START: pullOffStringBlock!
+                            OUTPUT:
+                                nil
+                        END: pullOffStringBlock!
+                        pullOffContainerBlock! string before is: 
+                            - 1.1
+                            - 1.2
+                            - 1.3
+                        -
+                            - 2.1
+                            - 2.2
+                            - 2.3
+                            - 2.4 
+                        START: pullOffBlock!
+                            string_clone is: 
+                                - 1.1
+                                - 1.2
+                                - 1.3
+                            -
+                                - 2.1
+                                - 2.2
+                                - 2.3
+                                - 2.4 
+                            after sub string_clone is: 
+                                - 1.1
+                                - 1.2
+                                - 1.3
+                            -
+                                - 2.1
+                                - 2.2
+                                - 2.3
+                                - 2.4 
+                            "next_line is: - 1.1 "
+                            "next_line is: - 1.2 "
+                            "next_line is: - 1.3 "
+                            "next_line is:  "
+                            OUTPUT:
+                                - 1.1
+                                - 1.2
+                                - 1.3
+                        END: pullOffBlock!
+                        pullOffContainerBlock! string after is: 
+                        -
+                            - 2.1
+                            - 2.2
+                            - 2.3
+                            - 2.4 
+                        START: processContainerBlock!
+                            "block at start is: \"- 1.1\\n- 1.2\\n- 1.3\" "
+                                "block before:"
+                                - 1.1
+                                - 1.2
+                                - 1.3
+                                OUTPUT:
+                                    nil
+                            START: pullOffComment!
+                                OUTPUT:
+                                    nil
+                            END: pullOffComment!
+                            START: pullOffListElement!
+                                START: pullOffValue!
+                                    START: pullOffInlineTypedValue!
+                                        START: pullOffType!
+                                            OUTPUT:
+                                                nil
+                                        END: pullOffType!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffInlineTypedValue!
+                                    START: pullOffEmptyContainer!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffEmptyContainer!
+                                    START: pullOffSpecialTerm!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffSpecialTerm!
+                                    START: pullOffNumber!
+                                        OUTPUT:
+                                            ---
+                                            :type: "#atom/number"
+                                            :value: '1.1'
+                                            :indent: ''
+                                    END: pullOffNumber!
+                                    OUTPUT:
+                                        ---
+                                        :type: "#atom/number"
+                                        :value: '1.1'
+                                        :indent: ''
+                                END: pullOffValue!
+                                OUTPUT:
+                                    ---
+                                    :type: "#listValue"
+                                    :value:
+                                      :type: "#atom/number"
+                                      :value: '1.1'
+                                      :indent: ''
+                            END: pullOffListElement!
+                                "block after:"
+                                
+                                - 1.2
+                                - 1.3
+                                OUTPUT:
+                                    nil
+                                "block before:"
+                                - 1.2
+                                - 1.3
+                                OUTPUT:
+                                    nil
+                            START: pullOffComment!
+                                OUTPUT:
+                                    nil
+                            END: pullOffComment!
+                            START: pullOffListElement!
+                                START: pullOffValue!
+                                    START: pullOffInlineTypedValue!
+                                        START: pullOffType!
+                                            OUTPUT:
+                                                nil
+                                        END: pullOffType!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffInlineTypedValue!
+                                    START: pullOffEmptyContainer!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffEmptyContainer!
+                                    START: pullOffSpecialTerm!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffSpecialTerm!
+                                    START: pullOffNumber!
+                                        OUTPUT:
+                                            ---
+                                            :type: "#atom/number"
+                                            :value: '1.2'
+                                            :indent: ''
+                                    END: pullOffNumber!
+                                    OUTPUT:
+                                        ---
+                                        :type: "#atom/number"
+                                        :value: '1.2'
+                                        :indent: ''
+                                END: pullOffValue!
+                                OUTPUT:
+                                    ---
+                                    :type: "#listValue"
+                                    :value:
+                                      :type: "#atom/number"
+                                      :value: '1.2'
+                                      :indent: ''
+                            END: pullOffListElement!
+                                "block after:"
+                                
+                                - 1.3
+                                OUTPUT:
+                                    nil
+                                "block before:"
+                                "- 1.3"
+                                OUTPUT:
+                                    nil
+                            START: pullOffComment!
+                                OUTPUT:
+                                    nil
+                            END: pullOffComment!
+                            START: pullOffListElement!
+                                START: pullOffValue!
+                                    START: pullOffInlineTypedValue!
+                                        START: pullOffType!
+                                            OUTPUT:
+                                                nil
+                                        END: pullOffType!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffInlineTypedValue!
+                                    START: pullOffEmptyContainer!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffEmptyContainer!
+                                    START: pullOffSpecialTerm!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffSpecialTerm!
+                                    START: pullOffNumber!
+                                        OUTPUT:
+                                            ---
+                                            :type: "#atom/number"
+                                            :value: '1.3'
+                                            :indent: ''
+                                    END: pullOffNumber!
+                                    OUTPUT:
+                                        ---
+                                        :type: "#atom/number"
+                                        :value: '1.3'
+                                        :indent: ''
+                                END: pullOffValue!
+                                OUTPUT:
+                                    ---
+                                    :type: "#listValue"
+                                    :value:
+                                      :type: "#atom/number"
+                                      :value: '1.3'
+                                      :indent: ''
+                            END: pullOffListElement!
+                                "block after:"
+                                ''
+                                OUTPUT:
+                                    nil
+                            OUTPUT:
+                                ---
+                                :type: "#container"
+                                :value:
+                                - :type: "#listValue"
+                                  :value:
+                                    :type: "#atom/number"
+                                    :value: '1.1'
+                                    :indent: ''
+                                - :type: "#listValue"
+                                  :value:
+                                    :type: "#atom/number"
+                                    :value: '1.2'
+                                    :indent: ''
+                                - :type: "#listValue"
+                                  :value:
+                                    :type: "#atom/number"
+                                    :value: '1.3'
+                                    :indent: ''
+                        END: processContainerBlock!
+                        OUTPUT:
+                            ---
+                            :type: "#container"
+                            :value:
+                            - :type: "#listValue"
+                              :value:
+                                :type: "#atom/number"
+                                :value: '1.1'
+                                :indent: ''
+                            - :type: "#listValue"
+                              :value:
+                                :type: "#atom/number"
+                                :value: '1.2'
+                                :indent: ''
+                            - :type: "#listValue"
+                              :value:
+                                :type: "#atom/number"
+                                :value: '1.3'
+                                :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#container"
+                          :value:
+                          - :type: "#listValue"
+                            :value:
+                              :type: "#atom/number"
+                              :value: '1.1'
+                              :indent: ''
+                          - :type: "#listValue"
+                            :value:
+                              :type: "#atom/number"
+                              :value: '1.2'
+                              :indent: ''
+                          - :type: "#listValue"
+                            :value:
+                              :type: "#atom/number"
+                              :value: '1.3'
+                              :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    
+                    -
+                        - 2.1
+                        - 2.2
+                        - 2.3
+                        - 2.4
+                    OUTPUT:
+                        nil
+                    "block before:"
+                    -
+                        - 2.1
+                        - 2.2
+                        - 2.3
+                        - 2.4
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffSpecialTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffSpecialTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                nil
+                        END: pullOffNumber!
+                        START: pullOffAtom!
+                            OUTPUT:
+                                nil
+                        END: pullOffAtom!
+                        START: pullOffInlineString!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineString!
+                        START: pullOffStringBlock!
+                            OUTPUT:
+                                nil
+                        END: pullOffStringBlock!
+                        pullOffContainerBlock! string before is: 
+                            - 2.1
+                            - 2.2
+                            - 2.3
+                            - 2.4 
+                        START: pullOffBlock!
+                            string_clone is: 
+                                - 2.1
+                                - 2.2
+                                - 2.3
+                                - 2.4 
+                            after sub string_clone is: 
+                                - 2.1
+                                - 2.2
+                                - 2.3
+                                - 2.4 
+                            "next_line is: - 2.1 "
+                            "next_line is: - 2.2 "
+                            "next_line is: - 2.3 "
+                            "next_line is: - 2.4 "
+                            "next_line is:  "
+                            OUTPUT:
+                                - 2.1
+                                - 2.2
+                                - 2.3
+                                - 2.4
+                        END: pullOffBlock!
+                        "pullOffContainerBlock! string after is:  "
+                        START: processContainerBlock!
+                            "block at start is: \"- 2.1\\n- 2.2\\n- 2.3\\n- 2.4\" "
+                                "block before:"
+                                - 2.1
+                                - 2.2
+                                - 2.3
+                                - 2.4
+                                OUTPUT:
+                                    nil
+                            START: pullOffComment!
+                                OUTPUT:
+                                    nil
+                            END: pullOffComment!
+                            START: pullOffListElement!
+                                START: pullOffValue!
+                                    START: pullOffInlineTypedValue!
+                                        START: pullOffType!
+                                            OUTPUT:
+                                                nil
+                                        END: pullOffType!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffInlineTypedValue!
+                                    START: pullOffEmptyContainer!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffEmptyContainer!
+                                    START: pullOffSpecialTerm!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffSpecialTerm!
+                                    START: pullOffNumber!
+                                        OUTPUT:
+                                            ---
+                                            :type: "#atom/number"
+                                            :value: '2.1'
+                                            :indent: ''
+                                    END: pullOffNumber!
+                                    OUTPUT:
+                                        ---
+                                        :type: "#atom/number"
+                                        :value: '2.1'
+                                        :indent: ''
+                                END: pullOffValue!
+                                OUTPUT:
+                                    ---
+                                    :type: "#listValue"
+                                    :value:
+                                      :type: "#atom/number"
+                                      :value: '2.1'
+                                      :indent: ''
+                            END: pullOffListElement!
+                                "block after:"
+                                
+                                - 2.2
+                                - 2.3
+                                - 2.4
+                                OUTPUT:
+                                    nil
+                                "block before:"
+                                - 2.2
+                                - 2.3
+                                - 2.4
+                                OUTPUT:
+                                    nil
+                            START: pullOffComment!
+                                OUTPUT:
+                                    nil
+                            END: pullOffComment!
+                            START: pullOffListElement!
+                                START: pullOffValue!
+                                    START: pullOffInlineTypedValue!
+                                        START: pullOffType!
+                                            OUTPUT:
+                                                nil
+                                        END: pullOffType!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffInlineTypedValue!
+                                    START: pullOffEmptyContainer!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffEmptyContainer!
+                                    START: pullOffSpecialTerm!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffSpecialTerm!
+                                    START: pullOffNumber!
+                                        OUTPUT:
+                                            ---
+                                            :type: "#atom/number"
+                                            :value: '2.2'
+                                            :indent: ''
+                                    END: pullOffNumber!
+                                    OUTPUT:
+                                        ---
+                                        :type: "#atom/number"
+                                        :value: '2.2'
+                                        :indent: ''
+                                END: pullOffValue!
+                                OUTPUT:
+                                    ---
+                                    :type: "#listValue"
+                                    :value:
+                                      :type: "#atom/number"
+                                      :value: '2.2'
+                                      :indent: ''
+                            END: pullOffListElement!
+                                "block after:"
+                                
+                                - 2.3
+                                - 2.4
+                                OUTPUT:
+                                    nil
+                                "block before:"
+                                - 2.3
+                                - 2.4
+                                OUTPUT:
+                                    nil
+                            START: pullOffComment!
+                                OUTPUT:
+                                    nil
+                            END: pullOffComment!
+                            START: pullOffListElement!
+                                START: pullOffValue!
+                                    START: pullOffInlineTypedValue!
+                                        START: pullOffType!
+                                            OUTPUT:
+                                                nil
+                                        END: pullOffType!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffInlineTypedValue!
+                                    START: pullOffEmptyContainer!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffEmptyContainer!
+                                    START: pullOffSpecialTerm!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffSpecialTerm!
+                                    START: pullOffNumber!
+                                        OUTPUT:
+                                            ---
+                                            :type: "#atom/number"
+                                            :value: '2.3'
+                                            :indent: ''
+                                    END: pullOffNumber!
+                                    OUTPUT:
+                                        ---
+                                        :type: "#atom/number"
+                                        :value: '2.3'
+                                        :indent: ''
+                                END: pullOffValue!
+                                OUTPUT:
+                                    ---
+                                    :type: "#listValue"
+                                    :value:
+                                      :type: "#atom/number"
+                                      :value: '2.3'
+                                      :indent: ''
+                            END: pullOffListElement!
+                                "block after:"
+                                
+                                - 2.4
+                                OUTPUT:
+                                    nil
+                                "block before:"
+                                "- 2.4"
+                                OUTPUT:
+                                    nil
+                            START: pullOffComment!
+                                OUTPUT:
+                                    nil
+                            END: pullOffComment!
+                            START: pullOffListElement!
+                                START: pullOffValue!
+                                    START: pullOffInlineTypedValue!
+                                        START: pullOffType!
+                                            OUTPUT:
+                                                nil
+                                        END: pullOffType!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffInlineTypedValue!
+                                    START: pullOffEmptyContainer!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffEmptyContainer!
+                                    START: pullOffSpecialTerm!
+                                        OUTPUT:
+                                            nil
+                                    END: pullOffSpecialTerm!
+                                    START: pullOffNumber!
+                                        OUTPUT:
+                                            ---
+                                            :type: "#atom/number"
+                                            :value: '2.4'
+                                            :indent: ''
+                                    END: pullOffNumber!
+                                    OUTPUT:
+                                        ---
+                                        :type: "#atom/number"
+                                        :value: '2.4'
+                                        :indent: ''
+                                END: pullOffValue!
+                                OUTPUT:
+                                    ---
+                                    :type: "#listValue"
+                                    :value:
+                                      :type: "#atom/number"
+                                      :value: '2.4'
+                                      :indent: ''
+                            END: pullOffListElement!
+                                "block after:"
+                                ''
+                                OUTPUT:
+                                    nil
+                            OUTPUT:
+                                ---
+                                :type: "#container"
+                                :value:
+                                - :type: "#listValue"
+                                  :value:
+                                    :type: "#atom/number"
+                                    :value: '2.1'
+                                    :indent: ''
+                                - :type: "#listValue"
+                                  :value:
+                                    :type: "#atom/number"
+                                    :value: '2.2'
+                                    :indent: ''
+                                - :type: "#listValue"
+                                  :value:
+                                    :type: "#atom/number"
+                                    :value: '2.3'
+                                    :indent: ''
+                                - :type: "#listValue"
+                                  :value:
+                                    :type: "#atom/number"
+                                    :value: '2.4'
+                                    :indent: ''
+                        END: processContainerBlock!
+                        OUTPUT:
+                            ---
+                            :type: "#container"
+                            :value:
+                            - :type: "#listValue"
+                              :value:
+                                :type: "#atom/number"
+                                :value: '2.1'
+                                :indent: ''
+                            - :type: "#listValue"
+                              :value:
+                                :type: "#atom/number"
+                                :value: '2.2'
+                                :indent: ''
+                            - :type: "#listValue"
+                              :value:
+                                :type: "#atom/number"
+                                :value: '2.3'
+                                :indent: ''
+                            - :type: "#listValue"
+                              :value:
+                                :type: "#atom/number"
+                                :value: '2.4'
+                                :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#container"
+                          :value:
+                          - :type: "#listValue"
+                            :value:
+                              :type: "#atom/number"
+                              :value: '2.1'
+                              :indent: ''
+                          - :type: "#listValue"
+                            :value:
+                              :type: "#atom/number"
+                              :value: '2.2'
+                              :indent: ''
+                          - :type: "#listValue"
+                            :value:
+                              :type: "#atom/number"
+                              :value: '2.3'
+                              :indent: ''
+                          - :type: "#listValue"
+                            :value:
+                              :type: "#atom/number"
+                              :value: '2.4'
+                              :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    ''
+                    OUTPUT:
+                        nil
+                OUTPUT:
+                    ---
+                    :type: "#container"
+                    :value:
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#container"
+                        :value:
+                        - :type: "#listValue"
+                          :value:
+                            :type: "#atom/number"
+                            :value: '1.1'
+                            :indent: ''
+                        - :type: "#listValue"
+                          :value:
+                            :type: "#atom/number"
+                            :value: '1.2'
+                            :indent: ''
+                        - :type: "#listValue"
+                          :value:
+                            :type: "#atom/number"
+                            :value: '1.3'
+                            :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#container"
+                        :value:
+                        - :type: "#listValue"
+                          :value:
+                            :type: "#atom/number"
+                            :value: '2.1'
+                            :indent: ''
+                        - :type: "#listValue"
+                          :value:
+                            :type: "#atom/number"
+                            :value: '2.2'
+                            :indent: ''
+                        - :type: "#listValue"
+                          :value:
+                            :type: "#atom/number"
+                            :value: '2.3'
+                            :indent: ''
+                        - :type: "#listValue"
+                          :value:
+                            :type: "#atom/number"
+                            :value: '2.4'
+                            :indent: ''
+            END: processContainerBlock!
+            OUTPUT:
+                ---
+                :type: "#container"
+                :value:
+                - :type: "#listValue"
+                  :value:
+                    :type: "#container"
+                    :value:
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '1.1'
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '1.2'
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '1.3'
+                        :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#container"
+                    :value:
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '2.1'
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '2.2'
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '2.3'
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '2.4'
+                        :indent: ''
+        END: pullOffValue!
+        "value is: {:type=>\"#container\", :value=>[{:type=>\"#listValue\", :value=>{:type=>\"#container\", :value=>[{:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"1.1\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"1.2\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"1.3\", :indent=>\"\"}}]}}, {:type=>\"#listValue\", :value=>{:type=>\"#container\", :value=>[{:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"2.1\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"2.2\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"2.3\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"2.4\", :indent=>\"\"}}]}}]} "
+        "string_clone after pullOffValue! is:  "
+        string before is: 'list of lists':
+            - 
+                - 1.1
+                - 1.2
+                - 1.3
+            -
+                - 2.1
+                - 2.2
+                - 2.3
+                - 2.4 
+        "string after is:  "
+        OUTPUT:
+            ---
+            :type: "#keyValue"
+            :key:
+              :type: "#string"
+              :value: list of lists
+              :indent: ''
+            :value:
+              :type: "#container"
+              :value:
+              - :type: "#listValue"
+                :value:
+                  :type: "#container"
+                  :value:
+                  - :type: "#listValue"
+                    :value:
+                      :type: "#atom/number"
+                      :value: '1.1'
+                      :indent: ''
+                  - :type: "#listValue"
+                    :value:
+                      :type: "#atom/number"
+                      :value: '1.2'
+                      :indent: ''
+                  - :type: "#listValue"
+                    :value:
+                      :type: "#atom/number"
+                      :value: '1.3'
+                      :indent: ''
+              - :type: "#listValue"
+                :value:
+                  :type: "#container"
+                  :value:
+                  - :type: "#listValue"
+                    :value:
+                      :type: "#atom/number"
+                      :value: '2.1'
+                      :indent: ''
+                  - :type: "#listValue"
+                    :value:
+                      :type: "#atom/number"
+                      :value: '2.2'
+                      :indent: ''
+                  - :type: "#listValue"
+                    :value:
+                      :type: "#atom/number"
+                      :value: '2.3'
+                      :indent: ''
+                  - :type: "#listValue"
+                    :value:
+                      :type: "#atom/number"
+                      :value: '2.4'
+                      :indent: ''
     END: pullOffKeyedElement!
         "block after:"
         ''
@@ -2018,6 +3602,57 @@ START: processContainerBlock!
                 :type: "#atom"
                 :value: "@brown"
                 :indent: ''
+        - :type: "#keyValue"
+          :key:
+            :type: "#string"
+            :value: list of lists
+            :indent: ''
+          :value:
+            :type: "#container"
+            :value:
+            - :type: "#listValue"
+              :value:
+                :type: "#container"
+                :value:
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '1.1'
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '1.2'
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '1.3'
+                    :indent: ''
+            - :type: "#listValue"
+              :value:
+                :type: "#container"
+                :value:
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '2.1'
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '2.2'
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '2.3'
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '2.4'
+                    :indent: ''
 END: processContainerBlock!
 ---
 :type: "#container"
@@ -2124,3 +3759,54 @@ END: processContainerBlock!
         :type: "#atom"
         :value: "@brown"
         :indent: ''
+- :type: "#keyValue"
+  :key:
+    :type: "#string"
+    :value: list of lists
+    :indent: ''
+  :value:
+    :type: "#container"
+    :value:
+    - :type: "#listValue"
+      :value:
+        :type: "#container"
+        :value:
+        - :type: "#listValue"
+          :value:
+            :type: "#atom/number"
+            :value: '1.1'
+            :indent: ''
+        - :type: "#listValue"
+          :value:
+            :type: "#atom/number"
+            :value: '1.2'
+            :indent: ''
+        - :type: "#listValue"
+          :value:
+            :type: "#atom/number"
+            :value: '1.3'
+            :indent: ''
+    - :type: "#listValue"
+      :value:
+        :type: "#container"
+        :value:
+        - :type: "#listValue"
+          :value:
+            :type: "#atom/number"
+            :value: '2.1'
+            :indent: ''
+        - :type: "#listValue"
+          :value:
+            :type: "#atom/number"
+            :value: '2.2'
+            :indent: ''
+        - :type: "#listValue"
+          :value:
+            :type: "#atom/number"
+            :value: '2.3'
+            :indent: ''
+        - :type: "#listValue"
+          :value:
+            :type: "#atom/number"
+            :value: '2.4'
+            :indent: ''

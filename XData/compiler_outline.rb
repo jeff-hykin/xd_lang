@@ -192,8 +192,6 @@ end
 
 def pullOffAtom!(string)
     debug_block "pullOffAtom!", ->() do
-        dp "string is: #{string.inspect} "
-        dp "string.match(#{$atom_pattern.inspect}) is: #{string.match($atom_pattern)} "
         pullOff! $atom_pattern, string, ->(indent: nil, match: nil) do
             {
                 type: "#atom",
@@ -298,7 +296,7 @@ def pullOffListElement!(string)
     debug_block "pullOffListElement!", ->() do
         string_clone = string.clone
         
-        return nil if string_clone.extract!(/\A- /) == nil
+        return nil if string_clone.extract!(/\A-( |$)/) == nil
         return nil if (value = pullOffValue!(string_clone)) == nil
         
         # replace string with the clone
