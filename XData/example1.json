@@ -1,58 +1,58 @@
 {
     "type": "#list",
-    // FUTURE: list will be given additional keys such subType: "pureList" or "length" or "pureMapping" etc
+    // FUTURE: list will be given additional keys such subType: "pureList" or length: 5 or subType: "pureMapping" etc
     "value": [
-        { "type": "#comment", "asString": "# imma comment" },
-        { "type": "#string",  "asString": "something" },
+        { "type": "#comment", "value": "# imma comment" },
+        { "type": "#string",  "value": "something" },
         {
             "type": "#keyValue", 
             "key": {
                 "type": "(boolean)",
-                "asString": "@true",
+                "value": "@true",
             },
             "value": {
                 "type": "#string",
-                "asString": "  ",
+                "value": "  ",
             }
         },
         {
             "type": "#keyValue", 
             "key": {
                 "type": "(int)",
-                "asString": "10",
+                "value": "10",
             },
             "value": {
                 "type": "(string)",
-                "asString": "hello world C:\\Users ",
+                "value": "hello world C:\\Users ",
             }
         },
         {
             "type": "#keyValue", 
             "key": {
                 "type": "(string)",
-                "asString": "Hello World",
+                "value": "Hello World",
             },
             "value": {
                 "type": "(string)",
-                "asString": "hello world",
+                "value": "hello world",
             }
         },
         {
             "type": "#keyValue", 
             "key": {
                 "type": "#string",
-                "asString": "helloWorld",
+                "value": "helloWorld",
             },
             "value": {
                 "type": "#string",
-                "asString": "hello world\nso I was thinking\nwhat if things just didn't suck?\n\"wouldn't\": that be cool",
+                "value": "hello world\nso I was thinking\nwhat if things just didn't suck?\n\"wouldn't\": that be cool",
             }
         },
         {
             "type": "#keyValue", 
             "key": {
                 "type": "#string",
-                "asString": "myListOfLists",
+                "value": "myListOfLists",
             },
             "value": {
                 "type": "#list",
@@ -62,15 +62,15 @@
                         "value": [
                             {
                                 "type": "#number",
-                                "asString": "1",
+                                "value": "1",
                             },
                             {
                                 "type": "#number",
-                                "asString": "2",
+                                "value": "2",
                             },
                             {
                                 "type": "#number",
-                                "asString": "3",
+                                "value": "3",
                             },
                         ]
                     },
@@ -79,15 +79,15 @@
                         "value": [
                             {
                                 "type": "#number",
-                                "asString": "1",
+                                "value": "1",
                             },
                             {
                                 "type": "#number",
-                                "asString": "2",
+                                "value": "2",
                             },
                             {
                                 "type": "#number",
-                                "asString": "3",
+                                "value": "3",
                             },
                         ]
                     }

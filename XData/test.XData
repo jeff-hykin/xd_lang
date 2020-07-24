@@ -1,2 +1,93 @@
-thing: 1
-thing2: 2
+# comment
+
+# mapping
+aMapping:
+    aKey1: aValue
+    aKey2: 1
+    aKey3: @true
+    1    : aValue
+    @true: aValue
+
+# listing
+aListing:
+    - aValue
+    - @false
+    - 1
+    - 0
+    - -1
+
+# list of lists
+"list of lists":
+    - 
+        - 1.1
+        - 1.2
+        - 1.3
+    -
+        - 2.1
+        - 2.2
+        - 2.3
+        - 2.4
+
+#  
+# string-blocks
+#  
+
+projectName: XData
+
+# block-string and interpolation
+introduction: "
+    This is a double quote string
+    This intro is for the $projectName project
+    I can also use C-style escapes like \t and \n here
+
+# block-string literal
+literalIntroduction: '
+    This is a single quote string
+    This intro is for the $projectName project
+    C-style escapes don't work at all \t and \n
+    however I type here, is exactly how its going to show up
+eyeColors:
+    - @blue
+    - @green
+    - @brown
+
+"Some People":
+    Bob: 
+        birthday: (date/usa) '12/31/1999'
+        single: @true
+        single: (bool) "no"
+        favoriteNumber: 7
+    Sally:
+        mainAddress: '
+            1337 Dopest Dr
+            Apt 69
+            Yarmom TX 42069
+        shippingAddress: ^mainAddress
+        eyeColor: $eyeColors.2
+        favoriteNumber: @infinite
+        single: @false
+    John:
+        fullName: Johnathan
+        favoriteNumber: @pi
+        greeting: "Hello ^fullName"
+        friends:
+            - ^^Bob
+            - ^^Sally
+    MadBob:
+        friends: # no friends (empty list/mapping)
+
+aLightSwitch:
+    on  (bool/true)  : (units/volts) 100
+    off (bool/false) : (units/volts) 0
+
+'''this is triple single quotes he said 'thats what she said'''': thing
+
+"things to consider":
+    - can't use dot syntax because of decimal numbers, maybe use @ instead
+    - using - instead of -
+    - adding keywords instead of @true
+    - having a way to indicate an empty list or empty mapping
+    - is the string-block syntax jarring
+    - using (infinite) as an alternative to @infinite
+    - trailing newlines
+    - add a pseudo end-of-line string kind
