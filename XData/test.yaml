@@ -1,0 +1,897 @@
+START: processContainerBlock!
+    "block at start is: \"# imma comment\\n'my list':\\n    - 1\\n    - 2\\n    - 3\\n    - 4\\n\\n'my map':\\n    'hello': 'world'\" "
+        "block before:"
+        # imma comment
+        'my list':
+            - 1
+            - 2
+            - 3
+            - 4
+        
+        'my map':
+            'hello': 'world'
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            ---
+            :type: "#comment"
+            :value: imma comment
+            :indent: ''
+    END: pullOffComment!
+        "block after:"
+        
+        'my list':
+            - 1
+            - 2
+            - 3
+            - 4
+        
+        'my map':
+            'hello': 'world'
+        OUTPUT:
+            nil
+        "block before:"
+        'my list':
+            - 1
+            - 2
+            - 3
+            - 4
+        
+        'my map':
+            'hello': 'world'
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            nil
+    END: pullOffComment!
+    START: pullOffListElement!
+        OUTPUT:
+            nil
+    END: pullOffListElement!
+    START: pullOffKeyedElement!
+        START: pullOffKey!
+            START: pullOffKeyTerm!
+                OUTPUT:
+                    nil
+            END: pullOffKeyTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                "single_quotes_match is: ' "
+                OUTPUT:
+                    ---
+                    :type: "#string"
+                    :value: my list
+                    :indent: ''
+            END: pullOffInlineString!
+            OUTPUT:
+                ---
+                :type: "#string"
+                :value: my list
+                :indent: ''
+        END: pullOffKey!
+        "key is: {:type=>\"#string\", :value=>\"my list\", :indent=>\"\"} "
+        START: pullOffValue!
+            START: pullOffInlineTypedValue!
+                START: pullOffType!
+                    OUTPUT:
+                        nil
+                END: pullOffType!
+                OUTPUT:
+                    nil
+            END: pullOffInlineTypedValue!
+            START: pullOffEmptyContainer!
+                OUTPUT:
+                    nil
+            END: pullOffEmptyContainer!
+            START: pullOffKeyTerm!
+                OUTPUT:
+                    nil
+            END: pullOffKeyTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                OUTPUT:
+                    nil
+            END: pullOffInlineString!
+            START: pullOffStringBlock!
+                OUTPUT:
+                    nil
+            END: pullOffStringBlock!
+            pullOffContainerBlock! string before is: 
+                - 1
+                - 2
+                - 3
+                - 4
+            
+            'my map':
+                'hello': 'world' 
+            START: pullOffBlock!
+                string_clone is: 
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+                
+                'my map':
+                    'hello': 'world' 
+                after sub string_clone is: 
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+                
+                'my map':
+                    'hello': 'world' 
+                "next_line is: - 1 "
+                "next_line is: - 2 "
+                "next_line is: - 3 "
+                "next_line is: - 4 "
+                "next_line is:  "
+                OUTPUT:
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+            END: pullOffBlock!
+            pullOffContainerBlock! string after is: 
+            
+            'my map':
+                'hello': 'world' 
+            START: processContainerBlock!
+                "block at start is: \"- 1\\n- 2\\n- 3\\n- 4\" "
+                    "block before:"
+                    - 1
+                    - 2
+                    - 3
+                    - 4
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffKeyTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffKeyTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                ---
+                                :type: "#atom/number"
+                                :value: '1'
+                                :indent: ''
+                        END: pullOffNumber!
+                        "pullOffContainerBlock!(string) is: {:type=>\"#atom/number\", :value=>\"1\", :indent=>\"\"} "
+                        "result is:"
+                        ---
+                        :type: "#atom/number"
+                        :value: '1'
+                        :indent: ''
+                        OUTPUT:
+                            ---
+                            :type: "#atom/number"
+                            :value: '1'
+                            :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#atom/number"
+                          :value: '1'
+                          :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    
+                    - 2
+                    - 3
+                    - 4
+                    OUTPUT:
+                        nil
+                    "block before:"
+                    - 2
+                    - 3
+                    - 4
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffKeyTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffKeyTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                ---
+                                :type: "#atom/number"
+                                :value: '2'
+                                :indent: ''
+                        END: pullOffNumber!
+                        "pullOffContainerBlock!(string) is: {:type=>\"#atom/number\", :value=>\"2\", :indent=>\"\"} "
+                        "result is:"
+                        ---
+                        :type: "#atom/number"
+                        :value: '2'
+                        :indent: ''
+                        OUTPUT:
+                            ---
+                            :type: "#atom/number"
+                            :value: '2'
+                            :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#atom/number"
+                          :value: '2'
+                          :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    
+                    - 3
+                    - 4
+                    OUTPUT:
+                        nil
+                    "block before:"
+                    - 3
+                    - 4
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffKeyTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffKeyTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                ---
+                                :type: "#atom/number"
+                                :value: '3'
+                                :indent: ''
+                        END: pullOffNumber!
+                        "pullOffContainerBlock!(string) is: {:type=>\"#atom/number\", :value=>\"3\", :indent=>\"\"} "
+                        "result is:"
+                        ---
+                        :type: "#atom/number"
+                        :value: '3'
+                        :indent: ''
+                        OUTPUT:
+                            ---
+                            :type: "#atom/number"
+                            :value: '3'
+                            :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#atom/number"
+                          :value: '3'
+                          :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    
+                    - 4
+                    OUTPUT:
+                        nil
+                    "block before:"
+                    "- 4"
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffKeyTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffKeyTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                ---
+                                :type: "#atom/number"
+                                :value: '4'
+                                :indent: ''
+                        END: pullOffNumber!
+                        "pullOffContainerBlock!(string) is: {:type=>\"#atom/number\", :value=>\"4\", :indent=>\"\"} "
+                        "result is:"
+                        ---
+                        :type: "#atom/number"
+                        :value: '4'
+                        :indent: ''
+                        OUTPUT:
+                            ---
+                            :type: "#atom/number"
+                            :value: '4'
+                            :indent: ''
+                    END: pullOffValue!
+                    OUTPUT:
+                        ---
+                        :type: "#listValue"
+                        :value:
+                          :type: "#atom/number"
+                          :value: '4'
+                          :indent: ''
+                END: pullOffListElement!
+                    "block after:"
+                    ''
+                    OUTPUT:
+                        nil
+                OUTPUT:
+                    ---
+                    :type: "#container"
+                    :value:
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '1'
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '2'
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '3'
+                        :indent: ''
+                    - :type: "#listValue"
+                      :value:
+                        :type: "#atom/number"
+                        :value: '4'
+                        :indent: ''
+            END: processContainerBlock!
+            "pullOffContainerBlock!(string) is: {:type=>\"#container\", :value=>[{:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"1\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"2\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"3\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"4\", :indent=>\"\"}}]} "
+            "result is:"
+            ---
+            :type: "#container"
+            :value:
+            - :type: "#listValue"
+              :value:
+                :type: "#atom/number"
+                :value: '1'
+                :indent: ''
+            - :type: "#listValue"
+              :value:
+                :type: "#atom/number"
+                :value: '2'
+                :indent: ''
+            - :type: "#listValue"
+              :value:
+                :type: "#atom/number"
+                :value: '3'
+                :indent: ''
+            - :type: "#listValue"
+              :value:
+                :type: "#atom/number"
+                :value: '4'
+                :indent: ''
+            OUTPUT:
+                ---
+                :type: "#container"
+                :value:
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '1'
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '2'
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '3'
+                    :indent: ''
+                - :type: "#listValue"
+                  :value:
+                    :type: "#atom/number"
+                    :value: '4'
+                    :indent: ''
+        END: pullOffValue!
+        "value is: {:type=>\"#container\", :value=>[{:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"1\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"2\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"3\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"4\", :indent=>\"\"}}]} "
+        string_clone after pullOffValue! is: 
+        
+        'my map':
+            'hello': 'world' 
+        string before is: 'my list':
+            - 1
+            - 2
+            - 3
+            - 4
+        
+        'my map':
+            'hello': 'world' 
+        string after is: 
+        
+        'my map':
+            'hello': 'world' 
+        OUTPUT:
+            ---
+            :type: "#keyValue"
+            :key:
+              :type: "#string"
+              :value: my list
+              :indent: ''
+            :value:
+              :type: "#container"
+              :value:
+              - :type: "#listValue"
+                :value:
+                  :type: "#atom/number"
+                  :value: '1'
+                  :indent: ''
+              - :type: "#listValue"
+                :value:
+                  :type: "#atom/number"
+                  :value: '2'
+                  :indent: ''
+              - :type: "#listValue"
+                :value:
+                  :type: "#atom/number"
+                  :value: '3'
+                  :indent: ''
+              - :type: "#listValue"
+                :value:
+                  :type: "#atom/number"
+                  :value: '4'
+                  :indent: ''
+    END: pullOffKeyedElement!
+        "block after:"
+        
+        
+        'my map':
+            'hello': 'world'
+        OUTPUT:
+            nil
+        "block before:"
+        'my map':
+            'hello': 'world'
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            nil
+    END: pullOffComment!
+    START: pullOffListElement!
+        OUTPUT:
+            nil
+    END: pullOffListElement!
+    START: pullOffKeyedElement!
+        START: pullOffKey!
+            START: pullOffKeyTerm!
+                OUTPUT:
+                    nil
+            END: pullOffKeyTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                "single_quotes_match is: ' "
+                OUTPUT:
+                    ---
+                    :type: "#string"
+                    :value: my map
+                    :indent: ''
+            END: pullOffInlineString!
+            OUTPUT:
+                ---
+                :type: "#string"
+                :value: my map
+                :indent: ''
+        END: pullOffKey!
+        "key is: {:type=>\"#string\", :value=>\"my map\", :indent=>\"\"} "
+        START: pullOffValue!
+            START: pullOffInlineTypedValue!
+                START: pullOffType!
+                    OUTPUT:
+                        nil
+                END: pullOffType!
+                OUTPUT:
+                    nil
+            END: pullOffInlineTypedValue!
+            START: pullOffEmptyContainer!
+                OUTPUT:
+                    nil
+            END: pullOffEmptyContainer!
+            START: pullOffKeyTerm!
+                OUTPUT:
+                    nil
+            END: pullOffKeyTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                OUTPUT:
+                    nil
+            END: pullOffInlineString!
+            START: pullOffStringBlock!
+                OUTPUT:
+                    nil
+            END: pullOffStringBlock!
+            pullOffContainerBlock! string before is: 
+                'hello': 'world' 
+            START: pullOffBlock!
+                string_clone is: 
+                    'hello': 'world' 
+                after sub string_clone is: 
+                    'hello': 'world' 
+                "next_line is: 'hello': 'world' "
+                "next_line is:  "
+                OUTPUT:
+                    "'hello': 'world'"
+            END: pullOffBlock!
+            "pullOffContainerBlock! string after is:  "
+            START: processContainerBlock!
+                "block at start is: \"'hello': 'world'\" "
+                    "block before:"
+                    "'hello': 'world'"
+                    OUTPUT:
+                        nil
+                START: pullOffComment!
+                    OUTPUT:
+                        nil
+                END: pullOffComment!
+                START: pullOffListElement!
+                    OUTPUT:
+                        nil
+                END: pullOffListElement!
+                START: pullOffKeyedElement!
+                    START: pullOffKey!
+                        START: pullOffKeyTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffKeyTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                nil
+                        END: pullOffNumber!
+                        START: pullOffAtom!
+                            OUTPUT:
+                                nil
+                        END: pullOffAtom!
+                        START: pullOffInlineString!
+                            "single_quotes_match is: ' "
+                            OUTPUT:
+                                ---
+                                :type: "#string"
+                                :value: hello
+                                :indent: ''
+                        END: pullOffInlineString!
+                        OUTPUT:
+                            ---
+                            :type: "#string"
+                            :value: hello
+                            :indent: ''
+                    END: pullOffKey!
+                    "key is: {:type=>\"#string\", :value=>\"hello\", :indent=>\"\"} "
+                    START: pullOffValue!
+                        START: pullOffInlineTypedValue!
+                            START: pullOffType!
+                                OUTPUT:
+                                    nil
+                            END: pullOffType!
+                            OUTPUT:
+                                nil
+                        END: pullOffInlineTypedValue!
+                        START: pullOffEmptyContainer!
+                            OUTPUT:
+                                nil
+                        END: pullOffEmptyContainer!
+                        START: pullOffKeyTerm!
+                            OUTPUT:
+                                nil
+                        END: pullOffKeyTerm!
+                        START: pullOffNumber!
+                            OUTPUT:
+                                nil
+                        END: pullOffNumber!
+                        START: pullOffAtom!
+                            OUTPUT:
+                                nil
+                        END: pullOffAtom!
+                        START: pullOffInlineString!
+                            "single_quotes_match is: ' "
+                            OUTPUT:
+                                ---
+                                :type: "#string"
+                                :value: world
+                                :indent: " "
+                        END: pullOffInlineString!
+                        "pullOffContainerBlock!(string) is: {:type=>\"#string\", :value=>\"world\", :indent=>\" \"} "
+                        "result is:"
+                        ---
+                        :type: "#string"
+                        :value: world
+                        :indent: " "
+                        OUTPUT:
+                            ---
+                            :type: "#string"
+                            :value: world
+                            :indent: " "
+                    END: pullOffValue!
+                    "value is: {:type=>\"#string\", :value=>\"world\", :indent=>\" \"} "
+                    "string_clone after pullOffValue! is:  "
+                    "string before is: 'hello': 'world' "
+                    "string after is:  "
+                    OUTPUT:
+                        ---
+                        :type: "#keyValue"
+                        :key:
+                          :type: "#string"
+                          :value: hello
+                          :indent: ''
+                        :value:
+                          :type: "#string"
+                          :value: world
+                          :indent: " "
+                END: pullOffKeyedElement!
+                    "block after:"
+                    ''
+                    OUTPUT:
+                        nil
+                OUTPUT:
+                    ---
+                    :type: "#container"
+                    :value:
+                    - :type: "#keyValue"
+                      :key:
+                        :type: "#string"
+                        :value: hello
+                        :indent: ''
+                      :value:
+                        :type: "#string"
+                        :value: world
+                        :indent: " "
+            END: processContainerBlock!
+            "pullOffContainerBlock!(string) is: {:type=>\"#container\", :value=>[{:type=>\"#keyValue\", :key=>{:type=>\"#string\", :value=>\"hello\", :indent=>\"\"}, :value=>{:type=>\"#string\", :value=>\"world\", :indent=>\" \"}}]} "
+            "result is:"
+            ---
+            :type: "#container"
+            :value:
+            - :type: "#keyValue"
+              :key:
+                :type: "#string"
+                :value: hello
+                :indent: ''
+              :value:
+                :type: "#string"
+                :value: world
+                :indent: " "
+            OUTPUT:
+                ---
+                :type: "#container"
+                :value:
+                - :type: "#keyValue"
+                  :key:
+                    :type: "#string"
+                    :value: hello
+                    :indent: ''
+                  :value:
+                    :type: "#string"
+                    :value: world
+                    :indent: " "
+        END: pullOffValue!
+        "value is: {:type=>\"#container\", :value=>[{:type=>\"#keyValue\", :key=>{:type=>\"#string\", :value=>\"hello\", :indent=>\"\"}, :value=>{:type=>\"#string\", :value=>\"world\", :indent=>\" \"}}]} "
+        "string_clone after pullOffValue! is:  "
+        string before is: 'my map':
+            'hello': 'world' 
+        "string after is:  "
+        OUTPUT:
+            ---
+            :type: "#keyValue"
+            :key:
+              :type: "#string"
+              :value: my map
+              :indent: ''
+            :value:
+              :type: "#container"
+              :value:
+              - :type: "#keyValue"
+                :key:
+                  :type: "#string"
+                  :value: hello
+                  :indent: ''
+                :value:
+                  :type: "#string"
+                  :value: world
+                  :indent: " "
+    END: pullOffKeyedElement!
+        "block after:"
+        ''
+        OUTPUT:
+            nil
+    OUTPUT:
+        ---
+        :type: "#container"
+        :value:
+        - :type: "#comment"
+          :value: imma comment
+          :indent: ''
+        - :type: "#keyValue"
+          :key:
+            :type: "#string"
+            :value: my list
+            :indent: ''
+          :value:
+            :type: "#container"
+            :value:
+            - :type: "#listValue"
+              :value:
+                :type: "#atom/number"
+                :value: '1'
+                :indent: ''
+            - :type: "#listValue"
+              :value:
+                :type: "#atom/number"
+                :value: '2'
+                :indent: ''
+            - :type: "#listValue"
+              :value:
+                :type: "#atom/number"
+                :value: '3'
+                :indent: ''
+            - :type: "#listValue"
+              :value:
+                :type: "#atom/number"
+                :value: '4'
+                :indent: ''
+        - :type: "#keyValue"
+          :key:
+            :type: "#string"
+            :value: my map
+            :indent: ''
+          :value:
+            :type: "#container"
+            :value:
+            - :type: "#keyValue"
+              :key:
+                :type: "#string"
+                :value: hello
+                :indent: ''
+              :value:
+                :type: "#string"
+                :value: world
+                :indent: " "
+END: processContainerBlock!
+---
+:type: "#container"
+:value:
+- :type: "#comment"
+  :value: imma comment
+  :indent: ''
+- :type: "#keyValue"
+  :key:
+    :type: "#string"
+    :value: my list
+    :indent: ''
+  :value:
+    :type: "#container"
+    :value:
+    - :type: "#listValue"
+      :value:
+        :type: "#atom/number"
+        :value: '1'
+        :indent: ''
+    - :type: "#listValue"
+      :value:
+        :type: "#atom/number"
+        :value: '2'
+        :indent: ''
+    - :type: "#listValue"
+      :value:
+        :type: "#atom/number"
+        :value: '3'
+        :indent: ''
+    - :type: "#listValue"
+      :value:
+        :type: "#atom/number"
+        :value: '4'
+        :indent: ''
+- :type: "#keyValue"
+  :key:
+    :type: "#string"
+    :value: my map
+    :indent: ''
+  :value:
+    :type: "#container"
+    :value:
+    - :type: "#keyValue"
+      :key:
+        :type: "#string"
+        :value: hello
+        :indent: ''
+      :value:
+        :type: "#string"
+        :value: world
+        :indent: " "

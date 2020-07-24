@@ -28,6 +28,37 @@ inline_patterns = [
 # FUTURE: allow inline comments inside of string-blocks
 # PROBLEM: completely empty value sections
 
+$indent_amount = 0
+def debug_block( name, block)
+    dp("START: #{name}\n") if name
+    $indent_amount += 4
+    output = block[]
+    dp("OUTPUT:\n")
+    $indent_amount += 4
+    dp(output)
+    $indent_amount -= 4
+    $indent_amount -= 4
+    dp("END: #{name}\n") if name
+    return output
+end
+def dp(args)
+    if args == nil 
+        puts (' '*$indent_amount)+"nil"
+    elsif args == ""
+        puts (' '*$indent_amount)+"''"
+    elsif args.is_a?(Hash) || args.is_a?(Array)
+        puts args.to_yaml.gsub(/^/, ' '*$indent_amount)
+    else
+        args = "#{args}"
+        if args.match(/\n/)
+            puts args.gsub(/^/, ' '*$indent_amount)
+        else
+            puts args.inspect.gsub(/^/, ' '*$indent_amount)
+        end
+    end
+end
+
+
 output = {}
 
 class String
@@ -72,254 +103,310 @@ def pullOff!(pattern, string, trim: true, response: nil)
 end
 
 def pullOffComment!(string)
-    pullOff! $comment_pattern, string,  response: ->(indent: nil, match: nil) do
-        {
-            type: "#comment",
-            value: match[1],
-            indent: indent,
-        }
+    debug_block "pullOffComment!", ->() do
+        pullOff! $comment_pattern, string,  response: ->(indent: nil, match: nil) do
+            {
+                type: "#comment",
+                value: match[1],
+                indent: indent,
+            }
+        end
     end
 end
 
 def pullOffType!(string)
-    pullOff! $type_pattern, string, response: ->(indent: nil, match: nil) do
-        {
-            value: match[2],
-            indent: indent,
-        }
+    debug_block "pullOffType!", ->() do
+        pullOff! $type_pattern, string, response: ->(indent: nil, match: nil) do
+            {
+                value: match[2],
+                indent: indent,
+            }
+        end
     end
 end
 
 def pullOffInlineTypedValue!(string)
-    string_clone = string.clone
-    type = pullOffType!(string_clone)
-    if type
-        return pullOff! /:(.*)/, string, response: ->(indent: nil, match: nil) do
-            {
-                type: type[:asString],
-                indent: type[:indent],
-                value: indent+match[1],
-            }
+    debug_block "pullOffInlineTypedValue!", ->() do
+        string_clone = string.clone
+        type = pullOffType!(string_clone)
+        output = nil
+        if type
+            output = pullOff! /:(.*)/, string, response: ->(indent: nil, match: nil) do
+                {
+                    type: type[:asString],
+                    indent: type[:indent],
+                    value: indent+match[1],
+                }
+            end
         end
+        output
     end
-    nil
 end
 # TODO: also cover the typed value without the colon
 
 
 def pullOffEmptyContainer!(string)
-    pullOff! $empty_container_pattern, string, response: ->(indent: nil, match: nil) do
-        container_symbol = match[0]
-        if container_symbol == "{}"
-            type = "#container/map"
-        elsif container_symbol == "[]"
-            type = "#container/list"
+    debug_block "pullOffEmptyContainer!", ->() do
+        pullOff! $empty_container_pattern, string, response: ->(indent: nil, match: nil) do
+            container_symbol = match[0]
+            if container_symbol == "{}"
+                type = "#container/map"
+            elsif container_symbol == "[]"
+                type = "#container/list"
+            end
+            {
+                type: type,
+                value: container_symbol,
+                indent: indent,
+            }
         end
-        {
-            type: type,
-            value: container_symbol,
-            indent: indent,
-        }
     end
 end
 
 def pullOffKeyTerm!(string)
-    pullOff! $special_term_pattern, string, response: ->(indent: nil, match: nil) do
-        special_term = match[0].downcase
-        if special_term == "null"
-            type = "#atom/null"
-        elsif special_term == "false"
-            type = "#atom/false"
-        elsif special_term == "true"
-            type = "#atom/true"
+    debug_block "pullOffKeyTerm!", ->() do
+        pullOff! $special_term_pattern, string, response: ->(indent: nil, match: nil) do
+            special_term = match[0].downcase
+            if special_term == "null"
+                type = "#atom/null"
+            elsif special_term == "false"
+                type = "#atom/false"
+            elsif special_term == "true"
+                type = "#atom/true"
+            end
+            {
+                type: type,
+                value: special_term,
+                indent: indent,
+            }
         end
-        {
-            type: type,
-            value: special_term,
-            indent: indent,
-        }
     end
 end
 
 # TODO: reference
 
 def pullOffNumber!(string)
-    pullOff! $number_pattern, string, response: ->(indent: nil, match: nil) do
-        {
-            type: "#atom/number",
-            value: match[0],
-            indent: indent,
-        }
+    debug_block "pullOffNumber!", ->() do
+        pullOff! $number_pattern, string, response: ->(indent: nil, match: nil) do
+            {
+                type: "#atom/number",
+                value: match[0],
+                indent: indent,
+            }
+        end
     end
 end
 
 def pullOffAtom!(string)
-    pullOff! $atom_pattern, string, response: ->(indent: nil, match: nil) do
-        {
-            type: "#atom",
-            value: match[0],
-            indent: indent,
-        }
+    debug_block "pullOffAtom!", ->() do
+        pullOff! $atom_pattern, string, response: ->(indent: nil, match: nil) do
+            {
+                type: "#atom",
+                value: match[0],
+                indent: indent,
+            }
+        end
     end
 end
 
 def pullOffInlineString!(string)
-    string_clone = string.clone
-    # find quotes
-    actual_indent = pullOffWhiteSpace!(string_clone)
-    single_quotes_match = string_clone.match(/\A'+/)
-    double_quotes_match = string_clone.match(/\A"+/)
-    return nil if ! (single_quotes_match || double_quotes_match)
-    
-    if double_quotes_match
-        # TODO
-        raise "\n\nDouble quotes not yet supported! srry"
-    else
-        number_of_quotes = single_quotes_match[0].size
-        valid_quote_start_size = 1
-        # find the size of the starting quote, which can be any power of three
-        largest_power_of_3_that_fits = 3**(Math::log(number_of_quotes, 3)).floor
-        pullOff! /\A('{#{largest_power_of_3_that_fits}})(.*?)\1/, string, response: ->(indent: nil, match: nil) do
-            {
-                type: "#string",
-                value: match[2],
-                indent: actual_indent,
-            }
+    debug_block "pullOffInlineString!", ->() do
+        string_clone = string.clone
+        # find quotes
+        actual_indent = pullOffWhiteSpace!(string_clone)
+        single_quotes_match = string_clone.match(/\A'+/)
+        double_quotes_match = string_clone.match(/\A"+/)
+        return nil if ! (single_quotes_match || double_quotes_match)
+        dp "single_quotes_match is: #{single_quotes_match} "
+        
+        if double_quotes_match
+            # TODO
+            raise "\n\nDouble quotes not yet supported! srry"
+        else
+            number_of_quotes = single_quotes_match[0].size
+            valid_quote_start_size = 1
+            # find the size of the starting quote, which can be any power of three
+            largest_power_of_3_that_fits = 3**(Math::log(number_of_quotes, 3)).floor
+            pullOff! /\A('{#{largest_power_of_3_that_fits}})(.*?)\1/, string, response: ->(indent: nil, match: nil) do
+                {
+                    type: "#string",
+                    value: match[2],
+                    indent: actual_indent,
+                }
+            end
         end
     end
 end
 
 def pullOffBlock!(string)
-    block = ""
-    starting_line_pattern = /\A[ \t]*\n/
-    # check that nothing remains on the starting line
-    if string =~ starting_line_pattern
-        # pull off that starting line
-        string.sub!(starting_line_pattern, "")
-        # pull off all the indented lines
-        loop do
-            next_line = pullOff! /\A\n {#{STANDARD_INDENT_SIZE}}(.*)/, string, trim: false, response: ->(indent: nil, match: nil) do
-                match[1]
+    debug_block "pullOffBlock!", ->() do
+        string_clone = string.clone
+        dp "string_clone is: #{string_clone} "
+        block = ""
+        starting_line_pattern = /\A[ \t]*(?=\n)/
+        # check that nothing remains on the starting line
+        if string_clone =~ starting_line_pattern
+            # pull off that starting line
+            string_clone.sub!(starting_line_pattern, "")
+            dp "after sub string_clone is: #{string_clone} "
+            # pull off all the indented lines
+            loop do
+                next_line = string_clone.extract!(/\A\n {#{STANDARD_INDENT_SIZE}}(.*)/, 1)
+                dp "next_line is: #{next_line} "
+                break if !next_line
+                block += "\n"+next_line
             end
-            break if !next_line
-            block += next_line
+            string.sub!(/[\w\W]*/, string_clone)
+            return block.sub(/\A\n/,"")
         end
-        return block
+        nil
     end
-    nil
 end
 
 def pullOffStringBlock!(string)
-    string_clone = string.clone
-    # TODO: should comments be allowed here?
-    pullOffWhiteSpace!(string_clone)
-    # TODO: add double quotes
-    if string_clone.extract!(/\A'/)
-        if block = pullOffBlock!(string_clone)
-            # replace string with the string clone
-            string.sub!(/[\w\W]/, string_clone)
-            return {
-                type: "#string",
-                value: block,
-                indent: actual_indent,
-            }
+    debug_block "pullOffStringBlock!", ->() do
+        string_clone = string.clone
+        # TODO: should comments be allowed here?
+        pullOffWhiteSpace!(string_clone)
+        # TODO: add double quotes
+        if string_clone.extract!(/\A'/)
+            if block = pullOffBlock!(string_clone)
+                # replace string with the string clone
+                string.sub!(/[\w\W]/, string_clone)
+                return {
+                    type: "#string",
+                    value: block,
+                    indent: actual_indent,
+                }
+            end
         end
+        nil
     end
-    nil
 end
 
 def pullOffValue!(string)
-    pullOffInlineTypedValue!(string)||
-    pullOffEmptyContainer!(string) ||
-    pullOffKeyTerm!(string) ||
-    pullOffNumber!(string) ||
-    pullOffAtom!(string) ||
-    pullOffInlineString!(string)||
-    pullOffStringBlock!(string)||
-    pullOffContainerBlock!(string)
+    debug_block "pullOffValue!", ->() do
+        string_clone = string.clone
+        result ||= pullOffInlineTypedValue!(string)
+        result ||= pullOffEmptyContainer!(string)  
+        result ||= pullOffKeyTerm!(string)         
+        result ||= pullOffNumber!(string)          
+        result ||= pullOffAtom!(string)            
+        result ||= pullOffInlineString!(string)    
+        result ||= pullOffStringBlock!(string)     
+        dp "pullOffContainerBlock!(string) is: #{result ||= pullOffContainerBlock!(string)} "
+        dp "result is:"
+        dp result
+        return result
+    end
 end
 
 def pullOffListElement!(string)
-    string_clone = string.clone
-    
-    return nil if string_clone.extract!(/- /) == nil
-    return nil if (value = pullOffValue!(string_clone)) == nil
-    
-    # replace string with the clone
-    string.sub!(/[\w\W]*/, string_clone)
-    return {
-        type: "#listValue", 
-        value: value,
-    }
+    debug_block "pullOffListElement!", ->() do
+        string_clone = string.clone
+        
+        return nil if string_clone.extract!(/\A- /) == nil
+        return nil if (value = pullOffValue!(string_clone)) == nil
+        
+        # replace string with the clone
+        string.sub!(/[\w\W]*/, string_clone)
+        {
+            type: "#listValue", 
+            value: value,
+        }
+    end
 end
 
 def pullOffKey!(string)
-    # PROBLEM: what about special_terms as keys
-    # FIXME: add smart keys
-    return_value = (pull_off_key_term = pullOffKeyTerm!(string)) || 
-        (pull_off_number = pullOffNumber!(string)) ||
-        (pull_off_atom = pullOffAtom!(string)) ||
-        (pull_off_inline_string = pullOffInlineString!(string))
-    puts "pull_off_key_term is: #{pull_off_key_term} "
-    puts "pull_off_number is: #{pull_off_number} "
-    puts "pull_off_atom is: #{pull_off_atom} "
-    puts "pull_off_inline_string is: #{pull_off_inline_string} "
-    return return_value
+    debug_block "pullOffKey!", ->() do
+        # PROBLEM: what about special_terms as keys
+        # FIXME: add smart keys
+        pullOffKeyTerm!(string) || 
+        pullOffNumber!(string) ||
+        pullOffAtom!(string) ||
+        pullOffInlineString!(string)
+    end
 end
 
 def pullOffKeyedElement!(string)
-    string_clone = string.clone
-    
-    return nil if (key = pullOffKey!(string_clone)) == nil
-    puts "key is: #{key} "
-    # TODO: record this indent somehow
-    trailing_key_indent = pullOffWhiteSpace!(string_clone)
-    return nil if string_clone.extract!(/\A:/) == nil
-    return nil if (value = pullOffValue!(string_clone)) == nil
-    return {
-        type: "#keyValue", 
-        key: key,
-        value: value,
-    }
+    debug_block "pullOffKeyedElement!", ->() do
+        string_clone = string.clone
+        
+        return nil if (key = pullOffKey!(string_clone)) == nil
+        dp "key is: #{key} "
+        # TODO: record this indent somehow
+        trailing_key_indent = pullOffWhiteSpace!(string_clone)
+        return nil if string_clone.extract!(/\A:/) == nil
+        return nil if (value = pullOffValue!(string_clone)) == nil
+        dp "value is: #{value} "
+        dp "string_clone after pullOffValue! is: #{string_clone} "
+        # perform the replacement
+        dp "string before is: #{string} "
+        string.sub!(/[\w\W]*/, string_clone)
+        dp "string after is: #{string} "
+        {
+            type: "#keyValue", 
+            key: key,
+            value: value,
+        }
+    end
 end
 
 def pullOffContainerBlock!(string)
+    dp "pullOffContainerBlock! string before is: #{string} "
     return nil if (block = pullOffBlock!(string)) == nil
-    processContainerBlock!(block)
+    dp "pullOffContainerBlock! string after is: #{string} "
+    return processContainerBlock!(block)
 end
 
 def processContainerBlock!(block)
-    original_block_content = block.clone
-    container = []
-    # if there's still text to process
-    loop do
-        starting_string_size = block.size
-        # remove excess whitespace
-        block.extract!(/\A\s*\n+/)
-        
-        # comments
-        container.push(
-            pullOffComment!(block) ||
-            pullOffListElement!(block) ||
-            pullOffKeyedElement!(block)
-        )
-        
-        # check for graceful end
-        if block =~ /[ \t]*\z/
-            # TODO: detect container type based on contents
-            return {
-                type: "#container",
-                value: container
-            }
+    debug_block "processContainerBlock!", ->() do
+        output = nil
+        original_block_content = block.clone
+        container = []
+        dp "block at start is: #{block.inspect} "
+        # if there's still text to process
+        loop do
+            starting_string_size = block.size
+            # remove excess whitespace
+            block.extract!(/\A\s*\n+/)
+            
+            # comments
+            debug_block nil, ->() do
+                dp "block before:"
+                dp block
+            end
+            container.push(
+                pullOffComment!(block) ||
+                pullOffListElement!(block) ||
+                pullOffKeyedElement!(block)
+            )
+            debug_block nil, ->() do
+                dp "block after:"
+                dp block
+            end
+            
+            # check for graceful end
+            if block =~ /\A[ \t]*\z/
+                # TODO: detect container type based on contents
+                output = {
+                    type: "#container",
+                    value: container
+                }
+                break
+            end
+            
+            # FAIL (no progression)
+            if starting_string_size == block.size
+                dp "FAILED"
+                dp "    got to #{block.size} starting from #{original_block_content.size}"
+                dp "    original block:\n#{original_block_content.gsub(/(\n|\A)/, '\\1        ')}"
+                dp "    Container:"
+                dp container.to_yaml
+                break
+            end
         end
-        
-        # FAIL (no progression)
-        if starting_string_size == block.size
-            puts "FAILED"
-            puts "    got to #{block.size} starting from #{original_block_content.size}"
-            puts "    original block:\n#{original_block_content.gsub(/(\n|\A)/, '    \1')}"
-            break
-        end
+        output
     end
 end
 
