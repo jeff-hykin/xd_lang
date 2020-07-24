@@ -126,7 +126,7 @@ def pullOffInlineTypedValue!(string)
         return nil if (type = pullOffType!(string_clone)) == nil
         output = pullOff! /:(.*)/, string_clone, ->(indent: nil, match: nil) do
             {
-                type: type[:asString],
+                type: type[:value],
                 indent: type[:indent],
                 value: indent+match[1],
             }
