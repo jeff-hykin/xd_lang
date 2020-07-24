@@ -220,7 +220,7 @@ def pullOffInlineString!(string)
             valid_quote_start_size = 1
             # find the size of the starting quote, which can be any power of three
             largest_power_of_3_that_fits = 3**(Math::log(number_of_quotes, 3)).floor
-            pullOff! /\A('{#{largest_power_of_3_that_fits}})(.*?)\1/, string, ->(indent: nil, match: nil) do
+            pullOff! /\A('{#{largest_power_of_3_that_fits}})(.*?'{0,#{largest_power_of_3_that_fits-1}})\1/, string, ->(indent: nil, match: nil) do
                 {
                     type: "#string",
                     value: match[2],

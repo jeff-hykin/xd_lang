@@ -1,5 +1,5 @@
 START: processContainerBlock!
-    "block at start is: \"# imma comment\\n'my list':\\n    - 1\\n    - 2\\n    - 3\\n    - 4\\n\\n'my map':\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\\n\\n\\n\\n'list of lists':\\n    - \\n        - 1.1\\n        - 1.2\\n        - 1.3\\n    -\\n        - 2.1\\n        - 2.2\\n        - 2.3\\n        - 2.4\" "
+    "block at start is: \"# imma comment\\n'my list':\\n    - 1\\n    - 2\\n    - 3\\n    - 4\\n\\n'my map':\\n    hello: 'world'\\n\\n\\n# block-string and interpolation\\nintroduction: '\\n    This is a double quote string\\n    This intro is for the $projectName project\\n    I can also use C-style escapes like \\\\t and \\\\n here\\n\\n# block-string literal\\nliteralIntroduction: '\\n    This is a single quote string\\n    This intro is for the $projectName project\\n    C-style escapes don't work at all \\\\t and \\\\n\\n    however I type here, is exactly how its going to show up\\neyeColors:\\n    - @blue\\n    - @green\\n    - @brown\\n\\n\\n\\n'list of lists':\\n    - \\n        - 1.1\\n        - 1.2\\n        - 1.3\\n    -\\n        - 2.1\\n        - 2.2\\n        - 2.3\\n        - 2.4\\n\\n\\n'''this is triple single quotes he said 'thats what she said'''': true\" "
         "block before:"
         # imma comment
         'my list':
@@ -41,6 +41,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
     START: pullOffComment!
@@ -91,6 +94,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
         "block before:"
@@ -133,6 +139,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
     START: pullOffComment!
@@ -243,7 +252,10 @@ START: processContainerBlock!
                     - 2.1
                     - 2.2
                     - 2.3
-                    - 2.4 
+                    - 2.4
+            
+            
+            '''this is triple single quotes he said 'thats what she said'''': true 
             START: pullOffBlock!
                 string_clone is: 
                     - 1
@@ -283,7 +295,10 @@ START: processContainerBlock!
                         - 2.1
                         - 2.2
                         - 2.3
-                        - 2.4 
+                        - 2.4
+                
+                
+                '''this is triple single quotes he said 'thats what she said'''': true 
                 after sub string_clone is: 
                     - 1
                     - 2
@@ -322,7 +337,10 @@ START: processContainerBlock!
                         - 2.1
                         - 2.2
                         - 2.3
-                        - 2.4 
+                        - 2.4
+                
+                
+                '''this is triple single quotes he said 'thats what she said'''': true 
                 "next_line is: - 1 "
                 "next_line is: - 2 "
                 "next_line is: - 3 "
@@ -368,7 +386,10 @@ START: processContainerBlock!
                     - 2.1
                     - 2.2
                     - 2.3
-                    - 2.4 
+                    - 2.4
+            
+            
+            '''this is triple single quotes he said 'thats what she said'''': true 
             START: processContainerBlock!
                 "block at start is: \"- 1\\n- 2\\n- 3\\n- 4\" "
                     "block before:"
@@ -672,7 +693,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         string before is: 'my list':
             - 1
             - 2
@@ -711,7 +735,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         string after is: 
         
         'my map':
@@ -746,7 +773,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         OUTPUT:
             ---
             :type: "#keyValue"
@@ -814,6 +844,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
         "block before:"
@@ -850,6 +883,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
     START: pullOffComment!
@@ -954,7 +990,10 @@ START: processContainerBlock!
                     - 2.1
                     - 2.2
                     - 2.3
-                    - 2.4 
+                    - 2.4
+            
+            
+            '''this is triple single quotes he said 'thats what she said'''': true 
             START: pullOffBlock!
                 string_clone is: 
                     hello: 'world'
@@ -988,7 +1027,10 @@ START: processContainerBlock!
                         - 2.1
                         - 2.2
                         - 2.3
-                        - 2.4 
+                        - 2.4
+                
+                
+                '''this is triple single quotes he said 'thats what she said'''': true 
                 after sub string_clone is: 
                     hello: 'world'
                 
@@ -1021,7 +1063,10 @@ START: processContainerBlock!
                         - 2.1
                         - 2.2
                         - 2.3
-                        - 2.4 
+                        - 2.4
+                
+                
+                '''this is triple single quotes he said 'thats what she said'''': true 
                 "next_line is: hello: 'world' "
                 "next_line is:  "
                 OUTPUT:
@@ -1058,7 +1103,10 @@ START: processContainerBlock!
                     - 2.1
                     - 2.2
                     - 2.3
-                    - 2.4 
+                    - 2.4
+            
+            
+            '''this is triple single quotes he said 'thats what she said'''': true 
             START: processContainerBlock!
                 "block at start is: \"hello: 'world'\" "
                     "block before:"
@@ -1217,7 +1265,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         string before is: 'my map':
             hello: 'world'
         
@@ -1250,7 +1301,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         string after is: 
         
         
@@ -1282,7 +1336,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         OUTPUT:
             ---
             :type: "#keyValue"
@@ -1336,6 +1393,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
         "block before:"
@@ -1368,6 +1428,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
     START: pullOffComment!
@@ -1407,6 +1470,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
         "block before:"
@@ -1438,6 +1504,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
     START: pullOffComment!
@@ -1532,7 +1601,10 @@ START: processContainerBlock!
                             - 2.1
                             - 2.2
                             - 2.3
-                            - 2.4 
+                            - 2.4
+                    
+                    
+                    '''this is triple single quotes he said 'thats what she said'''': true 
                     after sub string_clone is: 
                         This is a double quote string
                         This intro is for the $projectName project
@@ -1560,7 +1632,10 @@ START: processContainerBlock!
                             - 2.1
                             - 2.2
                             - 2.3
-                            - 2.4 
+                            - 2.4
+                    
+                    
+                    '''this is triple single quotes he said 'thats what she said'''': true 
                     "next_line is: This is a double quote string "
                     "next_line is: This intro is for the $projectName project "
                     "next_line is: I can also use C-style escapes like \\t and \\n here "
@@ -1613,7 +1688,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         string before is: introduction: '
             This is a double quote string
             This intro is for the $projectName project
@@ -1641,7 +1719,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         string after is: 
         
         # block-string literal
@@ -1666,7 +1747,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         OUTPUT:
             ---
             :type: "#keyValue"
@@ -1708,6 +1792,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
         "block before:"
@@ -1734,6 +1821,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
     START: pullOffComment!
@@ -1767,6 +1857,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
         "block before:"
@@ -1792,6 +1885,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
     START: pullOffComment!
@@ -1880,7 +1976,10 @@ START: processContainerBlock!
                             - 2.1
                             - 2.2
                             - 2.3
-                            - 2.4 
+                            - 2.4
+                    
+                    
+                    '''this is triple single quotes he said 'thats what she said'''': true 
                     after sub string_clone is: 
                         This is a single quote string
                         This intro is for the $projectName project
@@ -1902,7 +2001,10 @@ START: processContainerBlock!
                             - 2.1
                             - 2.2
                             - 2.3
-                            - 2.4 
+                            - 2.4
+                    
+                    
+                    '''this is triple single quotes he said 'thats what she said'''': true 
                     "next_line is: This is a single quote string "
                     "next_line is: This intro is for the $projectName project "
                     "next_line is: C-style escapes don't work at all \\t and \\n "
@@ -1952,7 +2054,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         string before is: literalIntroduction: '
             This is a single quote string
             This intro is for the $projectName project
@@ -1974,7 +2079,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         string after is: 
         eyeColors:
             - @blue
@@ -1992,7 +2100,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         OUTPUT:
             ---
             :type: "#keyValue"
@@ -2028,6 +2139,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
         "block before:"
@@ -2048,6 +2162,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
     START: pullOffComment!
@@ -2132,7 +2249,10 @@ START: processContainerBlock!
                     - 2.1
                     - 2.2
                     - 2.3
-                    - 2.4 
+                    - 2.4
+            
+            
+            '''this is triple single quotes he said 'thats what she said'''': true 
             START: pullOffBlock!
                 string_clone is: 
                     - @blue
@@ -2150,7 +2270,10 @@ START: processContainerBlock!
                         - 2.1
                         - 2.2
                         - 2.3
-                        - 2.4 
+                        - 2.4
+                
+                
+                '''this is triple single quotes he said 'thats what she said'''': true 
                 after sub string_clone is: 
                     - @blue
                     - @green
@@ -2167,7 +2290,10 @@ START: processContainerBlock!
                         - 2.1
                         - 2.2
                         - 2.3
-                        - 2.4 
+                        - 2.4
+                
+                
+                '''this is triple single quotes he said 'thats what she said'''': true 
                 "next_line is: - @blue "
                 "next_line is: - @green "
                 "next_line is: - @brown "
@@ -2190,7 +2316,10 @@ START: processContainerBlock!
                     - 2.1
                     - 2.2
                     - 2.3
-                    - 2.4 
+                    - 2.4
+            
+            
+            '''this is triple single quotes he said 'thats what she said'''': true 
             START: processContainerBlock!
                 "block at start is: \"- @blue\\n- @green\\n- @brown\" "
                     "block before:"
@@ -2418,7 +2547,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         string before is: eyeColors:
             - @blue
             - @green
@@ -2435,7 +2567,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         string after is: 
         
         
@@ -2449,7 +2584,10 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         OUTPUT:
             ---
             :type: "#keyValue"
@@ -2491,6 +2629,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
         "block before:"
@@ -2504,6 +2645,9 @@ START: processContainerBlock!
                 - 2.2
                 - 2.3
                 - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
         OUTPUT:
             nil
     START: pullOffComment!
@@ -2585,7 +2729,10 @@ START: processContainerBlock!
                     - 2.1
                     - 2.2
                     - 2.3
-                    - 2.4 
+                    - 2.4
+            
+            
+            '''this is triple single quotes he said 'thats what she said'''': true 
             START: pullOffBlock!
                 string_clone is: 
                     - 
@@ -2596,7 +2743,10 @@ START: processContainerBlock!
                         - 2.1
                         - 2.2
                         - 2.3
-                        - 2.4 
+                        - 2.4
+                
+                
+                '''this is triple single quotes he said 'thats what she said'''': true 
                 after sub string_clone is: 
                     - 
                         - 1.1
@@ -2606,7 +2756,10 @@ START: processContainerBlock!
                         - 2.1
                         - 2.2
                         - 2.3
-                        - 2.4 
+                        - 2.4
+                
+                
+                '''this is triple single quotes he said 'thats what she said'''': true 
                 "next_line is: -  "
                 "next_line is:     - 1.1 "
                 "next_line is:     - 1.2 "
@@ -2628,7 +2781,10 @@ START: processContainerBlock!
                         - 2.3
                         - 2.4
             END: pullOffBlock!
-            "pullOffContainerBlock! string after is:  "
+            pullOffContainerBlock! string after is: 
+            
+            
+            '''this is triple single quotes he said 'thats what she said'''': true 
             START: processContainerBlock!
                 "block at start is: \"- \\n    - 1.1\\n    - 1.2\\n    - 1.3\\n-\\n    - 2.1\\n    - 2.2\\n    - 2.3\\n    - 2.4\" "
                     "block before:"
@@ -3426,7 +3582,10 @@ START: processContainerBlock!
                         :indent: ''
         END: pullOffValue!
         "value is: {:type=>\"#container\", :value=>[{:type=>\"#listValue\", :value=>{:type=>\"#container\", :value=>[{:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"1.1\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"1.2\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"1.3\", :indent=>\"\"}}]}}, {:type=>\"#listValue\", :value=>{:type=>\"#container\", :value=>[{:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"2.1\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"2.2\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"2.3\", :indent=>\"\"}}, {:type=>\"#listValue\", :value=>{:type=>\"#atom/number\", :value=>\"2.4\", :indent=>\"\"}}]}}]} "
-        "string_clone after pullOffValue! is:  "
+        string_clone after pullOffValue! is: 
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         string before is: 'list of lists':
             - 
                 - 1.1
@@ -3436,8 +3595,14 @@ START: processContainerBlock!
                 - 2.1
                 - 2.2
                 - 2.3
-                - 2.4 
-        "string after is:  "
+                - 2.4
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
+        string after is: 
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true 
         OUTPUT:
             ---
             :type: "#keyValue"
@@ -3491,6 +3656,96 @@ START: processContainerBlock!
                       :type: "#atom/number"
                       :value: '2.4'
                       :indent: ''
+    END: pullOffKeyedElement!
+        "block after:"
+        
+        
+        
+        '''this is triple single quotes he said 'thats what she said'''': true
+        OUTPUT:
+            nil
+        "block before:"
+        "'''this is triple single quotes he said 'thats what she said'''': true"
+        OUTPUT:
+            nil
+    START: pullOffComment!
+        OUTPUT:
+            nil
+    END: pullOffComment!
+    START: pullOffListElement!
+        OUTPUT:
+            nil
+    END: pullOffListElement!
+    START: pullOffKeyedElement!
+        START: pullOffKey!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    nil
+            END: pullOffSpecialTerm!
+            START: pullOffNumber!
+                OUTPUT:
+                    nil
+            END: pullOffNumber!
+            START: pullOffAtom!
+                OUTPUT:
+                    nil
+            END: pullOffAtom!
+            START: pullOffInlineString!
+                "single_quotes_match is: ''' "
+                OUTPUT:
+                    ---
+                    :type: "#string"
+                    :value: this is triple single quotes he said 'thats what she said'
+                    :indent: ''
+            END: pullOffInlineString!
+            OUTPUT:
+                ---
+                :type: "#string"
+                :value: this is triple single quotes he said 'thats what she said'
+                :indent: ''
+        END: pullOffKey!
+        "key is: {:type=>\"#string\", :value=>\"this is triple single quotes he said 'thats what she said'\", :indent=>\"\"} "
+        START: pullOffValue!
+            START: pullOffInlineTypedValue!
+                START: pullOffType!
+                    OUTPUT:
+                        nil
+                END: pullOffType!
+                OUTPUT:
+                    nil
+            END: pullOffInlineTypedValue!
+            START: pullOffEmptyContainer!
+                OUTPUT:
+                    nil
+            END: pullOffEmptyContainer!
+            START: pullOffSpecialTerm!
+                OUTPUT:
+                    ---
+                    :type: "#atom/true"
+                    :value: 'true'
+                    :indent: " "
+            END: pullOffSpecialTerm!
+            OUTPUT:
+                ---
+                :type: "#atom/true"
+                :value: 'true'
+                :indent: " "
+        END: pullOffValue!
+        "value is: {:type=>\"#atom/true\", :value=>\"true\", :indent=>\" \"} "
+        "string_clone after pullOffValue! is:  "
+        "string before is: '''this is triple single quotes he said 'thats what she said'''': true "
+        "string after is:  "
+        OUTPUT:
+            ---
+            :type: "#keyValue"
+            :key:
+              :type: "#string"
+              :value: this is triple single quotes he said 'thats what she said'
+              :indent: ''
+            :value:
+              :type: "#atom/true"
+              :value: 'true'
+              :indent: " "
     END: pullOffKeyedElement!
         "block after:"
         ''
@@ -3653,6 +3908,15 @@ START: processContainerBlock!
                     :type: "#atom/number"
                     :value: '2.4'
                     :indent: ''
+        - :type: "#keyValue"
+          :key:
+            :type: "#string"
+            :value: this is triple single quotes he said 'thats what she said'
+            :indent: ''
+          :value:
+            :type: "#atom/true"
+            :value: 'true'
+            :indent: " "
 END: processContainerBlock!
 ---
 :type: "#container"
@@ -3810,3 +4074,12 @@ END: processContainerBlock!
             :type: "#atom/number"
             :value: '2.4'
             :indent: ''
+- :type: "#keyValue"
+  :key:
+    :type: "#string"
+    :value: this is triple single quotes he said 'thats what she said'
+    :indent: ''
+  :value:
+    :type: "#atom/true"
+    :value: 'true'
+    :indent: " "
