@@ -1,7 +1,7 @@
 // 
 // tools
 // 
-let extractFirst = ({ pattern, from}) => {
+let extractFirst = ({ pattern, from }) => {
     let match = from.match(pattern)
     if (match) {
         return {
@@ -16,15 +16,18 @@ let extractFirst = ({ pattern, from}) => {
     }
 }
 let testParse = ({ expectedIo, ifParsedWith}) => {
-    for (let each of expectedIo) {
-        let {input, output} = each
-        let nextExpectedOutput = JSON.stringify(output)
-        let nextActualOutput = JSON.stringify(ifParsedWith(input))
-        if (nextExpectedOutput != nextActualOutput) {
-            throw Error(`\n\n\n ifParsedWith:\n${ifParsedWith}\n\nWhen calling testParse()\nThe assertion that ${JSON.stringify(input)} results in ${nextExpectedOutput} was false\ninstead it was:\n{\n    input: ${JSON.stringify(input)},\n    output: ${nextActualOutput},\n},\n`)
+    // do at the end of the file 
+    setTimeout(() => {    
+        for (let each of expectedIo) {
+            let {input, output} = each
+            let nextExpectedOutput = JSON.stringify(output)
+            let nextActualOutput = JSON.stringify(ifParsedWith(input))
+            if (nextExpectedOutput != nextActualOutput) {
+                throw Error(`\n\n\n ifParsedWith:\n${ifParsedWith}\n\nWhen calling testParse()\nThe assertion that ${JSON.stringify(input)} results in ${nextExpectedOutput} was false\ninstead it was:\n{\n    input: ${JSON.stringify(input)},\n    output: ${nextActualOutput},\n},\n`)
+            }
         }
-    }
-    return true
+        console.log(`passed`)
+    }, 0)
 }
 
 
@@ -33,8 +36,12 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
 // 
 let parseMain
 
-
-let parseBlankLine = (remainingXdataString) => {
+// 
+// 
+// (blank lines)
+// 
+// 
+let parseBlankLine = (remainingXdataString, indent) => {
     let {remaining, extraction} = extractFirst({pattern: /^\s*$/, from: remainingXdataString,})
     // return null if no match
     if (!extraction) {
@@ -52,7 +59,11 @@ let parseBlankLine = (remainingXdataString) => {
         }
     }
 }
-
+// 
+// 
+//  # comments
+// 
+// 
 let parseComment
 testParse({
     expectedIo: [
@@ -69,7 +80,7 @@ testParse({
             output: { remaining: ''      , extraction: { types: ['#comment'] , content: '#'        } },
         },
     ],
-    ifParsedWith: parseComment = (remainingXdataString) => {
+    ifParsedWith: parseComment = (remainingXdataString, indent) => {
         let {remaining, extraction} = extractFirst({pattern:/^\s*#( .*|)\n?$/, from: remainingXdataString})
         // return null if no match
         if (!extraction) {
@@ -89,6 +100,331 @@ testParse({
         }
     }
 })
+
+// 
+// 
+// {}
+// []
+// 
+// 
+let parseEmptyContainer = (remainingXdataString) => {
+    let {remaining, extraction} = extractFirst({pattern: /^(\{\}|\[\])/, from: remainingXdataString}))
+    if (extraction == "{}") {
+        return {
+            remaining,
+            extraction: {
+                types: ["#mapping"],
+                value: extraction,
+            }
+        }
+    } else if (extraction == "[]") {
+        return {
+            remaining,
+            extraction: {
+                types: ["#list"],
+                value: extraction,
+            }
+        }
+    } else {
+        return {
+            remaining: remainingXdataString,
+            extraction: null
+        }
+    }
+}
+parseEmptyContainer.canHaveLeadingWhitespace = true
+parseEmptyContainer.canHaveTrailingWhitespace = true
+
+
+// 
+// 
+// null, true, false, infinite, nan
+// 
+// 
+let parseKeywordAtom = (remainingXdataString) => {
+    let {remaining, extraction} = extractFirst({pattern: /^(null|true|false|-?infinite|nan)/i, from: remainingXdataString})
+    if (extraction) {
+        return {
+            remaining,
+            extraction: {
+                types: ["#atom"],
+                value: extraction,
+            }
+        }
+    } else {
+        return {
+            remaining: remainingXdataString,
+            extraction: null
+        }
+    }
+}
+parseKeywordAtom.canHaveLeadingWhitespace = true
+parseKeywordAtom.canHaveTrailingWhitespace = true
+
+
+// 
+//
+// 12
+// 123.4324
+// @356
+// -2453
+// -@539035
+//
+//
+let parseNumber = (remainingXdataString) => {
+    let {remaining, extraction} = extractFirst({ pattern: /^(-?(@?[0-9][0-9]*|[0-9]+\.[0-9]+))\b/i, from: remainingXdataString, })
+    if (extraction) {
+        let rawNumberString = extraction
+        // remove the trailingWhitespace from the number
+        ;({remaining: rawNumberString, extraction: trailingWhitespace} = extractFirst({pattern: /\s*$/, from: rawNumberString}))
+        // check atomic format
+        ;({remaining: rawNumberString, extraction: isAtomicFormat} = extractFirst({pattern: /@/, from: rawNumberString}))
+
+        return returnSuccess({
+            remaining,
+            value: {
+                types: [ "#number", "#atom", ],
+                format: isAtomicFormat? "@" : null,
+                value: rawNumberString,
+            }
+        })
+    } else {
+        return {
+            remaining: remainingXdataString,
+            extraction: null
+        }
+    }
+    // TODO: add good warning when the negative sign is leading in front of the number
+    // TODO: add good warning for @ and decimal number
+    // TODO: add good warning for negative infinite
+}
+parseNumber.canHaveLeadingWhitespace = true
+parseNumber.canHaveTrailingWhitespace = true
+
+// 
+//
+// @atom
+// @infinite
+// -@infinte
+// @Nan
+//
+//
+let parseAtom = (remainingXdataString) => {
+    // negative sign in front is still always allowed
+    let {remaining, extraction} = extractFirst({pattern: /^(-?@[a-zA-Z][a-zA-Z_0-9]*)\b/, from: remainingXdataString})
+    if (extraction) {
+        return returnSuccess({
+            remaining,
+            value: {
+                types: ["#atom"],
+                format: "@",
+                value: extraction.replace(/@/, ""),
+            }
+        })
+    } else {
+        return {
+            remaining: remainingXdataString,
+            extraction: null
+        }
+    }
+    // TODO: add good warning when the negative sign is leading in front of the number
+    // TODO: add good warning for @ and decimal number
+    // TODO: add good warning for negative infinite
+}
+parseAtom.canHaveLeadingWhitespace = true
+parseAtom.canHaveTrailingWhitespace = true
+
+
+
+// 
+// 
+// weakUnquotedString
+// 
+// 
+let parseWeakUnquotedString = (remainingXdataString) => {
+    let {remaining, extraction} = extractFirst({pattern: /^('|")/, from: remainingXdataString}))
+    
+    // FIXME: 
+
+    return {
+        remaining: remainingXdataString,
+        extraction: null
+    }
+}
+
+
+// 
+// 
+// strongUnquotedString
+// 
+// 
+let parseStrongUnquotedString = (remainingXdataString) => {
+    let {remaining, extraction} = extractFirst({pattern: /^('|")/, from: remainingXdataString}))
+    
+    // FIXME: 
+    // - start with a-zA-Z, then anything except colon or trailing whitespace until line/block end. Error on colons and trailing whitespace
+    // TODO: decide if this is literal or figureative
+
+    return {
+        remaining: remainingXdataString,
+        extraction: null
+    }
+}
+
+// 
+// 
+// 'strings'
+// "strings"
+// '''strings'''
+// """strings"""
+// 
+// 
+let parseInlineString = (remainingXdataString) => {
+    let {remaining, extraction} = extractFirst({pattern: /^('|")/, from: remainingXdataString}))
+    
+    // FIXME: add both figureative and literal inline strings with multi-quoting
+
+    return {
+        remaining: remainingXdataString,
+        extraction: null
+    }
+}
+
+
+// 
+// 
+//  #thisDocument
+//  #thisFile@absolutePathToFolder
+//  #cwd
+// 
+// 
+let parseBuiltInValue = (remainingXdataString) => {
+    let {remaining, extraction} = extractFirst({pattern: /^('|")/, from: remainingXdataString}))
+    
+    // FIXME: 
+    // any of the keyterms, plus the #thisDocument[@thing] or #thisDocument["thing"] repetition
+    // warn on keys that don't exist
+    // allow #input
+
+    return {
+        remaining: remainingXdataString,
+        extraction: null
+    }
+}
+
+
+// 
+// 
+// #literally:
+// #figuratively:
+// '''
+// block
+// '''
+// """
+// block
+// """
+// 
+// 
+let parseblockString = (remainingXdataString) => {
+    let {remaining, extraction} = extractFirst({pattern: /^('|")/, from: remaining}))
+    
+    // FIXME: add both figureative and literal inline strings with multi-quoting
+    // TODO: add good warning when spaces are infront of colons
+    // TODO: figure out how to return trailing comments
+
+    return {
+        remaining: remainingXdataString,
+        extraction: null
+    }
+}
+
+
+
+let parseValue
+testParse({
+    expectedIo: [
+        // {
+        //     input: "null",
+        //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
+        // },
+        // {
+        //     input: "   null",
+        //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
+        // },
+        // {
+        //     input: "-10",
+        //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
+        // },
+        // {
+        //     input: "-10.234234",
+        //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
+        // },
+    ],
+    ifParsedWith: parseValue = (remainingXdataString, indent) => {
+        let remaining, extraction, leadingWhitespace, trailingWhitespace, customTypes, output
+        remaining = remainingXdataString
+        customTypes = []
+        leadingWhitespace = ""
+
+        let attempt = (remainingString, parseFunction) => {
+            let {remaining, extraction} = parseFunction(remainingString))
+            // FIXME: check the .canHaveLeadingWhitespace, .canHaveTrailingWhitespace
+            if (extraction) {
+                return {
+                    remaining: remaining,
+                    extraction: {
+                        ...extraction,
+                        leadingWhitespace,
+                        customTypes,
+                    }
+                }
+            }
+        }
+        
+        // pull out the leading white space
+        ;({remaining, extraction: leadingWhitespace} = extractFirst({pattern: /^\s*/, from: remaining}))
+
+        // 
+        // custom types
+        //
+        ;({remaining, extraction} = extractFirst({pattern: /^(#create\[( *[a-zA-Z_]+ *)(, *[a-zA-Z_]+ *)*\]):/, from: remaining}))
+        if (extraction) {
+            customTypes.push(extraction.replace(/^.+\[|\]:| /, "").split(","))
+        }
+        
+        
+        // 
+        // inline
+        // 
+
+        // - "{}" for empty mapping
+        // - "[]" for empty list
+        output || (output = attempt(remaining, parseEmptyContainer))
+        // null, true, false, infinite, nan
+        output || (output = attempt(remaining, parseKeywordAtom))
+        // 123, 1.23, @123, -123, -@123, -1.23
+        output || (output = attempt(remaining, parseNumber))
+        // @atom, -@atom
+        output || (output = attempt(remaining, parseAtom))
+        // : hello world, just talking here
+        output || (output = attempt(remaining, parseStrongUnquotedString)) 
+        // 'quoted string', "quoted", """quoted"""
+        output || (output = attempt(remaining, parseInlineString)) 
+        // #thisDocument, #thisFile@absolutePathToFolder
+        output || (output = attempt(remaining, parseBuiltInValue))
+
+        // TODO: parse trailing whitespace and trailing comment if possible
+
+        // 
+        // blocks
+        // 
+        output || (output = attempt(remaining, parseblockString))
+        
+        // TODO: add recursive step here
+
+    }
+})
+
 
 let parseKey
 testParse({
@@ -126,6 +462,8 @@ testParse({
                 }
             }
         }
+
+        // FIXME: either ": " or ":\n" don't allow non-space
         
         // 
         // unquoted string

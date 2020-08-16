@@ -18,6 +18,11 @@ STANDARD_INDENT_SIZE = 4
     #    - use *#root[term1][term2][@term3]*
     # [solved?] interpolation of locals
     #    - just don't for now, not very XD-like
+    # [solved?] placeholders for empty value sections (empty list, empty map)
+    # [solved] interpolation of a literal string into an interpolated string #{'\n'}
+    #    - the *#root* is an evaluation space, putting a string in it will work *'*'*
+    # is leading indentation going to be a problem for string blocks? mby make a type for specifying
+    # standard vs custom types, how to prevent standard type namespace pollution (maybe standardized types use capitalized words)
     # should errors be thrown escaping something that doesn't ever need to be escaped?
     # should a better system for units be created?
     # how can typing handle mixins, number/integer + storage/64bit + base/hex
@@ -50,22 +55,22 @@ STANDARD_INDENT_SIZE = 4
     # - url
     # - date
     # - time
-    # - regex/PRCE,ruby,javascript,etc
+    # - language/json,yaml/1.2,html,css,python,javascript,bash,zsh,sh
+    # - language/english,spanish
+    # - regex, language/PCRE,ruby
     # - version
     # - code
     # - function
-    # - hex
-    # - octal
-    # - binary
-    # - set
-    # - que
-    # - stack
-    # - enum
+    # - base/binary,octal,hex
+    # - container/set,que,stack,enum
     # - range
-    # - storage/float,integer,32bit,64bit
+    # - memory/32bit,64bit
+    # - storage/float,integer
     # - number/real,rational,irrational,imaginary
     # - units/min,sec,hour,day,year,pounds,feet,miles,cm,in,km,yards,degrees,kelvin,radians,newtons,mols,
-    # - math # for @pi or @e
+    # - interpolated
+    # - raw
+    
 
 $comment_pattern = /\A# (.*)/
 $list_element_pattern = /\A- /
@@ -81,12 +86,22 @@ inline_patterns = [
     $string_double_triple_pattern = /\A(""")(.+?"?"?)(""")/,
 ]
 
-# FUTURE: references, interpolation, escapes
-# FUTURE: auto alignment of nearby elements
-# FUTURE: my_list: 1,2,3,4 # must be inlines separated by commas
-# FUTURE: allow inline comments inside of string-blocks
-# PROBLEM: completely empty value sections
-
+# 
+# TODO:
+# 
+    # switch double and single quote behavior (double quote is literal string)
+    # references, interpolation, escapes
+#
+# consider
+#
+    # separators for large numbers
+    # intentionally anonymous variables for templating, maybe use #input
+    # unix file path literals, and file path interpolations
+    # auto alignment/styling of nearby elements
+    # inline list type
+    # ignore-comment string block type
+    # backticks as a futuristc/reabable interpolation string
+    # haveing a #__file__ and/or #__folder__
 # 
 # debugging
 #
