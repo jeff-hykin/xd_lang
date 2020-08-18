@@ -16,6 +16,7 @@
 // 
 // tools
 // 
+const indentUnit = "    "
 let extractFirst = ({ pattern, from }) => {
     let match = from.match(pattern)
     if (match) {
@@ -53,6 +54,7 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
             }
             let nextActualOutput = JSON.stringify(ifParsedWith(input), null, 4).replace(/(\n)/g, "$1            ")
             if (JSON.stringify(JSON.parse(nextExpectedOutput)) != JSON.stringify(JSON.parse(nextActualOutput))) {
+
                 console.log(`\n\n\n ifParsedWith:\n${ifParsedWith}\n\nWhen calling testParse()\nThe assertion that ${JSON.stringify(input)} results in ${nextExpectedOutput} was false\ninstead it was:\n        {\n            input: ${JSON.stringify(input)},\n            output: ${nextActualOutput},\n        },\n`)
                 process.exit()
             }
@@ -60,14 +62,22 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
         console.log(`passed`)
     }, 0)
 }
-
-
-// 
-// parser
-// 
-let parseMain
-
-
+let extractBlock = (string) => {
+    let {remaining, extraction} = extractFirst(RegExp(`^(\n?(${indentUnit}.*|${indentUnit[0]}{0,${indentUnit.length}})$)+`,"m"))
+    if (extraction) {
+        // remove the indent of the block
+        extraction = extraction.replace(RegExp(`^(${indentUnit}|${indentUnit[0]}{0,${indentUnit.length}})`, "m"))
+        return {
+            remaining,
+            extraction,
+        }
+    }
+    
+    return {
+        remaining: string,
+        extraction: null,
+    }
+}
 
 let parseLeadingWhitespace = (remainingXdataString) => {
     let result = extractFirst({pattern: /^( |\t)*/, from: remainingXdataString,})
@@ -933,46 +943,50 @@ testParse({
     expectedIo: [
         {
             input: "hello world",
-            output: [
-                {
-                    "types": [
-                        "#stringPiece"
-                    ],
-                    "value": "hello world"
-                }
-            ],
+            output: {
+                "types": [
+                    "#string"
+                ],
+                "value": "hello world"
+            },
         },
         {
             input: "hello world {#thisDocument}",
-            output: [
-                {
-                    "types": [
-                        "#stringPiece"
-                    ],
-                    "value": "hello world "
-                },
-                {
-                    "types": [
-                        "#interpolation"
-                    ],
-                    "value": {
+            output: {
+                "types": [
+                    "#string"
+                ],
+                "contains": [
+                    {
                         "types": [
-                            "#reference"
+                            "#stringPiece"
                         ],
-                        "accessList": [
-                            {
-                                "types": [
-                                    "#system"
-                                ],
-                                "value": "#thisDocument"
-                            }
-                        ]
+                        "value": "hello world "
+                    },
+                    {
+                        "types": [
+                            "#interpolation"
+                        ],
+                        "value": {
+                            "types": [
+                                "#reference"
+                            ],
+                            "accessList": [
+                                {
+                                    "types": [
+                                        "#system"
+                                    ],
+                                    "value": "#thisDocument"
+                                }
+                            ]
+                        }
                     }
-                }
-            ],
+                ]
+            },
         },
+
     ],
-    ifParsedWith: extractInterpolations = (figurativeStringContents) => {
+    ifParsedWith: extractInterpolations = (figurativeStringContents, format) => {
         var remaining = figurativeStringContents
         let pieces = []
         while (remaining.length > 0) {
@@ -1006,13 +1020,36 @@ testParse({
                 // 
                 } else {
                     // FIXME: write good error about broken string
-                    console.error(`Inside of an interpolated string, I think the (or one of the) interpolation(s) is broken\nthe string is:\n${figurativeStringContents}`)
+                    if (remaining[0] != '}' || remaining.length > 1) {
+                        console.error(`Inside of an interpolated string, I think the (or one of the) interpolation(s) is broken\nthe string is:\n${figurativeStringContents}`)
+                    }
                     break
                 }
             }
         }
-        return pieces
+        if (figurativeStringContents.length == 0) {
+            return {
+                types: [ "#string" ],
+                format,
+                value: extraction,
+            }
+        } else {
+            if (pieces.length == 1) {
+                return  {
+                    types: ["#string"],
+                    format,
+                    value: pieces[0].value,
+                }
+            } else {
+                return  {
+                    types: ["#string"],
+                    format,
+                    contains: pieces,
+                }
+            }
+        }
     }
+    
 })
 
 // 
@@ -1115,37 +1152,9 @@ testParse({
             if (extraction) {
                 // remove quotes
                 extraction = extraction.replace(RegExp(`(^${startingQuote}|${startingQuote}$)`,"g"), "")
-                
-                if (extraction.length == 0) {
-                    return {
-                        remaining,
-                        extraction: {
-                            types: [ "#string" ],
-                            format: startingQuote,
-                            value: extraction,
-                        },
-                    }
-                } else {
-                    let stringPieces = extractInterpolations(extraction)
-                    if (stringPieces.length == 1) {
-                        return {
-                            remaining,
-                            extraction: {
-                                types: ["#string"],
-                                format: startingQuote,
-                                value: stringPieces[0].value,
-                            }
-                        }
-                    } else {
-                        return {
-                            remaining,
-                            extraction: {
-                                types: ["#string"],
-                                format: startingQuote,
-                                contains: stringPieces,
-                            }
-                        }
-                    }
+                return {
+                    remaining,
+                    extraction: extractInterpolations(extraction, startingQuote),
                 }
             }
         }
@@ -1191,10 +1200,88 @@ let parseInlineString = (remainingXdataString) => {
 // """
 // 
 // 
-let parseblockString = (remainingXdataString) => {
-    let {remaining, extraction} = extractFirst({pattern: /^('|")/, from: remaining})
+let parseBlockString = (remainingXdataString) => {
+    // check if multi-line exists
+    let isMultiLine = remainingXdataString.match(RegExp(`^.+\\n${indentUnit}`))
+    // TODO: add is-almost multi-line warning
+    if (!isMultiLine) {
+        // 
+        // literal rest-of-line
+        // 
+        var {remaining, extraction} = extractFirst({pattern: /^#literally:.*/, from: remainingXdataString})
+        if (extraction) {
+            return {
+                remaining,
+                extraction: {
+                    types: [ "#string" ],
+                    format: "#literal:InlineBlock",
+                    value: extraction.replace(/^#literally:/, ''),
+                },
+            }
+        }
+        // 
+        // figurative rest-of-line
+        // 
+        var {remaining, extraction} = extractFirst({pattern: /^#figuratively:.*/, from: remainingXdataString})
+        if (extraction.length == 0) {
+            return {
+                remaining,
+                extraction: {
+                    types: [ "#string" ],
+                    format: "#figurative:InlineBlock",
+                    value: extraction,
+                },
+            }
+        } else {
+            return {
+                remaining,
+                extraction: extractInterpolations(extraction,"#figurative:InlineBlock"),
+            }
+        }
+
+    } else {
+        let quote = getStartingQuote(remainingXdataString)
+        var {remaining, extraction} = extractFirst({pattern: /^(#literally:|#figuratively:)/, from: remainingXdataString})
+        var {remaining, extraction: comment} = parseComment(remaining)
+        if (!remaining.match(/\n/)) {
+            // TODO: improve error message
+            console.log(`issue with the the remaining text on the line: ${remainingXdataString.split("\n")[0]}`)
+            return {
+                remaining: remainingXdataString,
+                extraction: null,
+            }
+        }
+        let isLiteralQuote = (quote && quote[0] == '"')
+        let isFigurativeQuote = (quote && quote[0] == "'")
+        if (extraction == "#literally:" || isLiteralQuote) {
+            let format = "#literal:MultilineBlock"
+            var {remaining, extraction} = extractBlock(remaining)
+            if (isLiteralQuote) {
+                extraction = extraction.replace(RegExp(`${quote}$`),"")
+                format = quote+":MultilineBlock"
+            }
+            return {
+                remaining,
+                extraction: {
+                    format: "#literal:MultilineBlock",
+                },
+                comment,
+            }
+        } else if (extraction == "#figuratively:" || isFigurativeQuote) {
+            let format = "#figurative:MultilineBlock"
+            var {remaining, extraction} = extractBlock(remaining)
+            if (isFigurativeQuote) {
+                extraction = extraction.replace(RegExp(`${quote}$`),"")
+                format = quote+":MultilineBlock"
+            }
+            return {
+                remaining,
+                extraction: extractInterpolations(extraction, format),
+                comment,
+            }
+        }
+    }
     
-    // FIXME: add both figurative and literal inline strings with multi-quoting
     // TODO: add good warning when spaces are infront of colons
     // TODO: figure out how to return trailing comments
 
@@ -1284,7 +1371,7 @@ testParse({
         // 
         // blocks
         // 
-        output || (output = attempt(remaining, parseblockString))
+        output || (output = attempt(remaining, parseBlockString))
         
         // TODO: add recursive step here
 
