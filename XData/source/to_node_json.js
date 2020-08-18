@@ -1,6 +1,7 @@
 // 
 // todo
 // 
+    // check version at top
     // record line numbers
     // create a good error system (create fallback checks like parseBadReference or parseBadLiteralString)
 
@@ -30,7 +31,7 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
             let nextExpectedOutput = JSON.stringify(output)
             let nextActualOutput = JSON.stringify(ifParsedWith(input))
             if (nextExpectedOutput != nextActualOutput) {
-                throw Error(`\n\n\n ifParsedWith:\n${ifParsedWith}\n\nWhen calling testParse()\nThe assertion that ${JSON.stringify(input)} results in ${nextExpectedOutput} was false\ninstead it was:\n{\n    input: ${JSON.stringify(input)},\n    output: ${nextActualOutput},\n},\n`)
+                throw Error(`\n\n\n ifParsedWith:\n${ifParsedWith}\n\nWhen calling testParse()\nThe assertion that ${JSON.stringify(input)} results in ${nextExpectedOutput} was false\ninstead it was:\n        {\n            input: ${JSON.stringify(input)},\n            output: ${nextActualOutput},\n        },\n`)
             }
         }
         console.log(`passed`)
@@ -187,33 +188,85 @@ parseKeywordAtom.canHaveTrailingWhitespace = true
 // -@539035
 //
 //
-let parseNumber = (remainingXdataString) => {
-    var {remaining, extraction} = extractFirst({ pattern: /^(-?(@?[0-9][0-9]*|[0-9]+\.[0-9]+))\b/i, from: remainingXdataString, })
-    if (extraction) {
-        var rawNumberString = extraction
-        // remove the trailingWhitespace from the number
-        var {remaining: rawNumberString, extraction: trailingWhitespace} = extractFirst({pattern: /\s*$/, from: rawNumberString})
-        // check atomic format
-        var {remaining: rawNumberString, extraction: isAtomicFormat} = extractFirst({pattern: /@/, from: rawNumberString})
-
-        return {
-            remaining,
-            value: {
-                types: [ "#number", "#atom", ],
-                format: isAtomicFormat? "@" : null,
+let parseNumber
+testParse({
+    expectedIo: [
+        {
+            input: "1",
+            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"1"}},
+        },
+        {
+            input: "-1",
+            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"-1"}},
+        },
+        {
+            input: "123.43232",
+            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"123.43232"}},
+        },
+        {
+            input: "1.1",
+            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"1.1"}},
+        },
+        {
+            input: ".1",
+            output: {"remaining":".1","extraction":null},
+        },
+        {
+            input: ".",
+            output: {"remaining":".","extraction":null},
+        },
+        {
+            input: "1.",
+            output: {"remaining":"1.","extraction":null},
+        },
+        {
+            input: "-123.43232",
+            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"-123.43232"}},
+        },
+        {
+            input: "-@123.43232",
+            output: {"remaining":"-@123.43232","extraction":null},
+        },
+        {
+            input: "-@539035",
+            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"-539035","format":"@"}},
+        },
+        {
+            input: "@539035",
+            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"539035","format":"@"}},
+        },
+    ],
+    ifParsedWith: parseNumber = (remainingXdataString) => {
+        var {remaining, extraction} = extractFirst({ pattern: /^(-?([0-9]+\.[0-9]+|@?[0-9][0-9]*))(?!\d|\.)/, from: remainingXdataString, })
+        if (extraction) {
+            var rawNumberString = extraction
+            // remove the trailingWhitespace from the number
+            var {remaining: rawNumberString, extraction: trailingWhitespace} = extractFirst({pattern: /\s*$/, from: rawNumberString})
+            // check atomic format
+            var {remaining: rawNumberString, extraction: isAtomicFormat} = extractFirst({pattern: /@/, from: rawNumberString})
+            
+            extraction = {
+                types: [ "#atom", "#number", ],
                 value: rawNumberString,
             }
+            if (isAtomicFormat) {
+                extraction.format = "@"
+            }
+            return {
+                remaining,
+                extraction,
+            }
         }
-    } else {
+        
         return {
             remaining: remainingXdataString,
             extraction: null
         }
+        // TODO: add good warning when the negative sign is leading in front of the number
+        // TODO: add good warning for @ and decimal number
+        // TODO: add good warning for negative infinite
     }
-    // TODO: add good warning when the negative sign is leading in front of the number
-    // TODO: add good warning for @ and decimal number
-    // TODO: add good warning for negative infinite
-}
+})
 parseNumber.canHaveLeadingWhitespace = true
 parseNumber.canHaveTrailingWhitespace = true
 
@@ -229,19 +282,19 @@ let parseAtom = (remainingXdataString) => {
     // negative sign in front is still always allowed
     let {remaining, extraction} = extractFirst({pattern: /^(-?@[a-zA-Z][a-zA-Z_0-9]*)\b/, from: remainingXdataString})
     if (extraction) {
-        return returnSuccess({
+        return {
             remaining,
-            value: {
+            extraction: {
                 types: ["#atom"],
                 format: "@",
                 value: extraction.replace(/@/, ""),
             }
-        })
-    } else {
-        return {
-            remaining: remainingXdataString,
-            extraction: null
         }
+    }
+
+    return {
+        remaining: remainingXdataString,
+        extraction: null
     }
     // TODO: add good warning when the negative sign is leading in front of the number
     // TODO: add good warning for @ and decimal number
@@ -263,7 +316,7 @@ let parseWeakUnquotedString = (remainingXdataString) => {
         let value = extraction.replace(/:$/, "")
         return {
             remaining,
-            value: {
+            extraction: {
                 types: ["#string"],
                 format: "unquoted",
                 value,
@@ -291,10 +344,10 @@ let parseStrongUnquotedString = (remainingXdataString) => {
     if (extraction) {
         return {
             remaining,
-            value: {
+            extraction: {
                 types: ["#string"],
                 format: "unquoted",
-                value,
+                value: extraction,
             }
         }
     }
@@ -493,6 +546,8 @@ testParse({
                     value: extraction,
                 }
             ]
+            console.log(`extraction is:`,extraction)
+            console.log(`remaining is:`,remaining)
             while (1) {
                 // 
                 //    find [, then whitespace, then number/@atom/literalInlineString, then whitespace, then ], repeat
@@ -516,6 +571,7 @@ testParse({
                     }
                     // then whitespace
                     var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remaining)
+                    console.log(`parseLeadingWhitespace: remaining is:`,remaining)
                     // then number/@atom/literalInlineString
                     var {remaining, extraction} = parseNumber(remaining)
                     if (!extraction) {
@@ -547,8 +603,9 @@ testParse({
                         // error: missing ]
                         // 
                         } else {
+                            console.log(`accessList is:`,accessList)
                             // TODO: better message
-                            console.error(`\nI found a ${accessList[0].extraction} and ['s,\nbut had trouble finding one of the closing ]'s\nhere's the line:\n    ${errorLine}\n`)
+                            console.error(`\nI found a ${accessList[0].value} and ['s,\nbut had trouble finding one of the closing ]'s\nhere's the line:\n    ${errorLine}\n`)
                             return {
                                 remaining: remainingXdataString,
                                 extraction: null
@@ -562,7 +619,7 @@ testParse({
                         let errorLine = remainingXdataString.split("\n")[0]
                         // TODO: better message
                         // TODO: better message specifically for the case of figurative string usage or special atom usage
-                        console.error(`\nI found a ${accessList[0].extraction} and ['s,\nbut had trouble finding a number, @atom, or "literal" inside (all) of the []'s\nhere's the line:\n    ${errorLine}\n`)
+                        console.error(`\nI found a ${accessList[0].value} and ['s,\nbut had trouble finding a number, @atom, or "literal" inside (all) of the []'s\nhere's the line:\n    ${errorLine}\n`)
                         return {
                             remaining: remainingXdataString,
                             extraction: null
@@ -756,7 +813,7 @@ testParse({
             let value = extraction.replace(/:$/, "")
             return returnSuccess({
                 remaining,
-                value: {
+                extraction: {
                     types: ["#string"],
                     format: "unquoted",
                     value,
@@ -781,7 +838,7 @@ testParse({
 
             return returnSuccess({
                 remaining,
-                value: {
+                extraction: {
                     types: [ "#number", "#atom", ],
                     format: isAtomicFormat? "@" : null,
                     value: rawNumberString,
@@ -805,7 +862,7 @@ testParse({
             
             return returnSuccess({
                 remaining,
-                value: {
+                extraction: {
                     types: ["#atom"],
                     format: "@",
                     value,
