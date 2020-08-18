@@ -34,7 +34,7 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
         for (let each of expectedIo) {
             let {input, output} = each
             let nextExpectedOutput = JSON.stringify(output)
-            console.debug(`input is:`,input)
+            console.debug(`    input is:`,input)
             let result
             let wasError
             try {
@@ -47,7 +47,7 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
             }
             if (wasError) {
                 console.log(`\n\n\n ifParsedWith:\n${ifParsedWith}\n\nWhen calling testParse()\nThe assertion that ${JSON.stringify(input)} results in ${nextExpectedOutput} was false\ninstead resulted in an error:\n${wasError}`)
-                process.exit()
+                throw wasError
             }
             let nextActualOutput = JSON.stringify(ifParsedWith(input), null, 4).replace(/(\n)/g, "$1            ")
             if (JSON.stringify(JSON.parse(nextExpectedOutput)) != JSON.stringify(JSON.parse(nextActualOutput))) {
@@ -580,13 +580,13 @@ testParse({
             },
         },
     ],
-    ifParsedWith: parseStaticInlineValue = (remaining) => {
+    ifParsedWith: parseStaticInlineValue = (remainingXdataString) => {
         // then number/@atom/literalInlineString
-        var {remaining, extraction} = parseNumber(remaining)
+        var {remaining, extraction} = parseNumber(remainingXdataString)
         if (!extraction) {
-            var {remaining, extraction} = parseAtom(remaining)
+            var {remaining, extraction} = parseAtom(remainingXdataString)
             if (!extraction) {
-                var {remaining, extraction} = parseLiteralInlineString(remaining)
+                var {remaining, extraction} = parseLiteralInlineString(remainingXdataString)
             }
             // FIXME: consider possible case of a reference as a key
         }
@@ -905,15 +905,47 @@ testParse({
     expectedIo: [
         {
             input: "hello world",
-            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"539035","format":"@"}},
+            output: [
+                {
+                    "types": [
+                        "#stringPiece"
+                    ],
+                    "value": "hello world"
+                }
+            ],
         },
         {
             input: "hello world {#thisDocument}",
-            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"539035","format":"@"}},
+            output: [
+                {
+                    "types": [
+                        "#stringPiece"
+                    ],
+                    "value": "hello world "
+                },
+                {
+                    "types": [
+                        "#interpolation"
+                    ],
+                    "value": {
+                        "types": [
+                            "#reference"
+                        ],
+                        "accessList": [
+                            {
+                                "types": [
+                                    "#system"
+                                ],
+                                "value": "#thisDocument"
+                            }
+                        ]
+                    }
+                }
+            ],
         },
     ],
-    ifParsedWith: extractInterpolations = (figureativeStringContents) => {
-        var remaining = figureativeStringContents
+    ifParsedWith: extractInterpolations = (figurativeStringContents) => {
+        var remaining = figurativeStringContents
         let pieces = []
         while (remaining.length > 0) {
             // find everything thats not a { or }
@@ -927,28 +959,31 @@ testParse({
                 // find the starting {
                 var {remaining, extraction} = extractFirst({pattern: /^\{ */, from: remaining})
                 // find a value
-                var {remaining, extraction} = parseStaticInlineValue(remaining)
+                var {remaining, extraction} = parseWrappingWhitespaceFor(parseReference, remaining)
                 if (!extraction) {
-                    var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remaining)
-                    var {remaining, extraction} = parseReference(remaining)
-                    var {remaining, extraction: trailingWhitespace} = parseLeadingWhitespace(remaining)
+                    var {remaining, extraction} = parseWrappingWhitespaceFor(parseStaticInlineValue, remaining)
                 }
+                // TODO: consider if figurative strings are also allowed inside interpolation (not sure why you'd want to)
                 
                 // 
-                // found reference
+                // found a value
                 // 
                 if (extraction) {
-                    // recurse by parsing a value
-                    // FIXME: call parse reference
+                    pieces.push({
+                        types: ["#interpolation"],
+                        value: extraction,
+                    })
                 // 
-                // couldn't 
+                // error: no value
                 // 
                 } else {
-                    // FIXME: error about broken string
+                    // FIXME: write good error about broken string
+                    console.error(`Inside of an interpolated string, I think the (or one of the) interpolation(s) is broken\nthe string is:\n${figurativeStringContents}`)
+                    break
                 }
             }
         }
-        return []
+        return pieces
     }
 })
 
@@ -958,7 +993,7 @@ testParse({
 // '''strings'''
 // 
 // 
-let parseFigureativeInlineString = (remainingXdataString) => {
+let parseFigurativeInlineString = (remainingXdataString) => {
     let startingQuote = getStartingQuote(remainingXdataString)
     if (startingQuote instanceof Object && startingQuote[0] == "'") {
         // match backslash escape, caret escape, or any regular non-quote character
@@ -999,7 +1034,7 @@ let parseInlineString = (remainingXdataString) => {
     if (result.extraction) {
         return result
     }
-    var result = parseFigureativeInlineString(remainingXdataString)
+    var result = parseFigurativeInlineString(remainingXdataString)
     if (result.extraction) {
         return result
     }
@@ -1025,7 +1060,7 @@ let parseInlineString = (remainingXdataString) => {
 let parseblockString = (remainingXdataString) => {
     let {remaining, extraction} = extractFirst({pattern: /^('|")/, from: remaining})
     
-    // FIXME: add both figureative and literal inline strings with multi-quoting
+    // FIXME: add both figurative and literal inline strings with multi-quoting
     // TODO: add good warning when spaces are infront of colons
     // TODO: figure out how to return trailing comments
 
