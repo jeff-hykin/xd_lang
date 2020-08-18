@@ -1,4 +1,11 @@
 // 
+// todo
+// 
+    // record line numbers
+    // create a good error system
+
+
+// 
 // tools
 // 
 let extractFirst = ({ pattern, from }) => {
@@ -246,14 +253,14 @@ let parseWeakUnquotedString = (remainingXdataString) => {
     let {remaining, extraction} = extractFirst({pattern: /^([a-zA-Z][a-zA-Z_0-9]*):/, from: remainingXdataString})
     if (extraction) {
         let value = extraction.replace(/:$/, "")
-        return returnSuccess({
+        return {
             remaining,
             value: {
                 types: ["#string"],
                 format: "unquoted",
                 value,
             }
-        })
+        }
     }
 
     return {
@@ -269,12 +276,106 @@ let parseWeakUnquotedString = (remainingXdataString) => {
 // 
 // 
 let parseStrongUnquotedString = (remainingXdataString) => {
-    let {remaining, extraction} = extractFirst({pattern: /^('|")/, from: remainingXdataString}))
-    
-    // FIXME: 
     // - start with a-zA-Z, then anything except colon or trailing whitespace until line/block end. Error on colons and trailing whitespace
-    // TODO: decide if this is literal or figureative
+    let {remaining, extraction} = extractFirst({pattern: /^[a-zA-Z]([^:\n]*[^\s:])?$/, from: remainingXdataString}))
+    // TODO: add good warning for leading/trailing whitespace (maybe and "almost" strongUnquotedString)
+    
+    if (extraction) {
+        return {
+            remaining,
+            value: {
+                types: ["#string"],
+                format: "unquoted",
+                value,
+            }
+        }
+    }
 
+    return {
+        remaining: remainingXdataString,
+        extraction: null
+    }
+}
+
+
+// 
+// interpolation
+//
+let extractInterpolations = (figureativeStringContents) => {
+    var remaining = figureativeStringContents
+    let pieces = []
+    while (remaining.length > 0) {
+        // find everything thats not a { or }
+        var {remaining, extraction} = extractFirst({pattern: /^(\\.|\^.|[^\n'\{\}])*/, from: remaining}))
+        if (extraction) {
+            pieces.push({
+                types: ["#figurativeStringPiece"],
+                value: extraction,
+            })
+        } else {
+            // find the starting {
+            var {remaining, extraction} = extractFirst({pattern: /^\{ */, from: remaining}))
+            if (extraction) {
+                // recurse by parsing a value
+                // FIXME: call parse reference
+            } else {
+                // FIXME: error about broken string
+            }
+        }
+    }
+}
+
+// 
+// 
+// '''
+// """
+// 
+// 
+let getStartingQuote = (remainingXdataString) => {
+    // starts with quote
+    let quoteMatch = remainingXdataString.match(/^('|")+/)
+    if (quoteMatch) {
+        // 
+        // quote size
+        // 
+        // this is valid: '''''''' which is a triple quote with two single quotes inside '''('')'''
+        // multiquotes are allowed to be any power of three
+        //  e.g: '''''''''''''''''''''''''' is a nine-quote with eight single quotes inside (''''''''')''''''''(''''''''')
+        // find the size of the starting quote, which can be any power of three
+        let logBase = 3
+        let logOfSizeBaseThree = Math.log(quoteMatch[0].length) / Math.log(base)
+        let closestPowerOfThree = Math.floor(logOfSizeBaseThree)
+        let quoteSize = 3**closestPowerOfThree
+        
+        let startingQuote = remainingXdataString[0].repeat(quoteSize)
+        return startingQuote
+    }
+    return null
+}
+
+// 
+// 
+// "strings"
+// """strings"""
+// 
+// 
+let parseLiteralInlineString = (remainingXdataString) => {
+    let startingQuote = getStartingQuote(remainingXdataString)
+    if (startingQuote instanceof Object && startingQuote[0] == '"') {
+        var {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}.+?${startingQuote}`), from: remainingXdataString}))
+        if (extraction) {
+            // remove quotes
+            extraction = extraction.replace(startingQuote, "")
+            return {
+                remaining,
+                extraction: {
+                    types: ["#string"],
+                    format: startingQuote,
+                    value: extraction,
+                }
+            }
+        }
+    }
     return {
         remaining: remainingXdataString,
         extraction: null
@@ -284,16 +385,54 @@ let parseStrongUnquotedString = (remainingXdataString) => {
 // 
 // 
 // 'strings'
-// "strings"
 // '''strings'''
+// 
+// 
+let parseFigureativeInlineString = (remainingXdataString) => {
+    let startingQuote = getStartingQuote(remainingXdataString)
+    if (startingQuote instanceof Object && startingQuote[0] == "'") {
+        // match backslash escape, caret escape, or any regular non-quote character
+        var {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}(\\\\.|\\\^.|[^\\\n'])*?${startingQuote}`), from: remainingXdataString}))
+        if (extraction) {
+            // remove quotes
+            extraction = extraction.replace(RegExp(`(^${startingQuote}|${startingQuote}$)`), "")
+            
+            // 
+            // handle interpolation
+            // 
+            let extractPreInterpolation
+            let extractInterpolation
+            while (1) {
+                let {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}(\\\\.|\\\^.|[^\\\n'])*?${startingQuote}`), from: remainingXdataString}))
+                if 
+            }
+            // extract all the inline parts
+            // FIXME
+        }
+    }
+    return {
+        remaining: remainingXdataString,
+        extraction: null
+    }
+}
+
+// 
+// 
+// 'strings'
+// '''strings'''
+// "strings"
 // """strings"""
 // 
 // 
 let parseInlineString = (remainingXdataString) => {
-    let {remaining, extraction} = extractFirst({pattern: /^('|")/, from: remainingXdataString}))
-    
-    // FIXME: add both figureative and literal inline strings with multi-quoting
-
+    let result = parseLiteralInlineString(remainingXdataString)
+    if (result.extraction) {
+        return result
+    }
+    let result = parseFigureativeInlineString(remainingXdataString)
+    if (result.extraction) {
+        return result
+    }
     return {
         remaining: remainingXdataString,
         extraction: null
@@ -308,7 +447,7 @@ let parseInlineString = (remainingXdataString) => {
 //  #cwd
 // 
 // 
-let parseBuiltInValue = (remainingXdataString) => {
+let parseReference = (remainingXdataString) => {
     let {remaining, extraction} = extractFirst({pattern: /^('|")/, from: remainingXdataString}))
     
     // FIXME: 
@@ -379,6 +518,7 @@ testParse({
         let attempt = (remainingString, parseFunction) => {
             let {remaining, extraction} = parseFunction(remainingString))
             // FIXME: check the .canHaveLeadingWhitespace, .canHaveTrailingWhitespace
+            // FIXME: add the custom types after the core types
             if (extraction) {
                 return {
                     remaining: remaining,
@@ -421,7 +561,7 @@ testParse({
         // 'quoted string', "quoted", """quoted"""
         output || (output = attempt(remaining, parseInlineString)) 
         // #thisDocument, #thisFile@absolutePathToFolder
-        output || (output = attempt(remaining, parseBuiltInValue))
+        output || (output = attempt(remaining, parseReference))
 
         // TODO: parse trailing whitespace and trailing comment if possible
 
