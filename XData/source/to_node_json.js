@@ -1,12 +1,14 @@
 // 
 // todo
 // 
+    // parse block strings
+    // parse recursive block
+    // unparse
+        // make sure format (like ") is viable for the content (like ")
     // check version at top
     // creating a hash of names->indicies
     // record line numbers
     // create a good error system (create fallback checks like parseBadReference or parseBadLiteralString)
-    // unparse
-        // make sure format (like ") is viable for the content (like ")
 
 
 // 
@@ -32,9 +34,25 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
         for (let each of expectedIo) {
             let {input, output} = each
             let nextExpectedOutput = JSON.stringify(output)
+            console.debug(`input is:`,input)
+            let result
+            let wasError
+            try {
+                result = ifParsedWith(input)
+            } catch (error) {
+                wasError = error
+            }
+            if (result == undefined) {
+                result = null
+            }
+            if (wasError) {
+                console.log(`\n\n\n ifParsedWith:\n${ifParsedWith}\n\nWhen calling testParse()\nThe assertion that ${JSON.stringify(input)} results in ${nextExpectedOutput} was false\ninstead resulted in an error:\n${wasError}`)
+                process.exit()
+            }
             let nextActualOutput = JSON.stringify(ifParsedWith(input), null, 4).replace(/(\n)/g, "$1            ")
             if (JSON.stringify(JSON.parse(nextExpectedOutput)) != JSON.stringify(JSON.parse(nextActualOutput))) {
-                throw Error(`\n\n\n ifParsedWith:\n${ifParsedWith}\n\nWhen calling testParse()\nThe assertion that ${JSON.stringify(input)} results in ${nextExpectedOutput} was false\ninstead it was:\n        {\n            input: ${JSON.stringify(input)},\n            output: ${nextActualOutput},\n        },\n`)
+                console.log(`\n\n\n ifParsedWith:\n${ifParsedWith}\n\nWhen calling testParse()\nThe assertion that ${JSON.stringify(input)} results in ${nextExpectedOutput} was false\ninstead it was:\n        {\n            input: ${JSON.stringify(input)},\n            output: ${nextActualOutput},\n        },\n`)
+                process.exit()
             }
         }
         console.log(`passed`)
@@ -54,6 +72,25 @@ let parseLeadingWhitespace = (remainingXdataString) => {
     // ensure it is always a string
     result.extraction = result.extraction || ""
     return result
+}
+
+let parseWrappingWhitespaceFor = (parserFunc, remainingXdataString) => {
+    var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remainingXdataString)
+    var {remaining, extraction} = parserFunc(remaining)
+    if (extraction) {
+        var {remaining, extraction: trailingWhitespace} = parseLeadingWhitespace(remaining)
+        leadingWhitespace  && (extraction.leadingWhitespace  = leadingWhitespace )
+        trailingWhitespace && (extraction.trailingWhitespace = trailingWhitespace)
+        return {
+            remaining,
+            extraction,
+        }
+    }
+
+    return {
+        remaining: remainingXdataString,
+        extraction: null
+    }
 }
 
 // 
@@ -93,24 +130,42 @@ testParse({
         },
         {
             input: " # hello",
-            output: {"remaining":"","extraction":{"types":["#comment"],"leadingWhitespace":" ","content":"# hello"}},
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#comment"
+                    ],
+                    "content": "# hello",
+                    "leadingWhitespace": " "
+                }
+            },
         },
         {
             input: "#",
-            output: {"remaining":"","extraction":{"types":["#comment"],"leadingWhitespace":"","content":"#"}},
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#comment"
+                    ],
+                    "content": "#"
+                }
+            },
         },
     ],
     ifParsedWith: parseComment = (remainingXdataString, indent) => {
-        var {remaining, extraction: whitespace} = parseLeadingWhitespace(remainingXdataString)
+        var {remaining, extraction: leadingWhitespace } = parseLeadingWhitespace(remainingXdataString)
         var {remaining, extraction} = extractFirst({pattern:/^#( .*|)\n?$/, from: remaining})
         if (extraction) {
+            extraction = {
+                types: ["#comment"],
+                content: extraction
+            }
+            leadingWhitespace && (extraction.leadingWhitespace = leadingWhitespace)
             return {
                 remaining,
-                extraction: {
-                    types: ["#comment"],
-                    leadingWhitespace: whitespace,
-                    content: extraction
-                }
+                extraction,
             }
         }
 
@@ -361,34 +416,6 @@ let parseStrongUnquotedString = (remainingXdataString) => {
     }
 }
 
-
-// 
-// interpolation
-//
-let extractInterpolations = (figureativeStringContents) => {
-    var remaining = figureativeStringContents
-    let pieces = []
-    while (remaining.length > 0) {
-        // find everything thats not a { or }
-        var {remaining, extraction} = extractFirst({pattern: /^(\\.|\^.|[^\n'\{\}])*/, from: remaining})
-        if (extraction) {
-            pieces.push({
-                types: ["#figurativeStringPiece"],
-                value: extraction,
-            })
-        } else {
-            // find the starting {
-            var {remaining, extraction} = extractFirst({pattern: /^\{ */, from: remaining})
-            if (extraction) {
-                // recurse by parsing a value
-                // FIXME: call parse reference
-            } else {
-                // FIXME: error about broken string
-            }
-        }
-    }
-}
-
 // 
 // 
 // '''
@@ -505,66 +532,83 @@ testParse({
 
 // 
 // 
-// 'strings'
-// '''strings'''
+// 123
+// "string literal"
+// @atom
 // 
 // 
-let parseFigureativeInlineString = (remainingXdataString) => {
-    let startingQuote = getStartingQuote(remainingXdataString)
-    if (startingQuote instanceof Object && startingQuote[0] == "'") {
-        // match backslash escape, caret escape, or any regular non-quote character
-        var {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}(\\\\.|\\\^.|[^\\\n'])*?${startingQuote}`), from: remainingXdataString})
-        if (extraction) {
-            // remove quotes
-            extraction = extraction.replace(RegExp(`(^${startingQuote}|${startingQuote}$)`,"g"), "")
-            
-            // 
-            // handle interpolation
-            // 
-            let extractPreInterpolation
-            let extractInterpolation
-            // while (1) {
-            //     let {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}(\\\\.|\\\^.|[^\\\n'])*?${startingQuote}`), from: remainingXdataString})
-            //     if 
-            // }
-            // extract all the inline parts
-            // FIXME
+let parseStaticInlineValue
+testParse({
+    expectedIo: [
+        {
+            input: "1",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#atom",
+                        "#number"
+                    ],
+                    "value": "1"
+                }
+            },
+        },
+        {
+            input: "\"hello world\"",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "\"",
+                    "value": "hello world"
+                }
+            },
+        },
+        {
+            input: "@atom",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#atom"
+                    ],
+                    "format": "@",
+                    "value": "atom"
+                }
+            },
+        },
+    ],
+    ifParsedWith: parseStaticInlineValue = (remaining) => {
+        // then number/@atom/literalInlineString
+        var {remaining, extraction} = parseNumber(remaining)
+        if (!extraction) {
+            var {remaining, extraction} = parseAtom(remaining)
+            if (!extraction) {
+                var {remaining, extraction} = parseLiteralInlineString(remaining)
+            }
+            // FIXME: consider possible case of a reference as a key
         }
-    }
-    return {
-        remaining: remainingXdataString,
-        extraction: null
-    }
-}
 
-// 
-// 
-// 'strings'
-// '''strings'''
-// "strings"
-// """strings"""
-// 
-// 
-let parseInlineString = (remainingXdataString) => {
-    var result = parseLiteralInlineString(remainingXdataString)
-    if (result.extraction) {
-        return result
-    }
-    var result = parseFigureativeInlineString(remainingXdataString)
-    if (result.extraction) {
-        return result
-    }
-    return {
-        remaining: remainingXdataString,
-        extraction: null
-    }
-}
+        if (extraction) {
+            return {
+                remaining,
+                extraction,
+            }
+        }
 
+        return {
+            remaining: remainingXdataString,
+            extraction: null
+        }
+    },
+})
 
 // 
 // 
 //  #thisDocument
-//  #thisFile@absolutePathToFolder
+//  #thisFile
 //  #cwd
 // 
 // 
@@ -754,7 +798,8 @@ testParse({
         },
     ],
     ifParsedWith: parseReference = (remainingXdataString) => {
-        var {remaining, extraction} = extractFirst({pattern: /^(#thisDocument|#thisFile)/, from: remainingXdataString})
+        var {remaining, extraction} = extractFirst({pattern: /^(#thisDocument|#thisFile|#input)/, from: remainingXdataString})
+        // FIXME: #thisFile@folderPath
         if (extraction) {
             let item = extraction
             let accessList = [
@@ -763,11 +808,9 @@ testParse({
                     value: extraction,
                 }
             ]
-            console.log(`extraction is:`,extraction)
-            console.log(`remaining is:`,remaining)
             while (1) {
                 // 
-                //    find [, then whitespace, then number/@atom/literalInlineString, then whitespace, then ], repeat
+                //    find "[", then static value then "]", repeat
                 // 
                 // check for whitespace (even though not allowed)
                 var {remaining, extraction: whitespace} = parseLeadingWhitespace(remaining)
@@ -786,27 +829,12 @@ testParse({
                             extraction: null
                         }
                     }
-                    // then whitespace
-                    var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remaining)
-                    console.debug(`parseLeadingWhitespace: remaining is:`,remaining)
-                    // then number/@atom/literalInlineString
-                    var {remaining, extraction} = parseNumber(remaining)
-                    console.debug(`remaining, extraction is:`,remaining, extraction)
-                    if (!extraction) {
-                        var {remaining, extraction} = parseAtom(remaining)
-                        if (!extraction) {
-                            var {remaining, extraction} = parseLiteralInlineString(remaining)
-                            console.debug(`extraction is:`,extraction)
-                            console.debug(`remaining is:`,remaining)
-                        }
-                        // FIXME: consider possible case of file name being used as a key
-                    }
                     // 
                     // found access-value
                     // 
+                    var {remaining, extraction} = parseWrappingWhitespaceFor(parseStaticInlineValue, remaining)
                     if (extraction) {
                         
-                        var {remaining, extraction: trailingWhitespace} = parseLeadingWhitespace(remaining)
                         // find the ]
                         var {remaining, extraction: discard} = extractFirst({pattern: /\]/, from: remaining})
                         
@@ -815,15 +843,12 @@ testParse({
                         // 
                         if (extraction) {
                             // add the value and try getting another
-                            leadingWhitespace  && (extraction.leadingWhitespace  = leadingWhitespace)
-                            trailingWhitespace && (extraction.trailingWhitespace = trailingWhitespace)
                             accessList.push(extraction)
                             continue
                         // 
                         // error: missing ]
                         // 
                         } else {
-                            console.debug(`accessList is:`,accessList)
                             // TODO: better message
                             console.error(`\nI found a ${accessList[0].value} and ['s,\nbut had trouble finding one of the closing ]'s\nhere's the line:\n    ${errorLine}\n`)
                             return {
@@ -871,6 +896,118 @@ testParse({
         }
     }
 })
+
+// 
+// interpolation
+//
+let extractInterpolations
+testParse({
+    expectedIo: [
+        {
+            input: "hello world",
+            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"539035","format":"@"}},
+        },
+        {
+            input: "hello world {#thisDocument}",
+            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"539035","format":"@"}},
+        },
+    ],
+    ifParsedWith: extractInterpolations = (figureativeStringContents) => {
+        var remaining = figureativeStringContents
+        let pieces = []
+        while (remaining.length > 0) {
+            // find everything thats not a { or }
+            var {remaining, extraction} = extractFirst({pattern: /^(\\.|\^.|[^\n'\{\}])*/, from: remaining})
+            if (extraction) {
+                pieces.push({
+                    types: ["#stringPiece"],
+                    value: extraction,
+                })
+            } else {
+                // find the starting {
+                var {remaining, extraction} = extractFirst({pattern: /^\{ */, from: remaining})
+                // find a value
+                var {remaining, extraction} = parseStaticInlineValue(remaining)
+                if (!extraction) {
+                    var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remaining)
+                    var {remaining, extraction} = parseReference(remaining)
+                    var {remaining, extraction: trailingWhitespace} = parseLeadingWhitespace(remaining)
+                }
+                
+                // 
+                // found reference
+                // 
+                if (extraction) {
+                    // recurse by parsing a value
+                    // FIXME: call parse reference
+                // 
+                // couldn't 
+                // 
+                } else {
+                    // FIXME: error about broken string
+                }
+            }
+        }
+        return []
+    }
+})
+
+// 
+// 
+// 'strings'
+// '''strings'''
+// 
+// 
+let parseFigureativeInlineString = (remainingXdataString) => {
+    let startingQuote = getStartingQuote(remainingXdataString)
+    if (startingQuote instanceof Object && startingQuote[0] == "'") {
+        // match backslash escape, caret escape, or any regular non-quote character
+        var {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}(\\\\.|\\\^.|[^\\\n'])*?${startingQuote}`), from: remainingXdataString})
+        if (extraction) {
+            // remove quotes
+            extraction = extraction.replace(RegExp(`(^${startingQuote}|${startingQuote}$)`,"g"), "")
+            
+            // 
+            // handle interpolation
+            // 
+            let extractPreInterpolation
+            let extractInterpolation
+            // while (1) {
+            //     let {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}(\\\\.|\\\^.|[^\\\n'])*?${startingQuote}`), from: remainingXdataString})
+            //     if 
+            // }
+            // extract all the inline parts
+            // FIXME
+        }
+    }
+    return {
+        remaining: remainingXdataString,
+        extraction: null
+    }
+}
+
+// 
+// 
+// 'strings'
+// '''strings'''
+// "strings"
+// """strings"""
+// 
+// 
+let parseInlineString = (remainingXdataString) => {
+    var result = parseLiteralInlineString(remainingXdataString)
+    if (result.extraction) {
+        return result
+    }
+    var result = parseFigureativeInlineString(remainingXdataString)
+    if (result.extraction) {
+        return result
+    }
+    return {
+        remaining: remainingXdataString,
+        extraction: null
+    }
+}
 
 
 // 
