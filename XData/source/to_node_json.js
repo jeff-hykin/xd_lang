@@ -5,10 +5,12 @@
     // parse recursive block
     // unparse
         // make sure format (like ") is viable for the content (like ")
+    // add a simple "shouldn't matched but didn't because __ an improved version would be ___"
     // check version at top
     // creating a hash of names->indicies
     // record line numbers
     // create a good error system (create fallback checks like parseBadReference or parseBadLiteralString)
+    // change atom's to named atoms
 
 
 // 
@@ -493,6 +495,32 @@ testParse({
             },
         },
         {
+            input: "\"\"\"\"string\"\"\"\"",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "\"\"\"",
+                    "value": "\"string\""
+                }
+            },
+        },
+        {
+            input: "\"\"\"\"\"string\"\"\"\"\"",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "\"\"\"",
+                    "value": "\"\"string\"\""
+                }
+            },
+        },
+        {
             input: "\"\"\"\"\"\"",
             output: {
                 "remaining": "",
@@ -509,7 +537,7 @@ testParse({
     ifParsedWith: parseLiteralInlineString = (remainingXdataString) => {
         let startingQuote = getStartingQuote(remainingXdataString)
         if (typeof startingQuote == 'string' && startingQuote[0] == '"') {
-            var {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}.*?${startingQuote}`), from: remainingXdataString})
+            var {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}.*?"{0,${startingQuote.length-1}}${startingQuote}`), from: remainingXdataString})
             if (extraction) {
                 // remove quotes
                 extraction = extraction.replace(RegExp(`(^${startingQuote}|${startingQuote}$)`,"g"), "")
@@ -898,7 +926,7 @@ testParse({
 })
 
 // 
-// interpolation
+// {interpolation}
 //
 let extractInterpolations
 testParse({
@@ -949,7 +977,7 @@ testParse({
         let pieces = []
         while (remaining.length > 0) {
             // find everything thats not a { or }
-            var {remaining, extraction} = extractFirst({pattern: /^(\\.|\^.|[^\n'\{\}])*/, from: remaining})
+            var {remaining, extraction} = extractFirst({pattern: /^(\\.|\^.|[^\n\{\}])*/, from: remaining})
             if (extraction) {
                 pieces.push({
                     types: ["#stringPiece"],
@@ -991,36 +1019,142 @@ testParse({
 // 
 // 'strings'
 // '''strings'''
+// '''strings and {interpolations}'''
 // 
 // 
-let parseFigurativeInlineString = (remainingXdataString) => {
-    let startingQuote = getStartingQuote(remainingXdataString)
-    if (startingQuote instanceof Object && startingQuote[0] == "'") {
-        // match backslash escape, caret escape, or any regular non-quote character
-        var {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}(\\\\.|\\\^.|[^\\\n'])*?${startingQuote}`), from: remainingXdataString})
-        if (extraction) {
-            // remove quotes
-            extraction = extraction.replace(RegExp(`(^${startingQuote}|${startingQuote}$)`,"g"), "")
-            
+let parseFigurativeInlineString
+testParse({
+    expectedIo: [
+        {
+            input: "'strings'",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "'",
+                    "value": "strings"
+                }
+            },
+        },
+        {
+            input: "'''strings'''",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "'''",
+                    "value": "strings"
+                }
+            },
+        },
+        {
+            input: "''''strings''''",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "'''",
+                    "value": "'strings'"
+                }
+            },
+        },
+        {
+            input: "'''strings and {@interpolations}'''",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "'''",
+                    "contains": [
+                        {
+                            "types": [
+                                "#stringPiece"
+                            ],
+                            "value": "strings and "
+                        },
+                        {
+                            "types": [
+                                "#interpolation"
+                            ],
+                            "value": {
+                                "types": [
+                                    "#atom"
+                                ],
+                                "format": "@",
+                                "value": "interpolations"
+                            }
+                        }
+                    ]
+                }
+            },
+        },
+    ],
+    ifParsedWith: parseFigurativeInlineString = (remainingXdataString) => {
+        let startingQuote = getStartingQuote(remainingXdataString)
+        if (typeof startingQuote == 'string' && startingQuote[0] == "'") {
+            // match backslash escape, caret escape, or any non-newline non-quote
+            let patternString = `^${startingQuote}(\\\\.|\\\^.|[^\\\n'])*?'{0,${startingQuote.length-1}}${startingQuote}`
+            // if statement allows for quotes inside of multi-quoted strings
+            // (yes the regex is only 1 char different)
+            if (startingQuote.length > 1) {
+                // match backslash escape, caret escape, or any non-newline
+                patternString = `^${startingQuote}(\\\\.|\\\^.|[^\\\n])*?'{0,${startingQuote.length-1}}${startingQuote}`
+            }
+            var {remaining, extraction} = extractFirst({pattern: RegExp(patternString), from: remainingXdataString})
             // 
-            // handle interpolation
+            // string found
             // 
-            let extractPreInterpolation
-            let extractInterpolation
-            // while (1) {
-            //     let {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}(\\\\.|\\\^.|[^\\\n'])*?${startingQuote}`), from: remainingXdataString})
-            //     if 
-            // }
-            // extract all the inline parts
-            // FIXME
+            if (extraction) {
+                // remove quotes
+                extraction = extraction.replace(RegExp(`(^${startingQuote}|${startingQuote}$)`,"g"), "")
+                
+                if (extraction.length == 0) {
+                    return {
+                        remaining,
+                        extraction: {
+                            types: [ "#string" ],
+                            format: startingQuote,
+                            value: extraction,
+                        },
+                    }
+                } else {
+                    let stringPieces = extractInterpolations(extraction)
+                    if (stringPieces.length == 1) {
+                        return {
+                            remaining,
+                            extraction: {
+                                types: ["#string"],
+                                format: startingQuote,
+                                value: stringPieces[0].value,
+                            }
+                        }
+                    } else {
+                        return {
+                            remaining,
+                            extraction: {
+                                types: ["#string"],
+                                format: startingQuote,
+                                contains: stringPieces,
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return {
+            remaining: remainingXdataString,
+            extraction: null
         }
     }
-    return {
-        remaining: remainingXdataString,
-        extraction: null
-    }
-}
-
+})
 // 
 // 
 // 'strings'
