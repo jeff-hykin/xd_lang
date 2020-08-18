@@ -89,11 +89,12 @@ testParse({
                 extraction: null,
             }
         } else {
+            let whiteSpaceResult = extractFirst({pattern: /^\s*/, from: extraction})
             return {
                 remaining,
                 extraction: {
                     types: ["#comment"],
-                    // TODO: break up into indent and 
+                    leadingWhiteSpace: whiteSpaceResult.extraction || "",
                     content: extraction
                 }
             }
@@ -242,9 +243,18 @@ parseAtom.canHaveTrailingWhitespace = true
 // 
 // 
 let parseWeakUnquotedString = (remainingXdataString) => {
-    let {remaining, extraction} = extractFirst({pattern: /^('|")/, from: remainingXdataString}))
-    
-    // FIXME: 
+    let {remaining, extraction} = extractFirst({pattern: /^([a-zA-Z][a-zA-Z_0-9]*):/, from: remainingXdataString})
+    if (extraction) {
+        let value = extraction.replace(/:$/, "")
+        return returnSuccess({
+            remaining,
+            value: {
+                types: ["#string"],
+                format: "unquoted",
+                value,
+            }
+        })
+    }
 
     return {
         remaining: remainingXdataString,
@@ -425,7 +435,7 @@ testParse({
     }
 })
 
-
+̄
 let parseKey
 testParse({
     expectedIo: [
