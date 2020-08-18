@@ -2,8 +2,11 @@
 // todo
 // 
     // check version at top
+    // creating a hash of names->indicies
     // record line numbers
     // create a good error system (create fallback checks like parseBadReference or parseBadLiteralString)
+    // unparse
+        // make sure format (like ") is viable for the content (like ")
 
 
 // 
@@ -29,8 +32,8 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
         for (let each of expectedIo) {
             let {input, output} = each
             let nextExpectedOutput = JSON.stringify(output)
-            let nextActualOutput = JSON.stringify(ifParsedWith(input))
-            if (nextExpectedOutput != nextActualOutput) {
+            let nextActualOutput = JSON.stringify(ifParsedWith(input), null, 4).replace(/(\n)/g, "$1            ")
+            if (JSON.stringify(JSON.parse(nextExpectedOutput)) != JSON.stringify(JSON.parse(nextActualOutput))) {
                 throw Error(`\n\n\n ifParsedWith:\n${ifParsedWith}\n\nWhen calling testParse()\nThe assertion that ${JSON.stringify(input)} results in ${nextExpectedOutput} was false\ninstead it was:\n        {\n            input: ${JSON.stringify(input)},\n            output: ${nextActualOutput},\n        },\n`)
             }
         }
@@ -404,7 +407,7 @@ let getStartingQuote = (remainingXdataString) => {
         //  e.g: '''''''''''''''''''''''''' is a nine-quote with eight single quotes inside (''''''''')''''''''(''''''''')
         // find the size of the starting quote, which can be any power of three
         let logBase = 3
-        let logOfSizeBaseThree = Math.log(quoteMatch[0].length) / Math.log(base)
+        let logOfSizeBaseThree = Math.log(quoteMatch[0].length) / Math.log(logBase)
         let closestPowerOfThree = Math.floor(logOfSizeBaseThree)
         let quoteSize = 3**closestPowerOfThree
         
@@ -420,28 +423,85 @@ let getStartingQuote = (remainingXdataString) => {
 // """strings"""
 // 
 // 
-let parseLiteralInlineString = (remainingXdataString) => {
-    let startingQuote = getStartingQuote(remainingXdataString)
-    if (startingQuote instanceof Object && startingQuote[0] == '"') {
-        var {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}.+?${startingQuote}`), from: remainingXdataString})
-        if (extraction) {
-            // remove quotes
-            extraction = extraction.replace(startingQuote, "")
-            return {
-                remaining,
-                extraction: {
-                    types: ["#string"],
-                    format: startingQuote,
-                    value: extraction,
+let parseLiteralInlineString
+testParse({
+    expectedIo: [
+        {
+            input: "\"string\"",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "\"",
+                    "value": "string"
+                }
+            },
+        },
+        {
+            input: "\"\"",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "\"",
+                    "value": ""
+                }
+            },
+        },
+        {
+            input: "\"\"\"string\"\"\"",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "\"\"\"",
+                    "value": "string"
+                }
+            },
+        },
+        {
+            input: "\"\"\"\"\"\"",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "\"\"\"",
+                    "value": ""
+                }
+            },
+        },
+    ],
+    ifParsedWith: parseLiteralInlineString = (remainingXdataString) => {
+        let startingQuote = getStartingQuote(remainingXdataString)
+        if (typeof startingQuote == 'string' && startingQuote[0] == '"') {
+            var {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}.*?${startingQuote}`), from: remainingXdataString})
+            if (extraction) {
+                // remove quotes
+                extraction = extraction.replace(RegExp(`(^${startingQuote}|${startingQuote}$)`,"g"), "")
+                return {
+                    remaining,
+                    extraction: {
+                        types: ["#string"],
+                        format: startingQuote,
+                        value: extraction,
+                    }
                 }
             }
         }
+        return {
+            remaining: remainingXdataString,
+            extraction: null
+        }
     }
-    return {
-        remaining: remainingXdataString,
-        extraction: null
-    }
-}
+})
 
 // 
 // 
@@ -456,7 +516,7 @@ let parseFigureativeInlineString = (remainingXdataString) => {
         var {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}(\\\\.|\\\^.|[^\\\n'])*?${startingQuote}`), from: remainingXdataString})
         if (extraction) {
             // remove quotes
-            extraction = extraction.replace(RegExp(`(^${startingQuote}|${startingQuote}$)`), "")
+            extraction = extraction.replace(RegExp(`(^${startingQuote}|${startingQuote}$)`,"g"), "")
             
             // 
             // handle interpolation
@@ -513,27 +573,184 @@ testParse({
     expectedIo: [
         {
             input: "#thisDocument",
-            output: {"remaining":"","extraction":{"types":["#reference"],"accessList":[{"types":["#system"],"value":"#thisDocument"}]}},
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#reference"
+                    ],
+                    "accessList": [
+                        {
+                            "types": [
+                                "#system"
+                            ],
+                            "value": "#thisDocument"
+                        }
+                    ]
+                }
+            },
         },
         {
             input: "#thisDocument[1]",
-            output: { remaining: ''      , extraction: { types: ['#comment'] , content: ' # hello' } },
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#reference"
+                    ],
+                    "accessList": [
+                        {
+                            "types": [
+                                "#system"
+                            ],
+                            "value": "#thisDocument"
+                        },
+                        {
+                            "types": [
+                                "#atom",
+                                "#number"
+                            ],
+                            "value": "1"
+                        }
+                    ]
+                }
+            },
         },
         {
-            input: "#thisDocument['thing'][  'thing']",
-            output: { remaining: ''      , extraction: { types: ['#comment'] , content: '#'        } },
+            input: "#thisDocument[\"thing\"][  \"thing\"]",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#reference"
+                    ],
+                    "accessList": [
+                        {
+                            "types": [
+                                "#system"
+                            ],
+                            "value": "#thisDocument"
+                        },
+                        {
+                            "types": [
+                                "#string"
+                            ],
+                            "format": "\"",
+                            "value": "thing"
+                        },
+                        {
+                            "types": [
+                                "#string"
+                            ],
+                            "format": "\"",
+                            "value": "thing",
+                            "leadingWhitespace": "  "
+                        }
+                    ]
+                }
+            },
         },
         {
-            input: "#thisDocument['thing'][  1]",
-            output: { remaining: ''      , extraction: { types: ['#comment'] , content: '#'        } },
+            input: "#thisDocument[\"thing\"][  1]",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#reference"
+                    ],
+                    "accessList": [
+                        {
+                            "types": [
+                                "#system"
+                            ],
+                            "value": "#thisDocument"
+                        },
+                        {
+                            "types": [
+                                "#string"
+                            ],
+                            "format": "\"",
+                            "value": "thing"
+                        },
+                        {
+                            "types": [
+                                "#atom",
+                                "#number"
+                            ],
+                            "value": "1",
+                            "leadingWhitespace": "  "
+                        }
+                    ]
+                }
+            },
         },
         {
-            input: "#thisDocument['thing'][1  ]",
-            output: { remaining: ''      , extraction: { types: ['#comment'] , content: '#'        } },
+            input: "#thisDocument[\"thing\"][1  ]",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#reference"
+                    ],
+                    "accessList": [
+                        {
+                            "types": [
+                                "#system"
+                            ],
+                            "value": "#thisDocument"
+                        },
+                        {
+                            "types": [
+                                "#string"
+                            ],
+                            "format": "\"",
+                            "value": "thing"
+                        },
+                        {
+                            "types": [
+                                "#atom",
+                                "#number"
+                            ],
+                            "value": "1",
+                            "trailingWhitespace": "  "
+                        }
+                    ]
+                }
+            },
         },
         {
-            input: "#thisDocument['thing'][1 ]",
-            output: { remaining: ''      , extraction: { types: ['#comment'] , content: '#'        } },
+            input: "#thisDocument[\"thing\"][1 ]",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#reference"
+                    ],
+                    "accessList": [
+                        {
+                            "types": [
+                                "#system"
+                            ],
+                            "value": "#thisDocument"
+                        },
+                        {
+                            "types": [
+                                "#string"
+                            ],
+                            "format": "\"",
+                            "value": "thing"
+                        },
+                        {
+                            "types": [
+                                "#atom",
+                                "#number"
+                            ],
+                            "value": "1",
+                            "trailingWhitespace": " "
+                        }
+                    ]
+                }
+            },
         },
     ],
     ifParsedWith: parseReference = (remainingXdataString) => {
@@ -571,13 +788,16 @@ testParse({
                     }
                     // then whitespace
                     var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remaining)
-                    console.log(`parseLeadingWhitespace: remaining is:`,remaining)
+                    console.debug(`parseLeadingWhitespace: remaining is:`,remaining)
                     // then number/@atom/literalInlineString
                     var {remaining, extraction} = parseNumber(remaining)
+                    console.debug(`remaining, extraction is:`,remaining, extraction)
                     if (!extraction) {
                         var {remaining, extraction} = parseAtom(remaining)
                         if (!extraction) {
-                            var {remaining, extraction} = parseInlineString(remaining)
+                            var {remaining, extraction} = parseLiteralInlineString(remaining)
+                            console.debug(`extraction is:`,extraction)
+                            console.debug(`remaining is:`,remaining)
                         }
                         // FIXME: consider possible case of file name being used as a key
                     }
@@ -588,22 +808,22 @@ testParse({
                         
                         var {remaining, extraction: trailingWhitespace} = parseLeadingWhitespace(remaining)
                         // find the ]
-                        var {remaining, extraction} = extractFirst({pattern: /\]/, from: remaining})
+                        var {remaining, extraction: discard} = extractFirst({pattern: /\]/, from: remaining})
                         
                         // 
                         // successfully completed an access-value section
                         // 
                         if (extraction) {
                             // add the value and try getting another
-                            extraction.leadingWhitespace = leadingWhitespace
-                            extraction.trailingWhitespace = trailingWhitespace
+                            leadingWhitespace  && (extraction.leadingWhitespace  = leadingWhitespace)
+                            trailingWhitespace && (extraction.trailingWhitespace = trailingWhitespace)
                             accessList.push(extraction)
                             continue
                         // 
                         // error: missing ]
                         // 
                         } else {
-                            console.log(`accessList is:`,accessList)
+                            console.debug(`accessList is:`,accessList)
                             // TODO: better message
                             console.error(`\nI found a ${accessList[0].value} and ['s,\nbut had trouble finding one of the closing ]'s\nhere's the line:\n    ${errorLine}\n`)
                             return {
