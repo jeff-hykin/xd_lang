@@ -1,6 +1,7 @@
 // 
 // todo
 // 
+    // have all values extract their comment and trailing newline
     // parse main/root
     //     check version at top
     //     handle final trailing newline
@@ -20,9 +21,24 @@
     // record line numbers for errors
 
 // 
-// tools
-// 
+const systemKeys = [ "#key:","#value", "#thisDocument", "#thisFile", "#input", "#create" ] // TODO: improve the #create, its only hear because of checks inside comment, but causes extra matching inside #reference
 const indentUnit = "    "
+// 
+// tools
+//
+let findAll = (regexPattern, sourceString) => {
+    let output = []
+    let match
+    // make sure the pattern has the global flag
+    let regexPatternWithGlobal = RegExp(regexPattern,"g")
+    while (match = regexPatternWithGlobal.exec(sourceString)) {
+        // get rid of the string copy
+        delete match.input
+        // store the match data
+        output.push(match)
+    } 
+    return output
+}
 let extractFirst = ({ pattern, from }) => {
     let match = from.match(pattern)
     if (match) {
@@ -112,6 +128,9 @@ let parseWrappingWhitespaceFor = (parserFunc, remainingXdataString) => {
         remaining: remainingXdataString,
         extraction: null
     }
+}
+let indent = (string) => {
+    return string.toString().replace(/(^|\n)/g, `$1${indentUnit}`)
 }
 
 // 
@@ -206,7 +225,24 @@ testParse({
                 extraction,
             }
         }
-
+        
+        // 
+        // almost-a-comment
+        // 
+        // TODO: ensure this doesn't cause false positives (root parse, custom type)
+        if (!remaining.match(RegExp(`^(${systemKeys.join("|")})`))) {
+            var {remaining, extraction: messedUpComment} = extractFirst({pattern:/^#[^:\s]+ [^\s]+.*/, from: remaining})
+            if (messedUpComment) {
+                return {
+                    remaining: remainingXdataString,
+                    extraction: null,
+                    was: messedUpComment,
+                    shouldBe: messedUpComment.replace(/^#/, "# "),
+                }
+            }
+        }
+        
+        // there isn't a comment (and there probably isnt a failed comment)
         return {
             remaining: remainingXdataString,
             extraction: null,
@@ -227,7 +263,7 @@ let parseEmptyContainer = (remainingXdataString) => {
             remaining,
             extraction: {
                 types: ["#mapping"],
-                value: extraction,
+                contains: [],
             }
         }
     } else if (extraction == "[]") {
@@ -238,11 +274,13 @@ let parseEmptyContainer = (remainingXdataString) => {
                 value: extraction,
             }
         }
-    } else {
-        return {
-            remaining: remainingXdataString,
-            extraction: null
-        }
+    }
+
+    // TODO: spaces inside brackets warning
+
+    return {
+        remaining: remainingXdataString,
+        extraction: null
     }
 }
 
@@ -348,13 +386,14 @@ testParse({
             }
         }
         
+        // TODO: add good warning when the negative sign is leading in front of the number
+        // TODO: add good warning for @ and decimal number
+        // TODO: add good warning for negative infinite
+
         return {
             remaining: remainingXdataString,
             extraction: null
         }
-        // TODO: add good warning when the negative sign is leading in front of the number
-        // TODO: add good warning for @ and decimal number
-        // TODO: add good warning for negative infinite
     }
 })
 
@@ -366,7 +405,7 @@ testParse({
 // @Nan
 //
 //
-let parseAtom = (remainingXdataString) => {
+let parseNamedAtom = (remainingXdataString) => {
     // negative sign in front is still always allowed
     let {remaining, extraction} = extractFirst({pattern: /^(-?@[a-zA-Z][a-zA-Z_0-9]*)\b/, from: remainingXdataString})
     if (extraction) {
@@ -395,7 +434,7 @@ let parseAtom = (remainingXdataString) => {
 // 
 // 
 let parseWeakUnquotedString = (remainingXdataString) => {
-    let {remaining, extraction} = extractFirst({pattern: /^([a-zA-Z][a-zA-Z_0-9]*)(?=:)/, from: remainingXdataString})
+    var {remaining, extraction} = extractFirst({pattern: /^([a-zA-Z][a-zA-Z_0-9]*)(?=:)/, from: remainingXdataString})
     if (extraction) {
         return {
             remaining,
@@ -404,6 +443,24 @@ let parseWeakUnquotedString = (remainingXdataString) => {
                 format: "unquoted",
                 value: extraction,
             }
+        }
+    }
+    
+    // 
+    // error: spaces before :
+    // 
+    var {remaining, extraction} = extractFirst({pattern: /^([a-zA-Z][a-zA-Z_0-9]*) +(?=:)/, from: remainingXdataString})
+    if (extraction) {
+        return {
+            remaining: remainingXdataString,
+            extraction: null,
+            was: extraction,
+            errorMessage: 
+                `spaces aren't supported before the colon\n`+
+                `just change:\n`+
+                `${indent(extraction)}\n`+
+                `to be:\n`+
+                `${indent(extraction.replace(/ *:/,":"))}`
         }
     }
 
@@ -420,8 +477,7 @@ let parseWeakUnquotedString = (remainingXdataString) => {
 // 
 let parseStrongUnquotedString = (remainingXdataString) => {
     // - start with a-zA-Z, then anything except colon or trailing whitespace until line/block end. Error on colons and trailing whitespace
-    let {remaining, extraction: unquotedString} = extractFirst({pattern: /^[a-zA-Z]([^:\n]*[^\s:])?(\n|$)/, from: remainingXdataString})
-    // TODO: add good warning for leading/trailing whitespace (maybe and "almost" strongUnquotedString)
+    var {remaining, extraction: unquotedString} = extractFirst({pattern: /^[a-zA-Z]([^:\n]*[^\s:])?(\n|$)/, from: remainingXdataString})
     
     if (unquotedString) {
         unquotedString = unquotedString.replace(/\n$/,"")
@@ -435,10 +491,63 @@ let parseStrongUnquotedString = (remainingXdataString) => {
         }
     }
 
+    // TODO: add good warning for almost unquoted block (forgot #literally:)
+
+    // 
+    // almost unquoted (but leading/trailing whitespace)
+    // 
+    var {remaining, extraction: almostUnquotedString} = extractFirst({pattern: /^[ \t]*[a-zA-Z]([^:\n]*)?(\n|$)/, from: remainingXdataString})
+    if (almostUnquotedString) {
+        let quote = literalQuoteNeededToContain(almostUnquotedString)
+        return {
+            remaining: remainingXdataString,
+            extraction: null,
+            was: almostUnquotedString,
+            errorMessage: 
+                `just replace:\n`+
+                `${indent(almostUnquotedString)}\n`+
+                `with:\n`+
+                `    ${quote}${almostUnquotedString}${almostUnquotedString}\n`+
+                `or just remove the whitespace that is at the end/begining (then quotes are not needed)`
+        }
+    }
+    // 
+    // almost unquoted (but contains :)
+    // 
+    var {remaining, extraction: almostUnquotedString} = extractFirst({pattern: /^[a-zA-Z]([^\n]*[^\s])?(\n|$)/, from: remainingXdataString})
+    if (almostUnquotedString) {
+        let quote = literalQuoteNeededToContain(almostUnquotedString)
+        return {
+            remaining: remainingXdataString,
+            extraction: null,
+            was: almostUnquotedString,
+            errorMessage: 
+                `for this part:\n`+
+                `${indent(almostUnquotedString)}\n`+
+                `I'm not sure if you meant for it to be a string or a (key: value) pair\n`+
+                `\n`+
+                `If you wanted a string, use this instead:\n`+
+                `    ${quote}${almostUnquotedString}${almostUnquotedString}\n`+
+                `If you wanted a (key: value) pair, put it on the line below and indent it`
+        }
+    }
+
     return {
         remaining: remainingXdataString,
         extraction: null
     }
+}
+
+// 
+// quoteSizeNeeded
+// 
+let literalQuoteNeededToContain = (string) => {
+    let singleQuotes = findAll(/"+/, almostUnquotedString)
+    let maxQuoteSize = Math.max(...singleQuotes.map(each=>each[0].length))
+    // at least one quote needed
+    maxQuoteSize || (maxQuoteSize = 1)
+    ('"').repeat(maxQuoteSize)
+    return getStartingQuote(maxQuoteSize)
 }
 
 // 
@@ -635,7 +744,7 @@ testParse({
         // then number/@atom/literalInlineString
         var {remaining, extraction} = parseNumber(remainingXdataString)
         if (!extraction) {
-            var {remaining, extraction} = parseAtom(remainingXdataString)
+            var {remaining, extraction} = parseNamedAtom(remainingXdataString)
             if (!extraction) {
                 var {remaining, extraction} = parseLiteralInlineString(remainingXdataString)
             }
@@ -849,7 +958,8 @@ testParse({
         },
     ],
     ifParsedWith: parseReference = (remainingXdataString) => {
-        var {remaining, extraction} = extractFirst({pattern: /^(#thisDocument|#thisFile|#input)/, from: remainingXdataString})
+        // TODO: selectively exclude some keys
+        var {remaining, extraction} = extractFirst({pattern: RegExp(`^(${systemKeys.join("|")})`), from: remainingXdataString})
         // FIXME: #thisFile@folderPath
         if (extraction) {
             let item = extraction
@@ -1780,7 +1890,7 @@ testParse({
         }
 
         // try normal values
-        for (let each of [parseEmptyContainer, parseKeywordAtom, parseNumber, parseAtom, parseInlineString, parseReference, parseBlockString, parseContainer]) {
+        for (let each of [parseEmptyContainer, parseKeywordAtom, parseNumber, parseNamedAtom, parseInlineString, parseReference, parseBlockString, parseContainer]) {
             var {remaining, extraction} = each(remaining)
             if (extraction) {
                 // 
@@ -2269,7 +2379,14 @@ testParse({
                 remaining: remainingXdataString,
                 extraction: null,
                 was: originalBlock,
-                shouldBe: fixedBlock,
+                errorMessage: 
+                    `having both keys (key: value) and list elements (- value) in the\n`+
+                    `same container currently isn't support\n`+
+                    `just change:\n`+
+                    `${indent(originalBlock)}\n`+
+                    `to be:\n`+
+                    `${indent(fixedBlock)}`
+                ,
             }
         // 
         // prep return value
