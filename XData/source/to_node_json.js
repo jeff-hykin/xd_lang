@@ -108,14 +108,14 @@ let extractBlock = (string) => {
         extraction: null,
     }
 }
-let parseLeadingWhitespace = (remainingXdataString) => {
-    let result = extractFirst({pattern: /^( |\t)*/, from: remainingXdataString,})
+let parseLeadingWhitespace = (remainingData1String) => {
+    let result = extractFirst({pattern: /^( |\t)*/, from: remainingData1String,})
     // ensure it is always a string
     result.extraction = result.extraction || ""
     return result
 }
-let parseWrappingWhitespaceFor = (parserFunc, remainingXdataString) => {
-    var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remainingXdataString)
+let parseWrappingWhitespaceFor = (parserFunc, remainingData1String) => {
+    var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remainingData1String)
     var {remaining, extraction} = parserFunc(remaining)
     if (extraction) {
         var {remaining, extraction: trailingWhitespace} = parseLeadingWhitespace(remaining)
@@ -128,7 +128,7 @@ let parseWrappingWhitespaceFor = (parserFunc, remainingXdataString) => {
     }
 
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null
     }
 }
@@ -141,8 +141,8 @@ let indent = (string) => {
 // (blank lines)
 // 
 // 
-let parseBlankLine = (remainingXdataString, indent) => {
-    let {remaining, extraction: blankLine} = extractFirst({pattern: /^(\s*)(\n|$)/, from: remainingXdataString,})
+let parseBlankLine = (remainingData1String, indent) => {
+    let {remaining, extraction: blankLine} = extractFirst({pattern: /^(\s*)(\n|$)/, from: remainingData1String,})
     // return null if no match
     if (blankLine) {
         // remove trailing newline
@@ -156,7 +156,7 @@ let parseBlankLine = (remainingXdataString, indent) => {
         }
     }
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null,
     }
 }
@@ -166,8 +166,8 @@ let parseBlankLine = (remainingXdataString, indent) => {
 //  # comments
 // 
 // 
-let parseComment = (remainingXdataString, indent) => {
-    var {remaining, extraction: leadingWhitespace } = parseLeadingWhitespace(remainingXdataString)
+let parseComment = (remainingData1String, indent) => {
+    var {remaining, extraction: leadingWhitespace } = parseLeadingWhitespace(remainingData1String)
     var {remaining, extraction: comment} = extractFirst({pattern:/^#( .*|)(\n|$)/, from: remaining})
     if (comment) {
         // remove trailing newline
@@ -191,7 +191,7 @@ let parseComment = (remainingXdataString, indent) => {
         var {remaining, extraction: messedUpComment} = extractFirst({pattern:/^#[^:\s]+ [^\s]+.*/, from: remaining})
         if (messedUpComment) {
             return {
-                remaining: remainingXdataString,
+                remaining: remainingData1String,
                 extraction: null,
                 was: messedUpComment,
                 shouldBe: messedUpComment.replace(/^#/, "# "),
@@ -201,7 +201,7 @@ let parseComment = (remainingXdataString, indent) => {
     
     // there isn't a comment (and there probably isnt a failed comment)
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null,
     }
 }
@@ -213,8 +213,8 @@ let parseComment = (remainingXdataString, indent) => {
 // []
 // 
 // 
-let parseEmptyContainer = (remainingXdataString) => {
-    let {remaining, extraction} = extractFirst({pattern: /^(\{\}|\[\])/, from: remainingXdataString})
+let parseEmptyContainer = (remainingData1String) => {
+    let {remaining, extraction} = extractFirst({pattern: /^(\{\}|\[\])/, from: remainingData1String})
     if (extraction == "{}") {
         return {
             remaining,
@@ -236,7 +236,7 @@ let parseEmptyContainer = (remainingXdataString) => {
     // TODO: spaces inside brackets warning
 
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null
     }
 }
@@ -246,8 +246,8 @@ let parseEmptyContainer = (remainingXdataString) => {
 // null, true, false, infinite, nan
 // 
 // 
-let parseKeywordAtom = (remainingXdataString) => {
-    let {remaining, extraction} = extractFirst({pattern: /^(null|true|false|-?infinite|nan)/i, from: remainingXdataString})
+let parseKeywordAtom = (remainingData1String) => {
+    let {remaining, extraction} = extractFirst({pattern: /^(null|true|false|-?infinite|nan)/i, from: remainingData1String})
     if (extraction) {
         return {
             remaining,
@@ -258,7 +258,7 @@ let parseKeywordAtom = (remainingXdataString) => {
         }
     } else {
         return {
-            remaining: remainingXdataString,
+            remaining: remainingData1String,
             extraction: null
         }
     }
@@ -273,8 +273,8 @@ let parseKeywordAtom = (remainingXdataString) => {
 // -@539035
 //
 //
-let parseNumber = (remainingXdataString) => {
-    var {remaining, extraction: rawNumberString} = extractFirst({ pattern: /^(-?([0-9]+\.[0-9]+|@?[0-9][0-9]*))(?!\d|\.)/, from: remainingXdataString, })
+let parseNumber = (remainingData1String) => {
+    var {remaining, extraction: rawNumberString} = extractFirst({ pattern: /^(-?([0-9]+\.[0-9]+|@?[0-9][0-9]*))(?!\d|\.)/, from: remainingData1String, })
     if (rawNumberString) {
         // check atomic format
         var {remaining: rawNumberString, extraction: isAtomicFormat} = extractFirst({pattern: /@/, from: rawNumberString})
@@ -297,7 +297,7 @@ let parseNumber = (remainingXdataString) => {
     // TODO: add good warning for negative infinite
 
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null
     }
 }
@@ -310,9 +310,9 @@ let parseNumber = (remainingXdataString) => {
 // @Nan
 //
 //
-let parseNamedAtom = (remainingXdataString) => {
+let parseNamedAtom = (remainingData1String) => {
     // negative sign in front is still always allowed
-    let {remaining, extraction} = extractFirst({pattern: /^(-?@[a-zA-Z][a-zA-Z_0-9]*)\b/, from: remainingXdataString})
+    let {remaining, extraction} = extractFirst({pattern: /^(-?@[a-zA-Z][a-zA-Z_0-9]*)\b/, from: remainingData1String})
     if (extraction) {
         return {
             remaining,
@@ -325,7 +325,7 @@ let parseNamedAtom = (remainingXdataString) => {
     }
 
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null
     }
     // TODO: add good warning when the negative sign is leading in front of the number
@@ -338,8 +338,8 @@ let parseNamedAtom = (remainingXdataString) => {
 // weakUnquotedString
 // 
 // 
-let parseWeakUnquotedString = (remainingXdataString) => {
-    var {remaining, extraction} = extractFirst({pattern: /^([a-zA-Z][a-zA-Z_0-9]*)(?=:)/, from: remainingXdataString})
+let parseWeakUnquotedString = (remainingData1String) => {
+    var {remaining, extraction} = extractFirst({pattern: /^([a-zA-Z][a-zA-Z_0-9]*)(?=:)/, from: remainingData1String})
     if (extraction) {
         return {
             remaining,
@@ -354,10 +354,10 @@ let parseWeakUnquotedString = (remainingXdataString) => {
     // 
     // error: spaces before :
     // 
-    var {remaining, extraction} = extractFirst({pattern: /^([a-zA-Z][a-zA-Z_0-9]*) +(?=:)/, from: remainingXdataString})
+    var {remaining, extraction} = extractFirst({pattern: /^([a-zA-Z][a-zA-Z_0-9]*) +(?=:)/, from: remainingData1String})
     if (extraction) {
         return {
-            remaining: remainingXdataString,
+            remaining: remainingData1String,
             extraction: null,
             was: extraction,
             errorMessage: 
@@ -370,7 +370,7 @@ let parseWeakUnquotedString = (remainingXdataString) => {
     }
 
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null
     }
 }
@@ -380,9 +380,9 @@ let parseWeakUnquotedString = (remainingXdataString) => {
 // strongUnquotedString
 // 
 // 
-let parseStrongUnquotedString = (remainingXdataString) => {
+let parseStrongUnquotedString = (remainingData1String) => {
     // - start with a-zA-Z, then anything except colon or trailing whitespace until line/block end. Error on colons and trailing whitespace
-    var {remaining, extraction: unquotedString} = extractFirst({pattern: /^[a-zA-Z]([^:\n]*[^\s:])?(\n|$)/, from: remainingXdataString})
+    var {remaining, extraction: unquotedString} = extractFirst({pattern: /^[a-zA-Z]([^:\n]*[^\s:])?(\n|$)/, from: remainingData1String})
     
     if (unquotedString) {
         // remove trailing newline before saving
@@ -402,11 +402,11 @@ let parseStrongUnquotedString = (remainingXdataString) => {
     // 
     // almost unquoted (but leading/trailing whitespace)
     // 
-    var {remaining, extraction: almostUnquotedString} = extractFirst({pattern: /^[ \t]*[a-zA-Z]([^:\n]*)?(\n|$)/, from: remainingXdataString})
+    var {remaining, extraction: almostUnquotedString} = extractFirst({pattern: /^[ \t]*[a-zA-Z]([^:\n]*)?(\n|$)/, from: remainingData1String})
     if (almostUnquotedString) {
         let quote = literalQuoteNeededToContain(almostUnquotedString)
         return {
-            remaining: remainingXdataString,
+            remaining: remainingData1String,
             extraction: null,
             was: almostUnquotedString,
             errorMessage: 
@@ -420,11 +420,11 @@ let parseStrongUnquotedString = (remainingXdataString) => {
     // 
     // almost unquoted (but contains :)
     // 
-    var {remaining, extraction: almostUnquotedString} = extractFirst({pattern: /^[a-zA-Z]([^\n]*[^\s])?(\n|$)/, from: remainingXdataString})
+    var {remaining, extraction: almostUnquotedString} = extractFirst({pattern: /^[a-zA-Z]([^\n]*[^\s])?(\n|$)/, from: remainingData1String})
     if (almostUnquotedString) {
         let quote = literalQuoteNeededToContain(almostUnquotedString)
         return {
-            remaining: remainingXdataString,
+            remaining: remainingData1String,
             extraction: null,
             was: almostUnquotedString,
             errorMessage: 
@@ -439,7 +439,7 @@ let parseStrongUnquotedString = (remainingXdataString) => {
     }
 
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null
     }
 }
@@ -463,9 +463,9 @@ let literalQuoteNeededToContain = (string) => {
 // """
 // 
 // 
-let getStartingQuote = (remainingXdataString) => {
+let getStartingQuote = (remainingData1String) => {
     // starts with quote
-    let quoteMatch = remainingXdataString.match(/^('|")+/)
+    let quoteMatch = remainingData1String.match(/^('|")+/)
     if (quoteMatch) {
         // 
         // quote size
@@ -479,7 +479,7 @@ let getStartingQuote = (remainingXdataString) => {
         let closestPowerOfThree = Math.floor(logOfSizeBaseThree)
         let quoteSize = 3**closestPowerOfThree
         
-        let startingQuote = remainingXdataString[0].repeat(quoteSize)
+        let startingQuote = remainingData1String[0].repeat(quoteSize)
         return startingQuote
     }
     return null
@@ -491,10 +491,10 @@ let getStartingQuote = (remainingXdataString) => {
 // """strings"""
 // 
 // 
-let parseLiteralInlineString = (remainingXdataString) => {
-    let startingQuote = getStartingQuote(remainingXdataString)
+let parseLiteralInlineString = (remainingData1String) => {
+    let startingQuote = getStartingQuote(remainingData1String)
     if (typeof startingQuote == 'string' && startingQuote[0] == '"') {
-        var {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}.*?"{0,${startingQuote.length-1}}${startingQuote}`), from: remainingXdataString})
+        var {remaining, extraction} = extractFirst({pattern: RegExp(`^${startingQuote}.*?"{0,${startingQuote.length-1}}${startingQuote}`), from: remainingData1String})
         if (extraction) {
             // remove quotes
             extraction = extraction.replace(RegExp(`(^${startingQuote}|${startingQuote}$)`,"g"), "")
@@ -509,7 +509,7 @@ let parseLiteralInlineString = (remainingXdataString) => {
         }
     }
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null
     }
 }
@@ -521,13 +521,13 @@ let parseLiteralInlineString = (remainingXdataString) => {
 // @atom
 // 
 // 
-let parseStaticInlineValue = (remainingXdataString) => {
+let parseStaticInlineValue = (remainingData1String) => {
     // then number/@atom/literalInlineString
-    var {remaining, extraction} = parseNumber(remainingXdataString)
+    var {remaining, extraction} = parseNumber(remainingData1String)
     if (!extraction) {
-        var {remaining, extraction} = parseNamedAtom(remainingXdataString)
+        var {remaining, extraction} = parseNamedAtom(remainingData1String)
         if (!extraction) {
-            var {remaining, extraction} = parseLiteralInlineString(remainingXdataString)
+            var {remaining, extraction} = parseLiteralInlineString(remainingData1String)
         }
         // TODO: consider possible case of a reference as a key
     }
@@ -540,7 +540,7 @@ let parseStaticInlineValue = (remainingXdataString) => {
     }
 
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null
     }
 }
@@ -552,9 +552,9 @@ let parseStaticInlineValue = (remainingXdataString) => {
 //  #input
 // 
 // 
-let parseReference = (remainingXdataString) => {
+let parseReference = (remainingData1String) => {
     // TODO: selectively exclude some keys
-    var {remaining, extraction} = extractFirst({pattern: RegExp(`^(${systemKeys.join("|")})`), from: remainingXdataString})
+    var {remaining, extraction} = extractFirst({pattern: RegExp(`^(${systemKeys.join("|")})`), from: remainingData1String})
     // FIXME: #thisFile@folderPath
     if (extraction) {
         let item = extraction
@@ -577,11 +577,11 @@ let parseReference = (remainingXdataString) => {
                 // error: whitespace infront of [
                 // 
                 if (whitespace) {
-                    let errorLine = remainingXdataString.split("\n")[0]
+                    let errorLine = remainingData1String.split("\n")[0]
                     // TODO: make this a good error message about leading whitespace
                     console.error(`There's leading whitespace before the [ in:\n    ${errorLine}\nI think you'll need to change it to:\n    ${errorLine.replace(/ *\[/g, "[")}`)
                     return {
-                        remaining: remainingXdataString,
+                        remaining: remainingData1String,
                         extraction: null
                     }
                 }
@@ -608,7 +608,7 @@ let parseReference = (remainingXdataString) => {
                         // TODO: better message
                         console.error(`\nI found a ${accessList[0].value} and ['s,\nbut had trouble finding one of the closing ]'s\nhere's the line:\n    ${errorLine}\n`)
                         return {
-                            remaining: remainingXdataString,
+                            remaining: remainingData1String,
                             extraction: null
                         }
                     }
@@ -617,12 +617,12 @@ let parseReference = (remainingXdataString) => {
                 // error: couldn't find access-value
                 // 
                 } else {
-                    let errorLine = remainingXdataString.split("\n")[0]
+                    let errorLine = remainingData1String.split("\n")[0]
                     // TODO: better message
                     // TODO: better message specifically for the case of figurative string usage or special atom usage
                     console.error(`\nI found a ${accessList[0].value} and ['s,\nbut had trouble finding a number, @atom, or "literal" inside (all) of the []'s\nhere's the line:\n    ${errorLine}\n`)
                     return {
-                        remaining: remainingXdataString,
+                        remaining: remainingData1String,
                         extraction: null
                     }
                 }
@@ -646,7 +646,7 @@ let parseReference = (remainingXdataString) => {
     // TODO: warn on keys that don't exist
 
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null
     }
 }
@@ -733,8 +733,8 @@ let extractInterpolations = (figurativeStringContents, format) => {
 // '''strings and {interpolations}'''
 // 
 // 
-let parseFigurativeInlineString = (remainingXdataString) => {
-        let startingQuote = getStartingQuote(remainingXdataString)
+let parseFigurativeInlineString = (remainingData1String) => {
+        let startingQuote = getStartingQuote(remainingData1String)
         if (typeof startingQuote == 'string' && startingQuote[0] == "'") {
             // match backslash escape, caret escape, or any non-newline non-quote
             let patternString = `^${startingQuote}(\\\\.|\\\^.|[^\\\n'])*?'{0,${startingQuote.length-1}}${startingQuote}`
@@ -744,7 +744,7 @@ let parseFigurativeInlineString = (remainingXdataString) => {
                 // match backslash escape, caret escape, or any non-newline
                 patternString = `^${startingQuote}(\\\\.|\\\^.|[^\\\n])*?'{0,${startingQuote.length-1}}${startingQuote}`
             }
-            var {remaining, extraction} = extractFirst({pattern: RegExp(patternString), from: remainingXdataString})
+            var {remaining, extraction} = extractFirst({pattern: RegExp(patternString), from: remainingData1String})
             // 
             // string found
             // 
@@ -758,7 +758,7 @@ let parseFigurativeInlineString = (remainingXdataString) => {
             }
         }
         return {
-            remaining: remainingXdataString,
+            remaining: remainingData1String,
             extraction: null
         }
     }
@@ -772,17 +772,17 @@ let parseFigurativeInlineString = (remainingXdataString) => {
 // """strings"""
 // 
 // 
-let parseInlineString = (remainingXdataString) => {
-    var result = parseLiteralInlineString(remainingXdataString)
+let parseInlineString = (remainingData1String) => {
+    var result = parseLiteralInlineString(remainingData1String)
     if (result.extraction) {
         return result
     }
-    var result = parseFigurativeInlineString(remainingXdataString)
+    var result = parseFigurativeInlineString(remainingData1String)
     if (result.extraction) {
         return result
     }
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null
     }
 }
@@ -799,15 +799,15 @@ let parseInlineString = (remainingXdataString) => {
 // """
 // 
 // 
-let parseBlockString = (remainingXdataString) => {
+let parseBlockString = (remainingData1String) => {
         // check if multi-line exists
-        let isMultiLine = remainingXdataString.match(RegExp(`^.+\\n${indentUnit}`))
+        let isMultiLine = remainingData1String.match(RegExp(`^.+\\n${indentUnit}`))
         // TODO: add is-almost multi-line warning
         if (!isMultiLine) {
             // 
             // literal rest-of-line
             // 
-            var {remaining, extraction} = extractFirst({pattern: /^#textLiteral:.*/, from: remainingXdataString})
+            var {remaining, extraction} = extractFirst({pattern: /^#textLiteral:.*/, from: remainingData1String})
             if (extraction) {
                 return {
                     remaining,
@@ -821,7 +821,7 @@ let parseBlockString = (remainingXdataString) => {
             // 
             // figurative rest-of-line
             // 
-            var {remaining, extraction} = extractFirst({pattern: /^#textFigurative:.*/, from: remainingXdataString})
+            var {remaining, extraction} = extractFirst({pattern: /^#textFigurative:.*/, from: remainingData1String})
             if (extraction) {
                 extraction = extraction.replace(/^#textFigurative:/, '')
                 return {
@@ -830,9 +830,9 @@ let parseBlockString = (remainingXdataString) => {
                 }
             }
         } else {
-            let quote = getStartingQuote(remainingXdataString)
+            let quote = getStartingQuote(remainingData1String)
             let pattern = quote || /^(#textLiteral:|#textFigurative:)/
-            var {remaining, extraction} = extractFirst({pattern, from: remainingXdataString})
+            var {remaining, extraction} = extractFirst({pattern, from: remainingData1String})
             var {remaining, extraction: comment} = parseComment(remaining)
             if (!comment) {
                 var {remaining, extraction: miscWhitespace} = parseLeadingWhitespace(remaining)
@@ -840,10 +840,10 @@ let parseBlockString = (remainingXdataString) => {
                     // if there was the start of a text literal
                     if (extraction) {
                         // TODO: improve error message
-                        console.error(`issue with the the remaining text on the line:${remainingXdataString.split("\n")[0]}`)
+                        console.error(`issue with the the remaining text on the line:${remainingData1String.split("\n")[0]}`)
                     }
                     return {
-                        remaining: remainingXdataString,
+                        remaining: remainingData1String,
                         extraction: null,
                     }
                 }
@@ -855,7 +855,7 @@ let parseBlockString = (remainingXdataString) => {
                     let endingQuote = RegExp(`\\n${quote}\\s*$`)
                     if (!extraction.match(endingQuote)) {
                         return {
-                            remaining: remainingXdataString,
+                            remaining: remainingData1String,
                             extraction: null,
                             was: extraction,
                             errorMessage:
@@ -923,7 +923,7 @@ let parseBlockString = (remainingXdataString) => {
         // TODO: figure out how to return trailing comments
 
         return {
-            remaining: remainingXdataString,
+            remaining: remainingData1String,
             extraction: null
         }
     }
@@ -932,8 +932,8 @@ let parseBlockString = (remainingXdataString) => {
 // 
 // VALUE
 // 
-let parseValue = (remainingXdataString, indent) => {
-        var remaining = remainingXdataString
+let parseValue = (remainingData1String, indent) => {
+        var remaining = remainingData1String
         // leading whitespace
         var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remaining)
         // 
@@ -986,10 +986,10 @@ let parseValue = (remainingXdataString, indent) => {
                 if (endOfLine === null) {
                     // TODO: fix this error message
                     return {
-                        remaining: remainingXdataString,
+                        remaining: remainingData1String,
                         extraction: null,
                         was: extraction,
-                        errorMessage: `When trying to parse the value on ${remainingXdataString.split("\n")[0]}\nI found this value:\n${JSON.stringify(extraction)}\nbut the line after it should be empty and instead I got:\n${JSON.stringify(remaining.split("\n")[0])}\n`
+                        errorMessage: `When trying to parse the value on ${remainingData1String.split("\n")[0]}\nI found this value:\n${JSON.stringify(extraction)}\nbut the line after it should be empty and instead I got:\n${JSON.stringify(remaining.split("\n")[0])}\n`
                     }
                 }
                 
@@ -1002,7 +1002,7 @@ let parseValue = (remainingXdataString, indent) => {
 
         if (leadingWhitespace) {
             return {
-                remaining: remainingXdataString,
+                remaining: remainingData1String,
                 extraction: null
             }
         }
@@ -1014,8 +1014,8 @@ let parseValue = (remainingXdataString, indent) => {
 // 
 // LIST ELEMENT
 // 
-let parseListElement = (remainingXdataString) => {
-        var {remaining, extraction} = extractFirst({pattern: /-( +| *(?=\n))/, from: remainingXdataString})
+let parseListElement = (remainingData1String) => {
+        var {remaining, extraction} = extractFirst({pattern: /-( +| *(?=\n))/, from: remainingData1String})
         if (extraction) {
             let result = parseValue(remaining)
             if (result.extraction) {
@@ -1023,7 +1023,7 @@ let parseListElement = (remainingXdataString) => {
             }
         }
         return {
-            remaining: remainingXdataString,
+            remaining: remainingData1String,
             extraction: null
         }
     }
@@ -1032,16 +1032,16 @@ let parseListElement = (remainingXdataString) => {
 // 
 // MAP ELEMENT
 // 
-let parseMapElement = (remainingXdataString) => {
+let parseMapElement = (remainingData1String) => {
         
-        var {remaining, extraction: key} = parseStaticInlineValue(remainingXdataString)
+        var {remaining, extraction: key} = parseStaticInlineValue(remainingData1String)
         if (key) {
             var {remaining, extraction: trailingWhitespace} = parseLeadingWhitespace(remaining)
             if (trailingWhitespace) {
                 key.leadingWhitespace = trailingWhitespace
             }
         } else {
-            var {remaining, extraction: key} = parseWeakUnquotedString(remainingXdataString)
+            var {remaining, extraction: key} = parseWeakUnquotedString(remainingData1String)
             // TODO: warning about trailing whitespace
         }
 
@@ -1068,7 +1068,7 @@ let parseMapElement = (remainingXdataString) => {
         }
 
         return {
-            remaining: remainingXdataString,
+            remaining: remainingData1String,
             extraction: null,
         }
     }
@@ -1077,7 +1077,7 @@ let parseMapElement = (remainingXdataString) => {
 //
 // container block
 // 
-let parseContainerBlock = (block, nodeParsers, {comment,remainingXdataString, remaining}={}) => {
+let parseContainerBlock = (block, nodeParsers, {comment,remainingData1String, remaining}={}) => {
     // TODO: clean up this
     //     (it was extracted from parseContainer and contains too much related logic)
     //     (e.g. it shouldn't need so many arguments)
@@ -1123,7 +1123,7 @@ let parseContainerBlock = (block, nodeParsers, {comment,remainingXdataString, re
         let fixedCounter = 0
         fixedBlock = fixedBlock.replace(/- /g, ()=>`${++fixedCounter}:`)
         return {
-            remaining: remainingXdataString,
+            remaining: remainingData1String,
             extraction: null,
             was: originalBlock,
             errorMessage: 
@@ -1156,7 +1156,7 @@ let parseContainerBlock = (block, nodeParsers, {comment,remainingXdataString, re
         } else {
             // TODO: optimize this in the future so its not re-parsed
             return {
-                remaining: remainingXdataString,
+                remaining: remainingData1String,
                 extraction: null
             }
         }
@@ -1172,11 +1172,11 @@ let parseContainerBlock = (block, nodeParsers, {comment,remainingXdataString, re
 // CONTAINER
 // 
 // 
-let parseContainer = (remainingXdataString) => {
+let parseContainer = (remainingData1String) => {
     // 
     // handling leading comment/whitespace
     // 
-    var remaining = remainingXdataString
+    var remaining = remainingData1String
     var {remaining, extraction: comment} = parseComment(remaining)
     if (!comment) {
         var {remaining, extraction: junkWhitespace} = parseLeadingWhitespace(remaining)
@@ -1184,7 +1184,7 @@ let parseContainer = (remainingXdataString) => {
             // probably not a container
             // TODO: check for "thing: blah" warn about inline list/mappings
             return {
-                remaining: remainingXdataString,
+                remaining: remainingData1String,
                 extraction: null,
             }
         }
@@ -1197,15 +1197,15 @@ let parseContainer = (remainingXdataString) => {
         return parseContainerBlock(
             block,
             [parseBlankLine, parseComment, parseListElement, parseMapElement],
-            {comment,remainingXdataString, remaining}
+            {comment,remainingData1String, remaining}
         )
     }
 
     // TODO: look for failed block (not all the way indented or something)
     // TODO: good message about empty key or list value
-    let failLine = remainingXdataString.split("\n")[0]
+    let failLine = remainingData1String.split("\n")[0]
     return {
-        remaining: remainingXdataString,
+        remaining: remainingData1String,
         extraction: null,
     }
 }
@@ -1215,11 +1215,11 @@ let parseContainer = (remainingXdataString) => {
 // ROOT
 // 
 // 
-let parseRoot = (remainingXdataString)=> {
+let parseRoot = (remainingData1String)=> {
     // stadardize to LF
-    remainingXdataString = remainingXdataString.replace(/\r\n/,"\n")
+    remainingData1String = remainingData1String.replace(/\r\n/,"\n")
 
-    var remaining = remainingXdataString
+    var remaining = remainingData1String
     let topNodes = []
     let foundAtLeastOneNode = true
     let foundAtLeastOneValue = false
@@ -1229,7 +1229,7 @@ let parseRoot = (remainingXdataString)=> {
         if (topNodes.length > 0) {
             let lastNode = topNodes[topNodes.length-1]
             if (lastNode.type != "#blankLines") {
-                if (remainingXdataString.match(/\n$/)) {
+                if (remainingData1String.match(/\n$/)) {
                     return { endsWithSingleNewline: true }
                 }
             }
