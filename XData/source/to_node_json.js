@@ -1,16 +1,15 @@
 // 
 // todo
 // 
-    // parse key+value
-    // parse list element
-    // parse recursive block
-    // check version at top
+    // parse contatiner
+    //     creating a hash of names->indicies
+    // parse main/root
+    //     check version at top
     // unparse
         // make sure format (like ") is viable for the content (like ")
     // add a simple "shouldn't matched but didn't because __ an improved version would be ___"
-    // creating a hash of names->indicies
-    // record line numbers
     // create a good error system (create fallback checks like parseBadReference or parseBadLiteralString)
+    // record line numbers
     // change atom's to named atoms
 
 
@@ -1712,7 +1711,6 @@ testParse({
     }
 })
 
-
 let parseListElement
 testParse({
     expectedIo: [
@@ -1771,7 +1769,7 @@ testParse({
     }
 })
 
-let parseKey
+let parseMapElement
 testParse({
     expectedIo: [
         {
@@ -1880,7 +1878,7 @@ testParse({
             },
         },
     ],
-    ifParsedWith: parseKey = (remainingXdataString) => {
+    ifParsedWith: parseMapElement = (remainingXdataString) => {
         
         var {remaining, extraction: key} = parseStaticInlineValue(remainingXdataString)
         if (key) {
@@ -1924,10 +1922,9 @@ testParse({
     }
 })
 
-
 // 
 // 
-// 
+// containers(map/list)
 // 
 // 
 let parseContainer
@@ -1945,24 +1942,24 @@ testParse({
         },
     ],
     ifParsedWith: parseContainer = (remainingXdataString) => {
+        // FIXME: parse comments, then parse block
         // FIXME attempt to parse a direct value inside root
         let isMapping, isList
         let list = []
         let itemCounter = -1
-        // FIXME try parsing a version
-        for (let each of [parseBlankLine, parseComment, parseListElement, parseKey]) {
+        for (let each of [parseBlankLine, parseComment, parseListElement, parseMapElement]) {
             var {remaining, extraction} = each(remaining)
             if (extraction && each == parseListElement) {
                 isList = true
                 extraction.key = ++itemCounter
                 list.push(extraction)
-            } else if (extraction && each == parseKey) {
+            } else if (extraction && each == parseMapElement) {
                 isMapping == true
             }
         }
 
         // FIXME: isMapping && isList , !isMapping && !isList
-        
+
     }
 })
 
