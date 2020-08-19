@@ -1715,6 +1715,21 @@ testParse({
                 }
             },
         },
+        {
+            input: "\n    test: @this",
+            output: {
+                "remaining": "\n",
+                "extraction": {
+                    "types": [
+                        "#atom",
+                        "number",
+                        "rational"
+                    ],
+                    "format": "@",
+                    "value": "pi"
+                }
+            },
+        },
     ],
     ifParsedWith: parseValue = (remainingXdataString, indent) => {
         var remaining = remainingXdataString
