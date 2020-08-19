@@ -1361,9 +1361,8 @@ testParse({
                         "#string"
                     ],
                     "format": "#figurative:MultilineBlock",
-                    "value": "like a billion"
+                    "value": "like a billion",
                 },
-                "comment": null
             },
         },
         {
@@ -1372,9 +1371,8 @@ testParse({
                 "remaining": "",
                 "extraction": {
                     "format": "#literal:MultilineBlock",
-                    "value": "like a billion\nlike a billion and a half"
+                    "value": "like a billion\nlike a billion and a half",
                 },
-                "comment": null
             },
         },
         {
@@ -1383,15 +1381,15 @@ testParse({
                 "remaining": "",
                 "extraction": {
                     "format": "#literal:MultilineBlock",
-                    "value": "like a billion\nlike a billion and a half"
+                    "value": "like a billion\nlike a billion and a half",
+                    "comment": {
+                        "types": [
+                            "#comment"
+                        ],
+                        "content": "# it means literally literally \n",
+                        "leadingWhitespace": "   "
+                    }
                 },
-                "comment": {
-                    "types": [
-                        "#comment"
-                    ],
-                    "content": "# it means literally literally \n",
-                    "leadingWhitespace": "   "
-                }
             },
         },
         {
@@ -1403,15 +1401,15 @@ testParse({
                         "#string"
                     ],
                     "format": "#figurative:MultilineBlock",
-                    "value": "like a billion\nlike a billion and a half"
+                    "value": "like a billion\nlike a billion and a half",
+                    "comment": {
+                        "types": [
+                            "#comment"
+                        ],
+                        "content": "# it means kinda \n",
+                        "leadingWhitespace": "   "
+                    }
                 },
-                "comment": {
-                    "types": [
-                        "#comment"
-                    ],
-                    "content": "# it means kinda \n",
-                    "leadingWhitespace": "   "
-                }
             },
         },
         {
@@ -1432,7 +1430,6 @@ testParse({
                     "format": "''':MultilineBlock",
                     "value": "testing\n    testing"
                 },
-                "comment": null
             },
         },
         {
@@ -1443,7 +1440,6 @@ testParse({
                     "format": "\"\"\":MultilineBlock",
                     "value": "testing\n    testing"
                 },
-                "comment": null
             },
         },
         {
@@ -1452,9 +1448,8 @@ testParse({
                 "remaining": "",
                 "extraction": {
                     "format": "\":MultilineBlock",
-                    "value": "testing\n    testing"
+                    "value": "testing\n    testing",
                 },
-                "comment": null
             },
         },
         {
@@ -1503,7 +1498,6 @@ testParse({
                         }
                     ]
                 },
-                "comment": null
             },
         },
     ],
@@ -1564,31 +1558,32 @@ testParse({
                     // TODO warning about triple quotes on the same line as text
                     format = quote+":MultilineBlock"
                 }
+                extraction = {
+                    format,
+                    value: extraction,
+                }
+                if (comment) {
+                    extraction.comment = comment
+                }
                 return {
                     remaining,
-                    extraction: {
-                        format,
-                        value: extraction,
-                    },
-                    comment,
+                    extraction,
                 }
             // 
             // figurative MultilineBlock
             // 
             } else if (extraction == "#figuratively:" || isFigurativeQuote) {
                 let format = "#figurative:MultilineBlock"
-                console.debug(`remaining is:`,remaining)
                 var {remaining, extraction} = extractBlock(remaining)
-                console.debug(`extraction is:`, JSON.stringify(extraction))
                 if (isFigurativeQuote) {
                     extraction = extraction.replace(RegExp(`\\n${quote}\\s*$`),"")
                     format = quote+":MultilineBlock"
                 }
-                console.debug(`extraction is:`,JSON.stringify(extraction))
+                extraction = extractInterpolations(extraction, format)
+                comment && (extraction.comment = comment)
                 return {
                     remaining,
-                    extraction: extractInterpolations(extraction, format),
-                    comment,
+                    extraction,
                 }
             }
         }
@@ -1609,14 +1604,32 @@ testParse({
 let parseValue
 testParse({
     expectedIo: [
-        // {
-        //     input: "null",
-        //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
-        // },
-        // {
-        //     input: "   null",
-        //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
-        // },
+        {
+            input: "null",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#atom"
+                    ],
+                    "value": "null"
+                }
+            },
+        },
+        {
+            input: "   1000",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#atom",
+                        "#number"
+                    ],
+                    "value": "1000",
+                    "leadingWhitespace": "   "
+                }
+            },
+        },
         // {
         //     input: "-10",
         //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
@@ -1630,85 +1643,119 @@ testParse({
         var remaining = remainingXdataString
         // leading whitespace
         var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remaining)
+        // 
         // attempt custom type
+        // 
         var {remaining, extraction} = extractFirst({pattern: /^(#create\[( *[a-zA-Z_]+ *)(, *[a-zA-Z_]+ *)*\]):/, from: remaining})
+        let customTypes = null
+        if (extraction) {
+            customTypes = {
+                types: extraction.replace(/^.+\[|\]:| /, "").split(","),
+            }
+            if (leadingWhitespace) {
+                customTypes.leadingWhitespace = leadingWhitespace
+                var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remaining)
+            }
+        }
 
         // try normal values
         for (let each of [parseEmptyContainer, parseKeywordAtom, parseNumber, parseAtom, parseInlineString, parseReference, parseBlockString]) {
             var {remaining, extraction} = each(remaining)
+            if (extraction) {
+                // 
+                // handle preceding whitespace
+                // 
+                leadingWhitespace && (extraction.leadingWhitespace = leadingWhitespace)
+                // 
+                // handle custom types
+                // 
+                if (customTypes) {
+                    extraction.types = extraction.types.concat(customTypes)
+                    customTypes.leadingWhitespace && (extraction.customTypeLeadingWhitespace = customTypes.leadingWhitespace)
+                }
+                // 
+                // handle comments/trailingWhitespace
+                // 
+                var {remaining, extraction: comment} = parseComment(remaining)
+                if (comment) {
+                    extraction.comment = comment
+                } else {
+                    var {remaining, extraction: trailingWhitespace} = parseLeadingWhitespace(remaining)
+                    if (trailingWhitespace) {
+                        extraction.trailingWhitespace = trailingWhitespace
+                    }
+                }
+
+                
+                return {
+                    remaining,
+                    extraction,
+                }
+            }
+        }
+        // try block values
+        return parseStrongUnquotedString(remainingXdataString)
+    }
+})
+
+
+let parseListElement
+testParse({
+    expectedIo: [
+        {
+            input: "- 10",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#atom",
+                        "#number"
+                    ],
+                    "value": "10"
+                }
+            },
+        },
+        {
+            input: "- #literally:100",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "#literal:InlineBlock",
+                    "value": "100"
+                }
+            },
+        },
+        {
+            input: "- #figuratively:\n    200",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "#figurative:MultilineBlock",
+                    "value": "200"
+                }
+            },
+        },
+    ],
+    ifParsedWith: parseListElement = (remainingXdataString) => {
+        var {remaining, extraction} = extractFirst({pattern: /- /, from: remainingXdataString})
+        if (extraction) {
+            let result = parseValue(remaining)
             if (result.extraction) {
                 return result
             }
         }
-        // try block values
-        let result = parseStrongUnquotedString(remainingXdataString)
-        // TODO: add error for leading whitespace on what would be an unquoted string
-
-        let remaining, extraction, leadingWhitespace, trailingWhitespace, customTypes, output
-        remaining = remainingXdataString
-        customTypes = []
-        leadingWhitespace = ""
-
-        let attempt = (remainingString, parseFunction) => {
-            let {remaining, extraction} = parseFunction(remainingString)
-            // FIXME: check the .canHaveLeadingWhitespace, .canHaveTrailingWhitespace
-            // FIXME: add the custom types after the core types
-            if (extraction) {
-                return {
-                    remaining: remaining,
-                    extraction: {
-                        ...extraction,
-                        leadingWhitespace,
-                        customTypes,
-                    }
-                }
-            }
+        return {
+            remaining: remainingXdataString,
+            extraction: null
         }
-        
-        // pull out the leading white space
-        ;({remaining, extraction: leadingWhitespace} = extractFirst({pattern: /^\s*/, from: remaining}))
-
-        // 
-        // custom types
-        //
-        ;()
-        if (extraction) {
-            customTypes.push(extraction.replace(/^.+\[|\]:| /, "").split(","))
-        }
-        
-        
-        // 
-        // inline
-        // 
-
-        // - "{}" for empty mapping
-        // - "[]" for empty list
-        output || (output = attempt(remaining, parseEmptyContainer))
-        // null, true, false, infinite, nan
-        output || (output = attempt(remaining, parseKeywordAtom))
-        // 123, 1.23, @123, -123, -@123, -1.23
-        output || (output = attempt(remaining, parseNumber))
-        // @atom, -@atom
-        output || (output = attempt(remaining, parseAtom))
-        // : hello world, just talking here
-        output || (output = attempt(remaining, parseStrongUnquotedString)) 
-        // 'quoted string', "quoted", """quoted"""
-        output || (output = attempt(remaining, parseInlineString)) 
-        // #thisDocument, #thisFile@absolutePathToFolder
-        output || (output = attempt(remaining, parseReference))
-
-        // TODO: parse trailing whitespace and trailing comment if possible
-
-        // 
-        // blocks
-        // 
-        output || (output = attempt(remaining, parseBlockString))
-        
-        // TODO: add recursive step here
-
     }
 })
-
 
 // let parseKey
 // testParse({
