@@ -131,6 +131,7 @@ let parseBlankLine = (remainingXdataString, indent) => {
         }
     }
 }
+
 // 
 // 
 //  # comments
@@ -235,9 +236,6 @@ let parseEmptyContainer = (remainingXdataString) => {
         }
     }
 }
-parseEmptyContainer.canHaveLeadingWhitespace = true
-parseEmptyContainer.canHaveTrailingWhitespace = true
-
 
 // 
 // 
@@ -261,9 +259,6 @@ let parseKeywordAtom = (remainingXdataString) => {
         }
     }
 }
-parseKeywordAtom.canHaveLeadingWhitespace = true
-parseKeywordAtom.canHaveTrailingWhitespace = true
-
 
 // 
 //
@@ -353,8 +348,6 @@ testParse({
         // TODO: add good warning for negative infinite
     }
 })
-parseNumber.canHaveLeadingWhitespace = true
-parseNumber.canHaveTrailingWhitespace = true
 
 // 
 //
@@ -386,10 +379,6 @@ let parseAtom = (remainingXdataString) => {
     // TODO: add good warning for @ and decimal number
     // TODO: add good warning for negative infinite
 }
-parseAtom.canHaveLeadingWhitespace = true
-parseAtom.canHaveTrailingWhitespace = true
-
-
 
 // 
 // 
@@ -415,7 +404,6 @@ let parseWeakUnquotedString = (remainingXdataString) => {
         extraction: null
     }
 }
-
 
 // 
 // 
@@ -1299,6 +1287,7 @@ testParse({
         }
     }
 })
+
 // 
 // 
 // 'strings'
@@ -1321,7 +1310,6 @@ let parseInlineString = (remainingXdataString) => {
         extraction: null
     }
 }
-
 
 // 
 // 
@@ -1615,92 +1603,111 @@ testParse({
     }
 })
 
+// 
+// 
+// 
+let parseValue
+testParse({
+    expectedIo: [
+        // {
+        //     input: "null",
+        //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
+        // },
+        // {
+        //     input: "   null",
+        //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
+        // },
+        // {
+        //     input: "-10",
+        //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
+        // },
+        // {
+        //     input: "-10.234234",
+        //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
+        // },
+    ],
+    ifParsedWith: parseValue = (remainingXdataString, indent) => {
+        var remaining = remainingXdataString
+        // leading whitespace
+        var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remaining)
+        // attempt custom type
+        var {remaining, extraction} = extractFirst({pattern: /^(#create\[( *[a-zA-Z_]+ *)(, *[a-zA-Z_]+ *)*\]):/, from: remaining})
 
-// let parseValue
-// testParse({
-//     expectedIo: [
-//         // {
-//         //     input: "null",
-//         //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
-//         // },
-//         // {
-//         //     input: "   null",
-//         //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
-//         // },
-//         // {
-//         //     input: "-10",
-//         //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
-//         // },
-//         // {
-//         //     input: "-10.234234",
-//         //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
-//         // },
-//     ],
-//     ifParsedWith: parseValue = (remainingXdataString, indent) => {
-//         let remaining, extraction, leadingWhitespace, trailingWhitespace, customTypes, output
-//         remaining = remainingXdataString
-//         customTypes = []
-//         leadingWhitespace = ""
+        // try normal values
+        for (let each of [parseEmptyContainer, parseKeywordAtom, parseNumber, parseAtom, parseInlineString, parseReference, parseBlockString]) {
+            var {remaining, extraction} = each(remaining)
+            if (result.extraction) {
+                return result
+            }
+        }
+        // try block values
+        let result = parseStrongUnquotedString(remainingXdataString)
+        // TODO: add error for leading whitespace on what would be an unquoted string
 
-//         let attempt = (remainingString, parseFunction) => {
-//             let {remaining, extraction} = parseFunction(remainingString)
-//             // FIXME: check the .canHaveLeadingWhitespace, .canHaveTrailingWhitespace
-//             // FIXME: add the custom types after the core types
-//             if (extraction) {
-//                 return {
-//                     remaining: remaining,
-//                     extraction: {
-//                         ...extraction,
-//                         leadingWhitespace,
-//                         customTypes,
-//                     }
-//                 }
-//             }
-//         }
+        let remaining, extraction, leadingWhitespace, trailingWhitespace, customTypes, output
+        remaining = remainingXdataString
+        customTypes = []
+        leadingWhitespace = ""
+
+        let attempt = (remainingString, parseFunction) => {
+            let {remaining, extraction} = parseFunction(remainingString)
+            // FIXME: check the .canHaveLeadingWhitespace, .canHaveTrailingWhitespace
+            // FIXME: add the custom types after the core types
+            if (extraction) {
+                return {
+                    remaining: remaining,
+                    extraction: {
+                        ...extraction,
+                        leadingWhitespace,
+                        customTypes,
+                    }
+                }
+            }
+        }
         
-//         // pull out the leading white space
-//         ;({remaining, extraction: leadingWhitespace} = extractFirst({pattern: /^\s*/, from: remaining}))
+        // pull out the leading white space
+        ;({remaining, extraction: leadingWhitespace} = extractFirst({pattern: /^\s*/, from: remaining}))
 
-//         // 
-//         // custom types
-//         //
-//         ;({remaining, extraction} = extractFirst({pattern: /^(#create\[( *[a-zA-Z_]+ *)(, *[a-zA-Z_]+ *)*\]):/, from: remaining}))
-//         if (extraction) {
-//             customTypes.push(extraction.replace(/^.+\[|\]:| /, "").split(","))
-//         }
+        // 
+        // custom types
+        //
+        ;()
+        if (extraction) {
+            customTypes.push(extraction.replace(/^.+\[|\]:| /, "").split(","))
+        }
         
         
-//         // 
-//         // inline
-//         // 
+        // 
+        // inline
+        // 
 
-//         // - "{}" for empty mapping
-//         // - "[]" for empty list
-//         output || (output = attempt(remaining, parseEmptyContainer))
-//         // null, true, false, infinite, nan
-//         output || (output = attempt(remaining, parseKeywordAtom))
-//         // 123, 1.23, @123, -123, -@123, -1.23
-//         output || (output = attempt(remaining, parseNumber))
-//         // @atom, -@atom
-//         output || (output = attempt(remaining, parseAtom))
-//         // : hello world, just talking here
-//         output || (output = attempt(remaining, parseStrongUnquotedString)) 
-//         // 'quoted string', "quoted", """quoted"""
-//         output || (output = attempt(remaining, parseInlineString)) 
-//         // #thisDocument, #thisFile@absolutePathToFolder
-//         output || (output = attempt(remaining, parseReference))
+        // - "{}" for empty mapping
+        // - "[]" for empty list
+        output || (output = attempt(remaining, parseEmptyContainer))
+        // null, true, false, infinite, nan
+        output || (output = attempt(remaining, parseKeywordAtom))
+        // 123, 1.23, @123, -123, -@123, -1.23
+        output || (output = attempt(remaining, parseNumber))
+        // @atom, -@atom
+        output || (output = attempt(remaining, parseAtom))
+        // : hello world, just talking here
+        output || (output = attempt(remaining, parseStrongUnquotedString)) 
+        // 'quoted string', "quoted", """quoted"""
+        output || (output = attempt(remaining, parseInlineString)) 
+        // #thisDocument, #thisFile@absolutePathToFolder
+        output || (output = attempt(remaining, parseReference))
 
-//         // TODO: parse trailing whitespace and trailing comment if possible
+        // TODO: parse trailing whitespace and trailing comment if possible
 
-//         // 
-//         // blocks
-//         // 
-//         output || (output = attempt(remaining, parseBlockString))
+        // 
+        // blocks
+        // 
+        output || (output = attempt(remaining, parseBlockString))
         
-//         // TODO: add recursive step here
+        // TODO: add recursive step here
 
-//     }
-// })
+    }
+})
 
 
 // let parseKey
