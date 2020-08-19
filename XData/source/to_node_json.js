@@ -1,24 +1,22 @@
 // 
 // todo
 // 
-    // have all values extract their comment and trailing newline
-    // parse main/root
-    //     check version at top
-    //     handle final trailing newline
-    // change #literally: to #literalText
-    // change atom's to named atoms
-    // change comments so their content doesn't include the "#"
-    // clean up the trailing newline behavior
-    // make the ''' block fail without a proper end quote
-    // make trailing newlines in blocks require correct indent
-    // auto detect indent
-    // handle CRLF/LF issues
-    // convert types to just type and extract out custom types
-    // unparse
-    //     make sure format (like ") is viable for the content (like ")
-    // add a simple "shouldn't matched but didn't because __ an improved version would be ___"
-    // create a good error system (create fallback checks like parseBadReference or parseBadLiteralString)
-    // record line numbers for errors
+//     have all values extract their comment and trailing newline
+//     parse main/root
+//         check version at top
+//         handle final trailing newline
+//     change #literally: to #literalText
+//     make the ''' block fail without a proper end quote
+//     make trailing newlines in blocks require correct indent
+//     FIXME: unindented newlines after the #literally: block end
+//     auto detect indent
+//     handle CRLF/LF issues
+//     convert types to just type and extract out custom types
+//     unparse
+//         make sure format (like ") is viable for the content (like ")
+//     add a simple "shouldn't matched but didn't because __ an improved version would be ___"
+//     create a good error system (create fallback checks like parseBadReference or parseBadLiteralString)
+//     record line numbers for errors
 
 // 
 const systemKeys = [ "#key:","#value", "#thisDocument", "#thisFile", "#input", "#create" ] // TODO: improve the #create, its only hear because of checks inside comment, but causes extra matching inside #reference
@@ -136,7 +134,7 @@ let indent = (string) => {
 // 
 // 
 let parseBlankLine = (remainingXdataString, indent) => {
-    let {remaining, extraction: blankLine} = extractFirst({pattern: /^\s*$/, from: remainingXdataString,})
+    let {remaining, extraction: blankLine} = extractFirst({pattern: /^(\s*)(\n|$)/, from: remainingXdataString,})
     // return null if no match
     if (blankLine) {
         // remove trailing newline
@@ -2078,6 +2076,131 @@ testParse({
                 }
             },
         },
+        {
+            input:
+                `\n`+
+                `    test: @this\n`+
+                `    test: @2\n`+
+                `    test: \n`+
+                `        nested: 1\n`+
+                `   \n`+
+                `        \n`+
+                `   \n`+
+                `        nested2: 2\n`+
+                "",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#mapping"
+                    ],
+                    "contains": [
+                        {
+                            "types": [
+                                "#keyedValue"
+                            ],
+                            "key": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "test"
+                            },
+                            "value": {
+                                "types": [
+                                    "#atom"
+                                ],
+                                "format": "@",
+                                "value": "this"
+                            }
+                        },
+                        {
+                            "types": [
+                                "#keyedValue"
+                            ],
+                            "key": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "test"
+                            },
+                            "value": {
+                                "types": [
+                                    "#atom",
+                                    "#number"
+                                ],
+                                "value": "2",
+                                "format": "@"
+                            }
+                        },
+                        {
+                            "types": [
+                                "#keyedValue"
+                            ],
+                            "key": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "test"
+                            },
+                            "value": {
+                                "types": [
+                                    "#mapping"
+                                ],
+                                "contains": [
+                                    {
+                                        "types": [
+                                            "#keyedValue"
+                                        ],
+                                        "key": {
+                                            "types": [
+                                                "#string"
+                                            ],
+                                            "format": "unquoted",
+                                            "value": "nested"
+                                        },
+                                        "value": {
+                                            "types": [
+                                                "#atom",
+                                                "#number"
+                                            ],
+                                            "value": "1"
+                                        }
+                                    },
+                                    {
+                                        "types": [
+                                            "#blankLines"
+                                        ],
+                                        "content": "\n\n"
+                                    },
+                                    {
+                                        "types": [
+                                            "#keyedValue"
+                                        ],
+                                        "key": {
+                                            "types": [
+                                                "#string"
+                                            ],
+                                            "format": "unquoted",
+                                            "value": "nested2"
+                                        },
+                                        "value": {
+                                            "types": [
+                                                "#atom",
+                                                "#number"
+                                            ],
+                                            "value": "2"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
+                }
+            },
+        },
     ],
     ifParsedWith: parseValue = (remainingXdataString, indent) => {
         var remaining = remainingXdataString
@@ -2536,7 +2659,9 @@ testParse({
         // 
         // handle block
         // 
+        console.debug(`block before is:`,remaining)
         var {remaining, extraction: block} = extractBlock(remaining)
+        console.debug(`block after is:`,block)
         // empty key or list value
         if (!block) {
             // TODO: look for failed block (not all the way indented or something)
@@ -2557,12 +2682,12 @@ testParse({
                 var {remaining: block, extraction} = each(block)
                 
                 // for future debugging:
-                // ;(each == parseBlankLine) && console.debug(`parseBlankLine`)
-                // ;(each == parseComment) && console.debug(`parseComment`)
-                // ;(each == parseListElement) && console.debug(`parseListElement`)
-                // ;(each == parseMapElement) && console.debug(`parseMapElement`)
-                // console.debug(`remaining is:`,JSON.stringify(block))
-                // console.debug(`extraction is:`,extraction)
+                ;(each == parseBlankLine) && console.debug(`parseBlankLine`)
+                ;(each == parseComment) && console.debug(`parseComment`)
+                ;(each == parseListElement) && console.debug(`parseListElement`)
+                ;(each == parseMapElement) && console.debug(`parseMapElement`)
+                console.debug(`    remaining is:`,JSON.stringify(block))
+                console.debug(`    extraction is:`,extraction)
 
                 if (extraction && each == parseListElement) {
                     isList = true
@@ -2634,6 +2759,34 @@ testParse({
     }
 })
 
+
+// 
+// 
+// ROOT
+// 
+// 
+let parseRoot = (remainingXdataString)=> {
+    var remaining = remainingXdataString
+    let topNodes = []
+    let foundAtLeastOne = true
+    // first try a value
+    while (foundAtLeastOne) {
+        foundAtLeastOne = false
+        for (let each of [parseBlankLine, parseComment, parseValue]) {
+            var {remaining: block, extraction} = each(block)
+            // save all the extractions
+            if (extraction) {
+                foundAtLeastOne = true
+                topNodes.push(extraction)
+            }
+        }
+    }
+    // check for trailing 
+
+    var {remaining, extraction} = parseValue(remainingXdataString)
+    remainingXdataString
+    // parse value or unindented container
+}
 // FIXME: parseRoot
 
 // # Method (any language)
