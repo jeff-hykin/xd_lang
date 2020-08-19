@@ -386,15 +386,14 @@ let parseAtom = (remainingXdataString) => {
 // 
 // 
 let parseWeakUnquotedString = (remainingXdataString) => {
-    let {remaining, extraction} = extractFirst({pattern: /^([a-zA-Z][a-zA-Z_0-9]*):/, from: remainingXdataString})
+    let {remaining, extraction} = extractFirst({pattern: /^([a-zA-Z][a-zA-Z_0-9]*)(?=:)/, from: remainingXdataString})
     if (extraction) {
-        let value = extraction.replace(/:$/, "")
         return {
             remaining,
             extraction: {
                 types: ["#string"],
                 format: "unquoted",
-                value,
+                value: extraction,
             }
         }
     }
@@ -1376,6 +1375,16 @@ testParse({
             },
         },
         {
+            input: "#literally:  \n    like a billion\n    like a billion and a half",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "format": "#literal:MultilineBlock",
+                    "value": "like a billion\nlike a billion and a half",
+                },
+            },
+        },
+        {
             input: "#literally:   # it means literally literally \n    like a billion\n    like a billion and a half",
             output: {
                 "remaining": "",
@@ -1536,12 +1545,15 @@ testParse({
             let pattern = quote || /^(#literally:|#figuratively:)/
             var {remaining, extraction} = extractFirst({pattern, from: remainingXdataString})
             var {remaining, extraction: comment} = parseComment(remaining)
-            if (!comment && !remaining.match(/^\n/)) {
-                // TODO: improve error message
-                console.error(`issue with the the remaining text on the line:${remainingXdataString.split("\n")[0]}`)
-                return {
-                    remaining: remainingXdataString,
-                    extraction: null,
+            if (!comment) {
+                var {remaining, extraction: miscWhitespace} = parseLeadingWhitespace(remaining)
+                if (!remaining.match(/^\n/)) {
+                    // TODO: improve error message
+                    console.error(`issue with the the remaining text on the line:${remainingXdataString.split("\n")[0]}`)
+                    return {
+                        remaining: remainingXdataString,
+                        extraction: null,
+                    }
                 }
             }
             let isLiteralQuote = (quote && quote[0] == '"')
@@ -1657,6 +1669,8 @@ testParse({
                 var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remaining)
             }
         }
+        
+        // FIXME: add recursive option
 
         // try normal values
         for (let each of [parseEmptyContainer, parseKeywordAtom, parseNumber, parseAtom, parseInlineString, parseReference, parseBlockString]) {
@@ -1757,133 +1771,158 @@ testParse({
     }
 })
 
-// let parseKey
-// testParse({
-//     expectedIo: [
-//         {
-//             input: "myKey:",
-//             output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
-//         },
-//         {
-//             input: "infinite:",
-//             output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'infinite' }      } },
-//         },
-//         {
-//             input: "1:",
-//             output: {"remaining":"","trailingWhitespace":"","extraction":{"types":["#key"],"value":{"types":["#number","#atom"],"format":null,"value":"1"}}},
-//         },
-//         {
-//             input: "Hello World:",
-//             output: {"remaining":"Hello World:","extraction":null},
-//         },
-//         {
-//             input: "@Hello  :",
-//             output: {"remaining":"","trailingWhitespace":"  ","extraction":{"types":["#key"],"value":{"types":["#atom"],"format":"@","value":"Hello"}}},
-//         },
-//     ],
-//     ifParsedWith: parseKey = (remainingXdataString) => {
-//         let remaining, extraction, trailingWhitespace
-//         let returnSuccess = ({remaining, value}) => {
-//             return {
-//                 remaining: remaining,
-//                 trailingWhitespace,
-//                 extraction: {
-//                     types: ["#key"],
-//                     value: value,
-//                 }
-//             }
-//         }
-
-//         // FIXME: either ": " or ":\n" don't allow non-space
+let parseKey
+testParse({
+    expectedIo: [
+        {
+            input: "myKey: 10",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#keyedValue"
+                    ],
+                    "key": {
+                        "types": [
+                            "#string"
+                        ],
+                        "format": "unquoted",
+                        "value": "myKey"
+                    },
+                    "value": {
+                        "types": [
+                            "#atom",
+                            "#number"
+                        ],
+                        "value": "10"
+                    }
+                }
+            },
+        },
+        {
+            input: "infinite: @infinite",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#keyedValue"
+                    ],
+                    "key": {
+                        "types": [
+                            "#string"
+                        ],
+                        "format": "unquoted",
+                        "value": "infinite"
+                    },
+                    "value": {
+                        "types": [
+                            "#atom"
+                        ],
+                        "format": "@",
+                        "value": "infinite"
+                    }
+                }
+            },
+        },
+        {
+            input: "1: #literally:\n     hi",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#keyedValue"
+                    ],
+                    "key": {
+                        "types": [
+                            "#atom",
+                            "#number"
+                        ],
+                        "value": "1"
+                    },
+                    "value": {
+                        "format": "#literal:MultilineBlock",
+                        "value": " hi"
+                    }
+                }
+            },
+        },
+        {
+            input: "Hello World: whats up",
+            output: {
+                "remaining": "Hello World: whats up",
+                "extraction": null
+            },
+        },
+        {
+            input: "@Hello  : @world",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#keyedValue"
+                    ],
+                    "key": {
+                        "types": [
+                            "#atom"
+                        ],
+                        "format": "@",
+                        "value": "Hello",
+                        "leadingWhitespace": "  "
+                    },
+                    "value": {
+                        "types": [
+                            "#atom"
+                        ],
+                        "format": "@",
+                        "value": "world"
+                    }
+                }
+            },
+        },
+    ],
+    ifParsedWith: parseKey = (remainingXdataString) => {
         
-//         // 
-//         // unquoted string
-//         // 
-//         ({remaining, extraction} = extractFirst({pattern: /^([a-zA-Z][a-zA-Z_0-9]*):/, from: remainingXdataString}))
-//         if (extraction) {
-//             let value = extraction.replace(/:$/, "")
-//             return returnSuccess({
-//                 remaining,
-//                 extraction: {
-//                     types: ["#string"],
-//                     format: "unquoted",
-//                     value,
-//                 }
-//             })
-//         }
-//         // FIXME: literal string, figurative string
-//         // TODO: add nice error when this fails because of whitespace
-//         // TODO: maybe add an "#ignoreTrailingWhitespace" feature people can add
+        var {remaining, extraction: key} = parseStaticInlineValue(remainingXdataString)
+        if (key) {
+            var {remaining, extraction: trailingWhitespace} = parseLeadingWhitespace(remaining)
+            if (trailingWhitespace) {
+                key.leadingWhitespace = trailingWhitespace
+            }
+        } else {
+            var {remaining, extraction: key} = parseWeakUnquotedString(remainingXdataString)
+            // TODO: warning about trailing whitespace
+        }
 
-//         //
-//         // number
-//         //
-//         ({remaining, extraction} = extractFirst({ pattern: /^(-?(@?[0-9][0-9]*|[0-9]+\.[0-9]))\s*:/i, from: remainingXdataString, }))
-//         if (extraction) {
-//             // remove the colon
-//             let rawNumberString = extraction.replace(/:$/, "")
-//             // remove the trailingWhitespace from the number
-//             ;({remaining: rawNumberString, extraction: trailingWhitespace} = extractFirst({pattern: /\s*$/, from: rawNumberString}))
-//             // check atomic format
-//             ;({remaining: rawNumberString, extraction: isAtomicFormat} = extractFirst({pattern: /@/, from: rawNumberString}))
+        if (key) {
+            var {remaining, extraction: colon} = extractFirst({pattern: /:( | *$)/, from: remaining})
+            if (colon) {
+                var {remaining, extraction: value, comment} = parseValue(remaining)
+                if (value) {
+                    var extraction = {
+                        types: ["#keyedValue"],
+                        key,
+                        value,
+                    }
+                    comment && (extraction.comment = comment)
+                    return {
+                        remaining,
+                        extraction,
+                    }
+                } else {
+                    // TODO: improve error message;
+                    throw Error(`found a key ${key}, but couldn't make sense of the value after the :`)
+                }
+            }
+        }
 
-//             return returnSuccess({
-//                 remaining,
-//                 extraction: {
-//                     types: [ "#number", "#atom", ],
-//                     format: isAtomicFormat? "@" : null,
-//                     value: rawNumberString,
-//                 }
-//             })
-//         }
-//         // TODO: add good warning when the negative sign is leading in front of the number
-//         // TODO: add good warning for @ and decimal number
-//         // TODO: add good warning for negative infinite
+        return {
+            remaining: remainingXdataString,
+            extraction: null,
+        }
 
-//         // 
-//         // non-numeric atom
-//         // 
-//         // negative sign in front is still always allowed
-//         ({remaining, extraction} = extractFirst({pattern: /^(-?@[a-zA-Z][a-zA-Z_0-9]*)\s*:/, from: remainingXdataString}))
-//         if (extraction) {
-//             // remove the colon and at-symbol
-//             let value = extraction.replace(/:$/, "").replace(/@/, "")
-//             // remove the trailingWhitespace from the number
-//             ;({remaining: value, extraction: trailingWhitespace} = extractFirst({pattern: /\s*$/, from: value}))
-            
-//             return returnSuccess({
-//                 remaining,
-//                 extraction: {
-//                     types: ["#atom"],
-//                     format: "@",
-//                     value,
-//                 }
-//             })
-//         }
-        
-//         // failure
-//         return {
-//             remaining: remainingXdataString,
-//             extraction: null
-//         }
-//     }
-// })
-// TODO: #as[ Type ]
-
-
-// 
-// keyterms
-// 
-// let {remaining, extraction} = extractFirst(remainingXdataString, /^(#thisDocument|#thisFile@absolutePathToFolder|#thisFile@absolutePathToFolder)\s*:/)
-// if (extraction) {
-//     return {
-//         remaining,
-//         extraction: {
-//             types: ["#keyterm"],
-//             value: extraction
-//         },
-//     }
-// }
+        // FIXME: either ": " or ":\n" don't allow non-space
+    }
+})
 
 // # Method (any language)
 // - try parsing version
