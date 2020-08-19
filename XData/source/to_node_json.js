@@ -1,14 +1,13 @@
 // 
 // todo
 // 
-    // parse contatiner
-    //     creating a hash of names->indicies
     // parse main/root
     //     check version at top
     //     handle final trailing newline
     // change #literally: to #literalText
     // change atom's to named atoms
     // change comments so their content doesn't include the "#"
+    // clean up the trailing newline behavior
     // make the ''' block fail without a proper end quote
     // make trailing newlines in blocks require correct indent
     // auto detect indent
@@ -637,7 +636,7 @@ testParse({
             if (!extraction) {
                 var {remaining, extraction} = parseLiteralInlineString(remainingXdataString)
             }
-            // FIXME: consider possible case of a reference as a key
+            // TODO: consider possible case of a reference as a key
         }
 
         if (extraction) {
@@ -658,7 +657,7 @@ testParse({
 // 
 //  #thisDocument
 //  #thisFile
-//  #cwd
+//  #input
 // 
 // 
 let parseReference
@@ -937,7 +936,6 @@ testParse({
         }
 
         // TODO: warn on keys that don't exist
-        // FIXME: allow #input
 
         return {
             remaining: remainingXdataString,
@@ -1104,7 +1102,7 @@ testParse({
                 // error: no value
                 // 
                 } else {
-                    // FIXME: write good error about broken string
+                    // TODO: write good error about broken string
                     console.error(`Inside of an interpolated string, I think the (or one of the) interpolation(s) is broken\nthe string is:\n${figurativeStringContents}`)
                     return null
                 }
@@ -1618,7 +1616,7 @@ testParse({
 })
 
 // 
-// 
+// VALUE
 // 
 let parseValue
 testParse({
@@ -1675,6 +1673,48 @@ testParse({
                 }
             },
         },
+        {
+            input: "#create[date]: this is a test\n",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "unquoted",
+                    "value": "this is a test"
+                }
+            },
+        },
+        {
+            input: "#create[date]: #literally: 1/1/1010\n",
+            output: {
+                "remaining": "\n",
+                "extraction": {
+                    "types": [
+                        "#string",
+                        "date"
+                    ],
+                    "format": "#literal:InlineBlock",
+                    "value": " 1/1/1010"
+                }
+            },
+        },
+        {
+            input: "#create[number,rational]: @pi\n",
+            output: {
+                "remaining": "\n",
+                "extraction": {
+                    "types": [
+                        "#atom",
+                        "number",
+                        "rational"
+                    ],
+                    "format": "@",
+                    "value": "pi"
+                }
+            },
+        },
     ],
     ifParsedWith: parseValue = (remainingXdataString, indent) => {
         var remaining = remainingXdataString
@@ -1683,22 +1723,21 @@ testParse({
         // 
         // attempt custom type
         // 
-        var {remaining, extraction} = extractFirst({pattern: /^(#create\[( *[a-zA-Z_]+ *)(, *[a-zA-Z_]+ *)*\]):/, from: remaining})
+        var {remaining, extraction} = extractFirst({pattern: /^(#create\[( *[a-zA-Z_]+ *)(, *[a-zA-Z_]+ *)*\]): /, from: remaining})
+        // FIXME: add #create[]literal:
         let customTypes = null
         if (extraction) {
             customTypes = {
-                types: extraction.replace(/^.+\[|\]:| /, "").split(","),
+                types: extraction.replace(/^.+\[|\]:| /g, "").split(","),
             }
             if (leadingWhitespace) {
                 customTypes.leadingWhitespace = leadingWhitespace
                 var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remaining)
             }
         }
-        
-        // FIXME: add recursive call to container
 
         // try normal values
-        for (let each of [parseEmptyContainer, parseKeywordAtom, parseNumber, parseAtom, parseInlineString, parseReference, parseBlockString]) {
+        for (let each of [parseEmptyContainer, parseKeywordAtom, parseNumber, parseAtom, parseInlineString, parseReference, parseBlockString, parseContainer]) {
             var {remaining, extraction} = each(remaining)
             if (extraction) {
                 // 
@@ -1709,7 +1748,8 @@ testParse({
                 // handle custom types
                 // 
                 if (customTypes) {
-                    extraction.types = extraction.types.concat(customTypes)
+                    // TODO whitespace between custom types
+                    extraction.types = extraction.types.concat(customTypes.types)
                     customTypes.leadingWhitespace && (extraction.customTypeLeadingWhitespace = customTypes.leadingWhitespace)
                 }
                 // 
@@ -1720,6 +1760,7 @@ testParse({
                     extraction.comment = comment
                 } else {
                     var {remaining, extraction: trailingWhitespace} = parseLeadingWhitespace(remaining)
+                    // TODO: fail on non-comment non-newline non-end-document after a value
                     if (trailingWhitespace) {
                         extraction.trailingWhitespace = trailingWhitespace
                     }
@@ -1732,8 +1773,15 @@ testParse({
                 }
             }
         }
+
+        if (leadingWhitespace) {
+            return {
+                remaining: remainingXdataString,
+                extraction: null
+            }
+        }
         // try block values
-        return parseStrongUnquotedString(remainingXdataString)
+        return parseStrongUnquotedString(remaining)
     }
 })
 
@@ -1948,7 +1996,7 @@ testParse({
 
 // 
 // 
-// containers(map/list)
+// CONTAINER
 // 
 // 
 let parseContainer
