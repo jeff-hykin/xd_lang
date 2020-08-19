@@ -3,10 +3,7 @@
 // 
 //     parse main/root
 //         check version at top
-//         handle final trailing newline
 //     make the ''' block fail without a proper end quote
-//     make trailing newlines in blocks require correct indent
-//     FIXME: unindented newlines after the #textLiteral: block end
 //     auto detect indent
 //     warning about using the wrong quotes for a key 
 //     handle CRLF/LF issues
@@ -25,7 +22,7 @@ let findAll = (regexPattern, sourceString) => {
     let output = []
     let match
     // make sure the pattern has the global flag
-    let regexPatternWithGlobal = RegExp(regexPattern,"g")
+    let regexPatternWithGlobal = RegExp(regexPattern,[...new Set("g"+regexPattern.flags)].join(""))
     while (match = regexPatternWithGlobal.exec(sourceString)) {
         // get rid of the string copy
         delete match.input
@@ -80,12 +77,28 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
     }, 0)
 }
 let extractBlock = (string) => {
-    let {remaining, extraction} = extractFirst({pattern: RegExp(`^(\n?(${indentUnit}.*|${indentUnit[0]}{0,${indentUnit.length}})$)+`,"m"), from: string})
+    let partialIntent = `${indentUnit[0]}{0,${indentUnit.length}}`
+    let indentedOrPartiallyIndentedLine = `(${indentUnit}.*|${partialIntent})`
+    let {remaining, extraction} = extractFirst({pattern: RegExp(`^(\n?${indentedOrPartiallyIndentedLine}$)+`,"m"), from: string})
     if (extraction) {
-        // remove the indent of the block
-        extraction = extraction.replace(RegExp(`^(${indentUnit}|${indentUnit[0]}{0,${indentUnit.length}})`, "mg"), "")
         // remove the newline from the begining (should always be there)
         extraction = extraction.replace(/^\n/,"")
+        
+        // TODO: optimize this incomplete indent checking
+        // check for possible incomplete indents
+        if (extraction.match(RegExp(`^(${partialIntent})`,"m"))) {
+            let matches = findAll(RegExp(`^(\n?${indentUnit}.*${indentedOrPartiallyIndentedLine}$)+`,"gm"), extraction)
+            if (matches.length > 0) {
+                let lastMatch = matches[matches.length-1]
+                let lastIndex = lastMatch.index + lastMatch[0].length
+                // limit it to the last line that was fully indented
+                extraction = extraction.slice(0,lastIndex)
+            }
+        }
+        // remove the indent of the block
+        extraction = extraction.replace(RegExp(`^(${indentUnit}|${indentUnit[0]}{0,${indentUnit.length}})`, "mg"), "")
+        
+        
         return {
             remaining,
             extraction,
@@ -1239,75 +1252,6 @@ let parseRoot = (remainingXdataString)=> {
     // TODO: check for trailing newline
     // TODO: get the version
 }
-
-
-// # Method (any language)
-// - try parsing version
-// - try parsing a blank line
-// - try parsing a comment
-// - try parsing a key
-// - try parsing a list element
-// - try parsing a value
-// - fail, say what was attempted
-
-// # Definitions
-
-// Blank line goes all the way to line end
-
-// Comments can have proceeding white space, then "# " then go until line end
-
-// Keys must be one of
-// - start with a-zA-Z, then varname 
-// - start with @, then varname
-// - start with 0-9, then integer/decimal
-// - start with - then atom
-// - start with ", then string literal
-// - start with ', then string figurative
-// Followed by
-// - maybe #as[ Type ]
-// - then ": "
-// - maybe additional spaces 
-// Followed by a value
-
-// List elements can be the "-" followed by a value
-
-// Values have 3 branching possibilities
-// 1. Inline values
-// Can (not must)
-//     start with spaces followed by one of
-//     - #create[ Type ]from:
-//     - #literalString:
-//     - #figurativeString:
-//     - #number:
-//     - #atom:
-// Then must be one of
-// - "null", "true", "false", "infinite", "nan"
-// - start with #thisDocument for referencing a variable
-// - start with #thisFile@absolutePathToFolder
-// - start with #cwd
-// - start with a-zA-Z, then anything except colon or trailing whitespace until line/block end. Error on colons and trailing whitespace
-// - start with @, then varname 
-// - start with 0-9, then integer/decimal
-// - start with - or +, then number (including inf)
-// - start with ", then string literal 
-// - start with ', then string casual
-// - "{}" for empty mapping
-// - "[]" for empty list
-// Then maybe followed by a space and a comment
-// 2. Block values 
-// Can have spaces
-// Can have interpretation
-// Can have spaces followed by a comment
-// Must have newline followed by indent
-// Then becomes recursive to the main scope
-// 3. String block 
-// Can have spaces
-// Can have interpretation
-// Must have some amount of single or double quotes
-// Can have comment
-// Must have newline
-// Must have indented block ending with same number of quotes/newlines
-
 
 // 
 // 
