@@ -69,12 +69,15 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
     }, 0)
 }
 let extractBlock = (string) => {
+    console.debug(`string is:`,string)
     let {remaining, extraction} = extractFirst({pattern: RegExp(`^(\n?(${indentUnit}.*|${indentUnit[0]}{0,${indentUnit.length}})$)+`,"m"), from: string})
+    console.debug(`extraction is:`,extraction)
     if (extraction) {
         // remove the indent of the block
         extraction = extraction.replace(RegExp(`^(${indentUnit}|${indentUnit[0]}{0,${indentUnit.length}})`, "mg"), "")
         // remove the newline from the begining (should always be there)
         extraction = extraction.replace(/^\n/,"")
+        console.debug(`extraction is:`,extraction)
         return {
             remaining,
             extraction,
@@ -1718,15 +1721,40 @@ testParse({
         {
             input: "\n    test: @this",
             output: {
-                "remaining": "\n",
+                "remaining": "",
                 "extraction": {
                     "types": [
-                        "#atom",
-                        "number",
-                        "rational"
+                        "#mapping"
                     ],
-                    "format": "@",
-                    "value": "pi"
+                    "contains": [
+                        {
+                            "types": [
+                                "#keyedValue"
+                            ],
+                            "key": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "test"
+                            },
+                            "value": {
+                                "types": [
+                                    "#atom"
+                                ],
+                                "format": "@",
+                                "value": "this"
+                            }
+                        }
+                    ]
+                }
+            },
+        },
+        {
+            input: "\n    test: @this\n    test: @2",
+            output: {
+                "remaining": "",
+                "extraction": {
                 }
             },
         },
@@ -2164,6 +2192,7 @@ testParse({
         }
     ],
     ifParsedWith: parseContainer = (remainingXdataString) => {
+        console.debug(`remainingXdataString is:`,remainingXdataString)
         // 
         // handling leading comment/whitespace
         // 
@@ -2180,6 +2209,7 @@ testParse({
                 }
             }
         }
+        console.debug(`parseContainer: remaining is:`,remaining)
         // 
         // handle block
         // 
@@ -2198,16 +2228,19 @@ testParse({
         let contains = []
         let itemCounter = 0
         let foundAtLeastOne = true
+        console.debug(`originalBlock is:`,originalBlock)
         while (foundAtLeastOne) {
             foundAtLeastOne = false
             for (let each of [parseBlankLine, parseComment, parseListElement, parseMapElement]) {
                 var {remaining: block, extraction} = each(block)
                 
                 // for future debugging:
-                // ;(each == parseBlankLine) && console.debug(`parseBlankLine`)
-                // ;(each == parseComment) && console.debug(`parseComment`)
-                // ;(each == parseListElement) && console.debug(`parseListElement`)
-                // ;(each == parseMapElement) && console.debug(`parseMapElement`)
+                ;(each == parseBlankLine) && console.debug(`parseBlankLine`)
+                ;(each == parseComment) && console.debug(`parseComment`)
+                ;(each == parseListElement) && console.debug(`parseListElement`)
+                ;(each == parseMapElement) && console.debug(`parseMapElement`)
+                console.debug(`remaining is:`,JSON.stringify(block))
+                console.debug(`extraction is:`,extraction)
 
                 if (extraction && each == parseListElement) {
                     isList = true
