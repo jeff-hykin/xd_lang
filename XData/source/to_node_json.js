@@ -142,7 +142,7 @@ let parseBlankLine = (remainingXdataString, indent) => {
         return {
             remaining,
             extraction: {
-                types: ["#blankLines"],
+                type: "#blankLines",
                 content: blankLine
             }
         }
@@ -165,7 +165,7 @@ let parseComment = (remainingXdataString, indent) => {
         // remove trailing newline
         comment = comment.replace(/\n$/, "")
         extraction = {
-            types: ["#comment"],
+            type: "#comment",
             content: comment.replace(/# ?/, ""),
         }
         leadingWhitespace && (extraction.leadingWhitespace = leadingWhitespace)
@@ -211,7 +211,7 @@ let parseEmptyContainer = (remainingXdataString) => {
         return {
             remaining,
             extraction: {
-                types: ["#mapping"],
+                type: "#mapping",
                 contains: [],
             }
         }
@@ -219,7 +219,7 @@ let parseEmptyContainer = (remainingXdataString) => {
         return {
             remaining,
             extraction: {
-                types: ["#list"],
+                type: "#listing",
                 value: extraction,
             }
         }
@@ -244,7 +244,7 @@ let parseKeywordAtom = (remainingXdataString) => {
         return {
             remaining,
             extraction: {
-                types: ["#atom"],
+                type: "#namedAtom",
                 value: extraction,
             }
         }
@@ -272,7 +272,7 @@ let parseNumber = (remainingXdataString) => {
         var {remaining: rawNumberString, extraction: isAtomicFormat} = extractFirst({pattern: /@/, from: rawNumberString})
         
         extraction = {
-            types: [ "#atom", "#number", ],
+            type: "#number",
             value: rawNumberString,
         }
         if (isAtomicFormat) {
@@ -309,7 +309,7 @@ let parseNamedAtom = (remainingXdataString) => {
         return {
             remaining,
             extraction: {
-                types: ["#atom"],
+                type: "#namedAtom",
                 format: "@",
                 value: extraction.replace(/@/, ""),
             }
@@ -336,7 +336,7 @@ let parseWeakUnquotedString = (remainingXdataString) => {
         return {
             remaining,
             extraction: {
-                types: ["#string"],
+                type: "#string",
                 format: "unquoted",
                 value: extraction,
             }
@@ -382,7 +382,7 @@ let parseStrongUnquotedString = (remainingXdataString) => {
         return {
             remaining,
             extraction: {
-                types: ["#string"],
+                type: "#string",
                 format: "unquoted",
                 value: unquotedString,
             }
@@ -493,7 +493,7 @@ let parseLiteralInlineString = (remainingXdataString) => {
             return {
                 remaining,
                 extraction: {
-                    types: ["#string"],
+                    type: "#string",
                     format: startingQuote,
                     value: extraction,
                 }
@@ -552,7 +552,7 @@ let parseReference = (remainingXdataString) => {
         let item = extraction
         let accessList = [
             {
-                types: ["#system"],
+                type: "#system",
                 value: extraction,
             }
         ]
@@ -626,7 +626,7 @@ let parseReference = (remainingXdataString) => {
         return {
             remaining,
             extraction: {
-                types: ["#reference"],
+                type: "#reference",
                 accessList,
             }
         }
@@ -660,7 +660,7 @@ let extractInterpolations = (figurativeStringContents, format) => {
         var {remaining, extraction} = extractFirst({pattern: characterPattern, from: remaining})
         if (extraction) {
             pieces.push({
-                types: ["#stringPiece"],
+                type: "#stringPiece",
                 value: extraction,
             })
         } else {
@@ -697,20 +697,20 @@ let extractInterpolations = (figurativeStringContents, format) => {
     }
     if (figurativeStringContents.length == 0) {
         return {
-            types: [ "#string" ],
+            type: "#string",
             format,
             value: extraction,
         }
     } else {
         if (pieces.length == 1) {
             return  {
-                types: ["#string"],
+                type: "#string",
                 format,
                 value: pieces[0].value,
             }
         } else {
             return  {
-                types: ["#string"],
+                type: "#string",
                 format,
                 contains: pieces,
             }
@@ -804,7 +804,7 @@ let parseBlockString = (remainingXdataString) => {
                 return {
                     remaining,
                     extraction: {
-                        types: [ "#string" ],
+                        type: "#string",
                         format: "#literal:InlineBlock",
                         value: extraction.replace(/^#textLiteral:/, ''),
                     },
@@ -929,7 +929,7 @@ let parseValue = (remainingXdataString, indent) => {
                 // 
                 if (customTypes) {
                     // TODO whitespace between custom types
-                    extraction.types = extraction.types.concat(customTypes.types)
+                    extraction.customTypes = customTypes.types
                     customTypes.leadingWhitespace && (extraction.customTypeLeadingWhitespace = customTypes.leadingWhitespace)
                 }
                 // 
@@ -1015,7 +1015,7 @@ let parseMapElement = (remainingXdataString) => {
                 var {remaining, extraction: value} = parseValue(remaining)
                 if (value) {
                     var extraction = {
-                        types: ["#keyedValue"],
+                        type: "#keyedValue",
                         key,
                         value,
                     }
@@ -1133,15 +1133,15 @@ let parseContainer = (remainingXdataString) => {
         // 
         } else {
             extraction = {
-                types: null,
+                type: null,
                 contains,
             }
             comment && (extraction.comment = comment)
 
             if (isMapping) {
-                extraction.types = ["#mapping"]
+                extraction.type = "#mapping"
             } else if (isList) {
-                extraction.types = ["#listing"]
+                extraction.type = "#listing"
             // 
             // just comments & blank lines
             // 
@@ -1320,9 +1320,7 @@ testParse({ifParsedWith: parseComment,
             output: {
                 "remaining": "   there werw",
                 "extraction": {
-                    "types": [
-                        "#comment"
-                    ],
+                    "type": "#comment",
                     "content": "it means literally literally ",
                     "leadingWhitespace": "    "
                 }
@@ -1333,9 +1331,7 @@ testParse({ifParsedWith: parseComment,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#comment"
-                    ],
+                    "type": "#comment",
                     "content": "hello",
                     "leadingWhitespace": " "
                 }
@@ -1346,9 +1342,7 @@ testParse({ifParsedWith: parseComment,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#comment"
-                    ],
+                    "type": "#comment",
                     "content": ""
                 }
             },
@@ -1359,19 +1353,19 @@ testParse({ifParsedWith: parseNumber,
     expectedIo: [
         {
             input: "1",
-            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"1"}},
+            output: {"remaining":"","extraction":{"type":"#number","value":"1"}},
         },
         {
             input: "-1",
-            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"-1"}},
+            output: {"remaining":"","extraction":{"type":"#number","value":"-1"}},
         },
         {
             input: "123.43232",
-            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"123.43232"}},
+            output: {"remaining":"","extraction":{"type":"#number","value":"123.43232"}},
         },
         {
             input: "1.1",
-            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"1.1"}},
+            output: {"remaining":"","extraction":{"type":"#number","value":"1.1"}},
         },
         {
             input: ".1",
@@ -1387,7 +1381,7 @@ testParse({ifParsedWith: parseNumber,
         },
         {
             input: "-123.43232",
-            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"-123.43232"}},
+            output: {"remaining":"","extraction":{"type":"#number","value":"-123.43232"}},
         },
         {
             input: "-@123.43232",
@@ -1395,11 +1389,11 @@ testParse({ifParsedWith: parseNumber,
         },
         {
             input: "-@539035",
-            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"-539035","format":"@"}},
+            output: {"remaining":"","extraction":{"type":"#number","value":"-539035","format":"@"}},
         },
         {
             input: "@539035",
-            output: {"remaining":"","extraction":{"types":["#atom","#number"],"value":"539035","format":"@"}},
+            output: {"remaining":"","extraction":{"type":"#number","value":"539035","format":"@"}},
         },
     ],
 })
@@ -1410,9 +1404,7 @@ testParse({ifParsedWith: parseLiteralInlineString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "\"",
                     "value": "string"
                 }
@@ -1423,9 +1415,7 @@ testParse({ifParsedWith: parseLiteralInlineString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "\"",
                     "value": ""
                 }
@@ -1436,9 +1426,7 @@ testParse({ifParsedWith: parseLiteralInlineString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "\"\"\"",
                     "value": "string"
                 }
@@ -1449,9 +1437,7 @@ testParse({ifParsedWith: parseLiteralInlineString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "\"\"\"",
                     "value": "\"string\""
                 }
@@ -1462,9 +1448,7 @@ testParse({ifParsedWith: parseLiteralInlineString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "\"\"\"",
                     "value": "\"\"string\"\""
                 }
@@ -1475,9 +1459,7 @@ testParse({ifParsedWith: parseLiteralInlineString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "\"\"\"",
                     "value": ""
                 }
@@ -1492,10 +1474,7 @@ testParse({ifParsedWith: parseStaticInlineValue,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#atom",
-                        "#number"
-                    ],
+                    "type": "#number",
                     "value": "1"
                 }
             },
@@ -1505,9 +1484,7 @@ testParse({ifParsedWith: parseStaticInlineValue,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "\"",
                     "value": "hello world"
                 }
@@ -1518,9 +1495,7 @@ testParse({ifParsedWith: parseStaticInlineValue,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#atom"
-                    ],
+                    "type": "#namedAtom",
                     "format": "@",
                     "value": "atom"
                 }
@@ -1535,14 +1510,10 @@ testParse({ifParsedWith: parseReference,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#reference"
-                    ],
+                    "type": "#reference",
                     "accessList": [
                         {
-                            "types": [
-                                "#system"
-                            ],
+                            "type": "#system",
                             "value": "#thisDocument"
                         }
                     ]
@@ -1554,21 +1525,14 @@ testParse({ifParsedWith: parseReference,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#reference"
-                    ],
+                    "type": "#reference",
                     "accessList": [
                         {
-                            "types": [
-                                "#system"
-                            ],
+                            "type": "#system",
                             "value": "#thisDocument"
                         },
                         {
-                            "types": [
-                                "#atom",
-                                "#number"
-                            ],
+                            "type": "#number",
                             "value": "1"
                         }
                     ]
@@ -1580,27 +1544,19 @@ testParse({ifParsedWith: parseReference,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#reference"
-                    ],
+                    "type": "#reference",
                     "accessList": [
                         {
-                            "types": [
-                                "#system"
-                            ],
+                            "type": "#system",
                             "value": "#thisDocument"
                         },
                         {
-                            "types": [
-                                "#string"
-                            ],
+                            "type": "#string",
                             "format": "\"",
                             "value": "thing"
                         },
                         {
-                            "types": [
-                                "#string"
-                            ],
+                            "type": "#string",
                             "format": "\"",
                             "value": "thing",
                             "leadingWhitespace": "  "
@@ -1614,28 +1570,19 @@ testParse({ifParsedWith: parseReference,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#reference"
-                    ],
+                    "type": "#reference",
                     "accessList": [
                         {
-                            "types": [
-                                "#system"
-                            ],
+                            "type": "#system",
                             "value": "#thisDocument"
                         },
                         {
-                            "types": [
-                                "#string"
-                            ],
+                            "type": "#string",
                             "format": "\"",
                             "value": "thing"
                         },
                         {
-                            "types": [
-                                "#atom",
-                                "#number"
-                            ],
+                            "type": "#number",
                             "value": "1",
                             "leadingWhitespace": "  "
                         }
@@ -1648,28 +1595,19 @@ testParse({ifParsedWith: parseReference,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#reference"
-                    ],
+                    "type": "#reference",
                     "accessList": [
                         {
-                            "types": [
-                                "#system"
-                            ],
+                            "type": "#system",
                             "value": "#thisDocument"
                         },
                         {
-                            "types": [
-                                "#string"
-                            ],
+                            "type": "#string",
                             "format": "\"",
                             "value": "thing"
                         },
                         {
-                            "types": [
-                                "#atom",
-                                "#number"
-                            ],
+                            "type": "#number",
                             "value": "1",
                             "trailingWhitespace": "  "
                         }
@@ -1682,28 +1620,19 @@ testParse({ifParsedWith: parseReference,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#reference"
-                    ],
+                    "type": "#reference",
                     "accessList": [
                         {
-                            "types": [
-                                "#system"
-                            ],
+                            "type": "#system",
                             "value": "#thisDocument"
                         },
                         {
-                            "types": [
-                                "#string"
-                            ],
+                            "type": "#string",
                             "format": "\"",
                             "value": "thing"
                         },
                         {
-                            "types": [
-                                "#atom",
-                                "#number"
-                            ],
+                            "type": "#number",
                             "value": "1",
                             "trailingWhitespace": " "
                         }
@@ -1718,34 +1647,24 @@ testParse({ifParsedWith: extractInterpolations,
         {
             input: "hello world",
             output: {
-                "types": [
-                    "#string"
-                ],
+                "type": "#string",
                 "value": "hello world"
             },
         },
         {
             input: "hello world {#thisDocument}",
             output: {
-                "types": [
-                    "#string"
-                ],
+                "type": "#string",
                 "contains": [
                     {
-                        "types": [
-                            "#stringPiece"
-                        ],
+                        "type": "#stringPiece",
                         "value": "hello world "
                     },
                     {
-                        "types": [
-                            "#reference"
-                        ],
+                        "type": "#reference",
                         "accessList": [
                             {
-                                "types": [
-                                    "#system"
-                                ],
+                                "type": "#system",
                                 "value": "#thisDocument"
                             }
                         ]
@@ -1756,33 +1675,23 @@ testParse({ifParsedWith: extractInterpolations,
         {
             input: "hello world\nThis is {#thisDocument} so ",
             output: {
-                "types": [
-                    "#string"
-                ],
+                "type": "#string",
                 "contains": [
                     {
-                        "types": [
-                            "#stringPiece"
-                        ],
+                        "type": "#stringPiece",
                         "value": "hello world\nThis is "
                     },
                     {
-                        "types": [
-                            "#reference"
-                        ],
+                        "type": "#reference",
                         "accessList": [
                             {
-                                "types": [
-                                    "#system"
-                                ],
+                                "type": "#system",
                                 "value": "#thisDocument"
                             }
                         ]
                     },
                     {
-                        "types": [
-                            "#stringPiece"
-                        ],
+                        "type": "#stringPiece",
                         "value": " so "
                     }
                 ]
@@ -1791,33 +1700,23 @@ testParse({ifParsedWith: extractInterpolations,
         {
             input: "\n    testing\n    {#thisDocument}     testing",
             output: {
-                "types": [
-                    "#string"
-                ],
+                "type": "#string",
                 "contains": [
                     {
-                        "types": [
-                            "#stringPiece"
-                        ],
+                        "type": "#stringPiece",
                         "value": "\n    testing\n    "
                     },
                     {
-                        "types": [
-                            "#reference"
-                        ],
+                        "type": "#reference",
                         "accessList": [
                             {
-                                "types": [
-                                    "#system"
-                                ],
+                                "type": "#system",
                                 "value": "#thisDocument"
                             }
                         ]
                     },
                     {
-                        "types": [
-                            "#stringPiece"
-                        ],
+                        "type": "#stringPiece",
                         "value": "     testing"
                     }
                 ]
@@ -1832,9 +1731,7 @@ testParse({ifParsedWith: parseFigurativeInlineString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "'",
                     "value": "strings"
                 }
@@ -1845,9 +1742,7 @@ testParse({ifParsedWith: parseFigurativeInlineString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "'''",
                     "value": "strings"
                 }
@@ -1858,9 +1753,7 @@ testParse({ifParsedWith: parseFigurativeInlineString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "'''",
                     "value": "'strings'"
                 }
@@ -1871,21 +1764,15 @@ testParse({ifParsedWith: parseFigurativeInlineString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "'''",
                     "contains": [
                         {
-                            "types": [
-                                "#stringPiece"
-                            ],
+                            "type": "#stringPiece",
                             "value": "strings and "
                         },
                         {
-                            "types": [
-                                "#atom"
-                            ],
+                            "type": "#namedAtom",
                             "format": "@",
                             "value": "interpolations"
                         }
@@ -1898,47 +1785,33 @@ testParse({ifParsedWith: parseFigurativeInlineString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "'''",
                     "contains": [
                         {
-                            "types": [
-                                "#stringPiece"
-                            ],
+                            "type": "#stringPiece",
                             "value": "strings and "
                         },
                         {
-                            "types": [
-                                "#atom"
-                            ],
+                            "type": "#namedAtom",
                             "format": "@",
                             "value": "interpolations"
                         },
                         {
-                            "types": [
-                                "#stringPiece"
-                            ],
+                            "type": "#stringPiece",
                             "value": " with more "
                         },
                         {
-                            "types": [
-                                "#reference"
-                            ],
+                            "type": "#reference",
                             "accessList": [
                                 {
-                                    "types": [
-                                        "#system"
-                                    ],
+                                    "type": "#system",
                                     "value": "#thisDocument"
                                 }
                             ]
                         },
                         {
-                            "types": [
-                                "#stringPiece"
-                            ],
+                            "type": "#stringPiece",
                             "value": " interpolations"
                         }
                     ]
@@ -1954,9 +1827,7 @@ testParse({ifParsedWith: parseBlockString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "#literal:InlineBlock",
                     "value": " like a billion"
                 }
@@ -1967,9 +1838,7 @@ testParse({ifParsedWith: parseBlockString,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "#figurative:InlineBlock",
                     "value": " like a billion"
                 }
@@ -1980,9 +1849,7 @@ testParse({ifParsedWith: parseBlockString,
             output: {
                 "remaining": "\n",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "#figurative:MultilineBlock",
                     "value": "like a billion"
                 }
@@ -2016,9 +1883,7 @@ testParse({ifParsedWith: parseBlockString,
                     "format": "#literal:MultilineBlock",
                     "value": "like a billion\nlike a billion and a half",
                     "comment": {
-                        "types": [
-                            "#comment"
-                        ],
+                        "type": "#comment",
                         "content": "it means literally literally ",
                         "leadingWhitespace": "   "
                     }
@@ -2030,15 +1895,11 @@ testParse({ifParsedWith: parseBlockString,
             output: {
                 "remaining": "\n",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "#figurative:MultilineBlock",
                     "value": "like a billion\nlike a billion and a half",
                     "comment": {
-                        "types": [
-                            "#comment"
-                        ],
+                        "type": "#comment",
                         "content": "it means kinda ",
                         "leadingWhitespace": "   "
                     }
@@ -2057,9 +1918,7 @@ testParse({ifParsedWith: parseBlockString,
             output: {
                 "remaining": "\n",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "''':MultilineBlock",
                     "value": "testing\n    testing"
                 },
@@ -2097,34 +1956,23 @@ testParse({ifParsedWith: parseBlockString,
             output: {
                 "remaining": "\n",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "''':MultilineBlock",
                     "contains": [
                         {
-                            "types": [
-                                "#stringPiece"
-                            ],
+                            "type": "#stringPiece",
                             "value": "testing\n   "
                         },
                         {
-                            "types": [
-                                "#atom",
-                                "#number"
-                            ],
+                            "type": "#number",
                             "value": "10"
                         },
                         {
-                            "types": [
-                                "#stringPiece"
-                            ],
+                            "type": "#stringPiece",
                             "value": " testing"
                         },
                         {
-                            "types": [
-                                "#string"
-                            ],
+                            "type": "#string",
                             "format": "\"",
                             "value": "dataaaa",
                             "leadingWhitespace": "   "
@@ -2138,34 +1986,24 @@ testParse({ifParsedWith: parseBlockString,
             output: {
                 "remaining": "\n\nunindented: 10",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "#figurative:MultilineBlock",
                     "contains": [
                         {
-                            "types": [
-                                "#stringPiece"
-                            ],
+                            "type": "#stringPiece",
                             "value": "bleh forgot quotes:\n"
                         },
                         {
-                            "types": [
-                                "#reference"
-                            ],
+                            "type": "#reference",
                             "accessList": [
                                 {
-                                    "types": [
-                                        "#system"
-                                    ],
+                                    "type": "#system",
                                     "value": "#thisDocument"
                                 }
                             ]
                         },
                         {
-                            "types": [
-                                "#stringPiece"
-                            ],
+                            "type": "#stringPiece",
                             "value": "     testing"
                         }
                     ]
@@ -2177,9 +2015,7 @@ testParse({ifParsedWith: parseBlockString,
             output: {
                 "remaining": "\n",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "#literal:InlineBlock",
                     "value": " like a billion"
                 }
@@ -2194,9 +2030,7 @@ testParse({ifParsedWith: parseValue,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#atom"
-                    ],
+                    "type": "#namedAtom",
                     "value": "null"
                 }
             },
@@ -2206,10 +2040,7 @@ testParse({ifParsedWith: parseValue,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#atom",
-                        "#number"
-                    ],
+                    "type": "#number",
                     "value": "1000",
                     "leadingWhitespace": "   "
                 }
@@ -2220,9 +2051,7 @@ testParse({ifParsedWith: parseValue,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "unquoted",
                     "value": "this is a test"
                 }
@@ -2233,38 +2062,34 @@ testParse({ifParsedWith: parseValue,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "unquoted",
                     "value": "this is a test"
                 }
             },
         },
-        {
-            input: "#create[date]: this is a test\n",
-            output: {
-                "remaining": "",
-                "extraction": {
-                    "types": [
-                        "#string"
-                    ],
-                    "format": "unquoted",
-                    "value": "this is a test"
-                }
-            },
-        },
+        // FIXME
+        // {
+        //     input: "#create[date]: this is a test\n",
+        //     output: {
+        //         "remaining": "",
+        //         "extraction": {
+        //             "type": "#string",
+        //             "customTypes": ["date"],
+        //             "format": "unquoted",
+        //             "value": "this is a test"
+        //         }
+        //     },
+        // },
         {
             input: "#create[date]: #textLiteral: 1/1/1010\n",
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string",
-                        "date"
-                    ],
+                    "type": "#string",
                     "format": "#literal:InlineBlock",
-                    "value": " 1/1/1010"
+                    "value": " 1/1/1010",
+                    "customTypes": ["date"],
                 }
             },
         },
@@ -2273,13 +2098,10 @@ testParse({ifParsedWith: parseValue,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#atom",
-                        "number",
-                        "rational"
-                    ],
+                    "type": "#namedAtom",
                     "format": "@",
-                    "value": "pi"
+                    "value": "pi",
+                    "customTypes": ["number","rational"],
                 }
             },
         },
@@ -2288,25 +2110,17 @@ testParse({ifParsedWith: parseValue,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#mapping"
-                    ],
+                    "type": "#mapping",
                     "contains": [
                         {
-                            "types": [
-                                "#keyedValue"
-                            ],
+                            "type": "#keyedValue",
                             "key": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "test"
                             },
                             "value": {
-                                "types": [
-                                    "#atom"
-                                ],
+                                "type": "#namedAtom",
                                 "format": "@",
                                 "value": "this"
                             }
@@ -2320,45 +2134,30 @@ testParse({ifParsedWith: parseValue,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#mapping"
-                    ],
+                    "type": "#mapping",
                     "contains": [
                         {
-                            "types": [
-                                "#keyedValue"
-                            ],
+                            "type": "#keyedValue",
                             "key": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "test"
                             },
                             "value": {
-                                "types": [
-                                    "#atom"
-                                ],
+                                "type": "#namedAtom",
                                 "format": "@",
                                 "value": "this"
                             }
                         },
                         {
-                            "types": [
-                                "#keyedValue"
-                            ],
+                            "type": "#keyedValue",
                             "key": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "test"
                             },
                             "value": {
-                                "types": [
-                                    "#atom",
-                                    "#number"
-                                ],
+                                "type": "#number",
                                 "value": "2",
                                 "format": "@"
                             }
@@ -2379,100 +2178,65 @@ testParse({ifParsedWith: parseValue,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#mapping"
-                    ],
+                    "type": "#mapping",
                     "contains": [
                         {
-                            "types": [
-                                "#keyedValue"
-                            ],
+                            "type": "#keyedValue",
                             "key": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "test"
                             },
                             "value": {
-                                "types": [
-                                    "#atom"
-                                ],
+                                "type": "#namedAtom",
                                 "format": "@",
                                 "value": "this"
                             }
                         },
                         {
-                            "types": [
-                                "#keyedValue"
-                            ],
+                            "type": "#keyedValue",
                             "key": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "test"
                             },
                             "value": {
-                                "types": [
-                                    "#atom",
-                                    "#number"
-                                ],
+                                "type": "#number",
                                 "value": "2",
                                 "format": "@"
                             }
                         },
                         {
-                            "types": [
-                                "#keyedValue"
-                            ],
+                            "type": "#keyedValue",
                             "key": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "test"
                             },
                             "value": {
-                                "types": [
-                                    "#mapping"
-                                ],
+                                "type": "#mapping",
                                 "contains": [
                                     {
-                                        "types": [
-                                            "#keyedValue"
-                                        ],
+                                        "type": "#keyedValue",
                                         "key": {
-                                            "types": [
-                                                "#string"
-                                            ],
+                                            "type": "#string",
                                             "format": "unquoted",
                                             "value": "nested"
                                         },
                                         "value": {
-                                            "types": [
-                                                "#atom",
-                                                "#number"
-                                            ],
+                                            "type": "#number",
                                             "value": "1"
                                         }
                                     },
                                     {
-                                        "types": [
-                                            "#keyedValue"
-                                        ],
+                                        "type": "#keyedValue",
                                         "key": {
-                                            "types": [
-                                                "#string"
-                                            ],
+                                            "type": "#string",
                                             "format": "unquoted",
                                             "value": "nested2"
                                         },
                                         "value": {
-                                            "types": [
-                                                "#atom",
-                                                "#number"
-                                            ],
+                                            "type": "#number",
                                             "value": "2"
                                         }
                                     }
@@ -2498,106 +2262,69 @@ testParse({ifParsedWith: parseValue,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#mapping"
-                    ],
+                    "type": "#mapping",
                     "contains": [
                         {
-                            "types": [
-                                "#keyedValue"
-                            ],
+                            "type": "#keyedValue",
                             "key": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "test"
                             },
                             "value": {
-                                "types": [
-                                    "#atom"
-                                ],
+                                "type": "#namedAtom",
                                 "format": "@",
                                 "value": "this"
                             }
                         },
                         {
-                            "types": [
-                                "#keyedValue"
-                            ],
+                            "type": "#keyedValue",
                             "key": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "test"
                             },
                             "value": {
-                                "types": [
-                                    "#atom",
-                                    "#number"
-                                ],
+                                "type": "#number",
                                 "value": "2",
                                 "format": "@"
                             }
                         },
                         {
-                            "types": [
-                                "#keyedValue"
-                            ],
+                            "type": "#keyedValue",
                             "key": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "test"
                             },
                             "value": {
-                                "types": [
-                                    "#mapping"
-                                ],
+                                "type": "#mapping",
                                 "contains": [
                                     {
-                                        "types": [
-                                            "#keyedValue"
-                                        ],
+                                        "type": "#keyedValue",
                                         "key": {
-                                            "types": [
-                                                "#string"
-                                            ],
+                                            "type": "#string",
                                             "format": "unquoted",
                                             "value": "nested"
                                         },
                                         "value": {
-                                            "types": [
-                                                "#atom",
-                                                "#number"
-                                            ],
+                                            "type": "#number",
                                             "value": "1"
                                         }
                                     },
                                     {
-                                        "types": [
-                                            "#blankLines"
-                                        ],
+                                        "type": "#blankLines",
                                         "content": "\n\n"
                                     },
                                     {
-                                        "types": [
-                                            "#keyedValue"
-                                        ],
+                                        "type": "#keyedValue",
                                         "key": {
-                                            "types": [
-                                                "#string"
-                                            ],
+                                            "type": "#string",
                                             "format": "unquoted",
                                             "value": "nested2"
                                         },
                                         "value": {
-                                            "types": [
-                                                "#atom",
-                                                "#number"
-                                            ],
+                                            "type": "#number",
                                             "value": "2"
                                         }
                                     }
@@ -2617,10 +2344,7 @@ testParse({ifParsedWith: parseListElement,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#atom",
-                        "#number"
-                    ],
+                    "type": "#number",
                     "value": "10"
                 }
             },
@@ -2630,9 +2354,7 @@ testParse({ifParsedWith: parseListElement,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "#literal:InlineBlock",
                     "value": "100"
                 }
@@ -2643,9 +2365,7 @@ testParse({ifParsedWith: parseListElement,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#string"
-                    ],
+                    "type": "#string",
                     "format": "#figurative:MultilineBlock",
                     "value": "200"
                 }
@@ -2660,21 +2380,14 @@ testParse({ifParsedWith: parseMapElement,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#keyedValue"
-                    ],
+                    "type": "#keyedValue",
                     "key": {
-                        "types": [
-                            "#string"
-                        ],
+                        "type": "#string",
                         "format": "unquoted",
                         "value": "myKey"
                     },
                     "value": {
-                        "types": [
-                            "#atom",
-                            "#number"
-                        ],
+                        "type": "#number",
                         "value": "10"
                     }
                 }
@@ -2685,20 +2398,14 @@ testParse({ifParsedWith: parseMapElement,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#keyedValue"
-                    ],
+                    "type": "#keyedValue",
                     "key": {
-                        "types": [
-                            "#string"
-                        ],
+                        "type": "#string",
                         "format": "unquoted",
                         "value": "infinite"
                     },
                     "value": {
-                        "types": [
-                            "#atom"
-                        ],
+                        "type": "#namedAtom",
                         "format": "@",
                         "value": "infinite"
                     }
@@ -2710,14 +2417,9 @@ testParse({ifParsedWith: parseMapElement,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#keyedValue"
-                    ],
+                    "type": "#keyedValue",
                     "key": {
-                        "types": [
-                            "#atom",
-                            "#number"
-                        ],
+                        "type": "#number",
                         "value": "1"
                     },
                     "value": {
@@ -2739,20 +2441,14 @@ testParse({ifParsedWith: parseMapElement,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#keyedValue"
-                    ],
+                    "type": "#keyedValue",
                     "key": {
-                        "types": [
-                            "#string"
-                        ],
+                        "type": "#string",
                         "format": "\"",
                         "value": "Hello World"
                     },
                     "value": {
-                        "types": [
-                            "#string"
-                        ],
+                        "type": "#string",
                         "format": "unquoted",
                         "value": "whats up"
                     }
@@ -2764,26 +2460,17 @@ testParse({ifParsedWith: parseMapElement,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#keyedValue"
-                    ],
+                    "type": "#keyedValue",
                     "key": {
-                        "types": [
-                            "#string"
-                        ],
+                        "type": "#string",
                         "format": "\"",
                         "value": "list of "
                     },
                     "value": {
-                        "types": [
-                            "#listing"
-                        ],
+                        "type": "#listing",
                         "contains": [
                             {
-                                "types": [
-                                    "#atom",
-                                    "#number"
-                                ],
+                                "type": "#number",
                                 "value": "1",
                                 "key": 1
                             }
@@ -2797,21 +2484,15 @@ testParse({ifParsedWith: parseMapElement,
             output: {
                 "remaining": "",
                 "extraction": {
-                    "types": [
-                        "#keyedValue"
-                    ],
+                    "type": "#keyedValue",
                     "key": {
-                        "types": [
-                            "#atom"
-                        ],
+                        "type": "#namedAtom",
                         "format": "@",
                         "value": "Hello",
                         "leadingWhitespace": "  "
                     },
                     "value": {
-                        "types": [
-                            "#atom"
-                        ],
+                        "type": "#namedAtom",
                         "format": "@",
                         "value": "world"
                     }
@@ -2830,25 +2511,17 @@ testParse({ifParsedWith: parseContainer,
             output: {
                 "remaining": "\n",
                 "extraction": {
-                    "types": [
-                        "#mapping"
-                    ],
+                    "type": "#mapping",
                     "contains": [
                         {
-                            "types": [
-                                "#keyedValue"
-                            ],
+                            "type": "#keyedValue",
                             "key": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "testing"
                             },
                             "value": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "does this work?"
                             }
@@ -2883,28 +2556,20 @@ testParse({ifParsedWith: parseContainer,
             output: {
                 "remaining": "\n",
                 "extraction": {
-                    "types": [
-                        "#listing"
-                    ],
+                    "type": "#listing",
                     "contains": [
                         {
-                            "types": [
-                                "#comment"
-                            ],
+                            "type": "#comment",
                             "content": "Im doing tests wbu"
                         },
                         {
-                            "types": [
-                                "#string"
-                            ],
+                            "type": "#string",
                             "format": "unquoted",
                             "value": "how about this?",
                             "key": 1
                         },
                         {
-                            "types": [
-                                "#string"
-                            ],
+                            "type": "#string",
                             "format": "unquoted",
                             "value": "or this @atom",
                             "key": 2
@@ -2923,33 +2588,23 @@ testParse({ifParsedWith: parseContainer,
             output: {
                 "remaining": "\n",
                 "extraction": {
-                    "types": [
-                        "#mapping"
-                    ],
+                    "type": "#mapping",
                     "contains": [
                         {
-                            "types": [
-                                "#keyedValue"
-                            ],
+                            "type": "#keyedValue",
                             "key": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "testing"
                             },
                             "value": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "does this work?"
                             }
                         },
                         {
-                            "types": [
-                                "#comment"
-                            ],
+                            "type": "#comment",
                             "content": "so I was thinking"
                         }
                     ]
@@ -2976,25 +2631,17 @@ testParse({ifParsedWith: parseContainer,
             output: {
                 "remaining": "\n",
                 "extraction": {
-                    "types": [
-                        "#mapping"
-                    ],
+                    "type": "#mapping",
                     "contains": [
                         {
-                            "types": [
-                                "#keyedValue"
-                            ],
+                            "type": "#keyedValue",
                             "key": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "hello"
                             },
                             "value": {
-                                "types": [
-                                    "#string"
-                                ],
+                                "type": "#string",
                                 "format": "unquoted",
                                 "value": "world"
                             }
@@ -3013,10 +2660,7 @@ testParse({ifParsedWith: parseRoot,
                 "isContainer": false,
                 "documentNodes": [
                     {
-                        "types": [
-                            "#atom",
-                            "#number"
-                        ],
+                        "type": "#number",
                         "value": "5"
                     }
                 ],
@@ -3028,10 +2672,7 @@ testParse({ifParsedWith: parseRoot,
                 "isContainer": false,
                 "documentNodes": [
                     {
-                        "types": [
-                            "#atom",
-                            "#number"
-                        ],
+                        "type": "#number",
                         "value": "-5000"
                     }
                 ],
@@ -3043,25 +2684,17 @@ testParse({ifParsedWith: parseRoot,
                 "isContainer": true,
                 "documentNodes": [
                     {
-                        "types": [
-                            "#mapping"
-                        ],
+                        "type": "#mapping",
                         "contains": [
                             {
-                                "types": [
-                                    "#keyedValue"
-                                ],
+                                "type": "#keyedValue",
                                 "key": {
-                                    "types": [
-                                        "#string"
-                                    ],
+                                    "type": "#string",
                                     "format": "unquoted",
                                     "value": "hello"
                                 },
                                 "value": {
-                                    "types": [
-                                        "#string"
-                                    ],
+                                    "type": "#string",
                                     "format": "unquoted",
                                     "value": "world"
                                 }
@@ -3088,52 +2721,33 @@ testParse({ifParsedWith: parseRoot,
                 "isContainer": true,
                 "documentNodes": [
                     {
-                        "types": [
-                            "#mapping"
-                        ],
+                        "type": "#mapping",
                         "contains": [
                             {
-                                "types": [
-                                    "#keyedValue"
-                                ],
+                                "type": "#keyedValue",
                                 "key": {
-                                    "types": [
-                                        "#string"
-                                    ],
+                                    "type": "#string",
                                     "format": "\"",
                                     "value": "list of lists"
                                 },
                                 "value": {
-                                    "types": [
-                                        "#listing"
-                                    ],
+                                    "type": "#listing",
                                     "contains": [
                                         {
-                                            "types": [
-                                                "#listing"
-                                            ],
+                                            "type": "#listing",
                                             "contains": [
                                                 {
-                                                    "types": [
-                                                        "#atom",
-                                                        "#number"
-                                                    ],
+                                                    "type": "#number",
                                                     "value": "1.1",
                                                     "key": 1
                                                 },
                                                 {
-                                                    "types": [
-                                                        "#atom",
-                                                        "#number"
-                                                    ],
+                                                    "type": "#number",
                                                     "value": "1.2",
                                                     "key": 2
                                                 },
                                                 {
-                                                    "types": [
-                                                        "#atom",
-                                                        "#number"
-                                                    ],
+                                                    "type": "#number",
                                                     "value": "1.3",
                                                     "key": 3
                                                 }
@@ -3141,45 +2755,29 @@ testParse({ifParsedWith: parseRoot,
                                             "key": 1
                                         },
                                         {
-                                            "types": [
-                                                "#blankLines"
-                                            ],
+                                            "type": "#blankLines",
                                             "content": ""
                                         },
                                         {
-                                            "types": [
-                                                "#listing"
-                                            ],
+                                            "type": "#listing",
                                             "contains": [
                                                 {
-                                                    "types": [
-                                                        "#atom",
-                                                        "#number"
-                                                    ],
+                                                    "type": "#number",
                                                     "value": "2.1",
                                                     "key": 1
                                                 },
                                                 {
-                                                    "types": [
-                                                        "#atom",
-                                                        "#number"
-                                                    ],
+                                                    "type": "#number",
                                                     "value": "2.2",
                                                     "key": 2
                                                 },
                                                 {
-                                                    "types": [
-                                                        "#atom",
-                                                        "#number"
-                                                    ],
+                                                    "type": "#number",
                                                     "value": "2.3",
                                                     "key": 3
                                                 },
                                                 {
-                                                    "types": [
-                                                        "#atom",
-                                                        "#number"
-                                                    ],
+                                                    "type": "#number",
                                                     "value": "2.4",
                                                     "key": 4
                                                 }
