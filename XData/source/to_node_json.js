@@ -85,15 +85,12 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
     }, 0)
 }
 let extractBlock = (string) => {
-    console.debug(`string is:`,string)
     let {remaining, extraction} = extractFirst({pattern: RegExp(`^(\n?(${indentUnit}.*|${indentUnit[0]}{0,${indentUnit.length}})$)+`,"m"), from: string})
-    console.debug(`extraction is:`,extraction)
     if (extraction) {
         // remove the indent of the block
         extraction = extraction.replace(RegExp(`^(${indentUnit}|${indentUnit[0]}{0,${indentUnit.length}})`, "mg"), "")
         // remove the newline from the begining (should always be there)
         extraction = extraction.replace(/^\n/,"")
-        console.debug(`extraction is:`,extraction)
         return {
             remaining,
             extraction,
@@ -542,12 +539,13 @@ let parseStrongUnquotedString = (remainingXdataString) => {
 // quoteNeededFor
 // 
 let literalQuoteNeededToContain = (string) => {
-    let singleQuotes = findAll(/"+/, almostUnquotedString)
-    let maxQuoteSize = Math.max(...singleQuotes.map(each=>each[0].length))
+    let singleQuotes = findAll(/"+/, string)
+    var maxQuoteSize = Math.max(...singleQuotes.map(each=>each[0].length))
     // at least one quote needed
-    maxQuoteSize || (maxQuoteSize = 1)
-    ('"').repeat(maxQuoteSize)
-    return getStartingQuote(maxQuoteSize)
+    if (maxQuoteSize <= 0) {
+        maxQuoteSize = 1
+    }
+    return getStartingQuote(('"').repeat(maxQuoteSize))
 }
 
 // 
@@ -1473,30 +1471,30 @@ testParse({
         {
             input: "#figuratively:\n    like a billion",
             output: {
-                "remaining": "",
+                "remaining": "\n",
                 "extraction": {
                     "types": [
                         "#string"
                     ],
                     "format": "#figurative:MultilineBlock",
-                    "value": "like a billion",
-                },
+                    "value": "like a billion"
+                }
             },
         },
         {
             input: "#literally:\n    like a billion\n    like a billion and a half",
             output: {
-                "remaining": "",
+                "remaining": "\n",
                 "extraction": {
                     "format": "#literal:MultilineBlock",
-                    "value": "like a billion\nlike a billion and a half",
-                },
+                    "value": "like a billion\nlike a billion and a half"
+                }
             },
         },
         {
             input: "#literally:  \n    like a billion\n    like a billion and a half",
             output: {
-                "remaining": "",
+                "remaining": "\n",
                 "extraction": {
                     "format": "#literal:MultilineBlock",
                     "value": "like a billion\nlike a billion and a half",
@@ -1506,7 +1504,7 @@ testParse({
         {
             input: "#literally:   # it means literally literally \n    like a billion\n    like a billion and a half",
             output: {
-                "remaining": "",
+                "remaining": "\n",
                 "extraction": {
                     "format": "#literal:MultilineBlock",
                     "value": "like a billion\nlike a billion and a half",
@@ -1523,7 +1521,7 @@ testParse({
         {
             input: "#figuratively:   # it means kinda \n    like a billion\n    like a billion and a half",
             output: {
-                "remaining": "",
+                "remaining": "\n",
                 "extraction": {
                     "types": [
                         "#string"
@@ -1550,7 +1548,7 @@ testParse({
         {
             input: "'''\n    testing\n        testing\n    '''\n                ",
             output: {
-                "remaining": "",
+                "remaining": "\n",
                 "extraction": {
                     "types": [
                         "#string"
@@ -1563,7 +1561,7 @@ testParse({
         {
             input: "\"\"\"\n    testing\n        testing\n    \"\"\"\n                ",
             output: {
-                "remaining": "",
+                "remaining": "\n",
                 "extraction": {
                     "format": "\"\"\":MultilineBlock",
                     "value": "testing\n    testing"
@@ -1573,7 +1571,7 @@ testParse({
         {
             input: "\"\n    testing\n        testing\n    \"\n                ",
             output: {
-                "remaining": "",
+                "remaining": "\n",
                 "extraction": {
                     "format": "\":MultilineBlock",
                     "value": "testing\n    testing",
@@ -1590,7 +1588,7 @@ testParse({
         {
             input: "'''\n    testing\n       {10} testing{   \"dataaaa\"}\n    '''\n                ",
             output: {
-                "remaining": "",
+                "remaining": "\n",
                 "extraction": {
                     "types": [
                         "#string"
@@ -1631,7 +1629,7 @@ testParse({
         {
             input: "#figuratively:\n    bleh forgot quotes:\n    {#thisDocument}     testing\nunindented: 10",
             output: {
-                "remaining": "\nunindented: 10",
+                "remaining": "\n\nunindented: 10",
                 "extraction": {
                     "types": [
                         "#string"
@@ -1748,7 +1746,7 @@ testParse({
                     extraction.comment = comment
                 }
                 return {
-                    remaining,
+                    remaining: "\n"+remaining,
                     extraction,
                 }
             // 
@@ -1764,7 +1762,7 @@ testParse({
                 extraction = extractInterpolations(extraction, format)
                 comment && (extraction.comment = comment)
                 return {
-                    remaining,
+                    remaining: "\n"+remaining,
                     extraction,
                 }
             }
@@ -1854,7 +1852,7 @@ testParse({
         {
             input: "#create[date]: #literally: 1/1/1010\n",
             output: {
-                "remaining": "\n",
+                "remaining": "",
                 "extraction": {
                     "types": [
                         "#string",
@@ -1868,7 +1866,7 @@ testParse({
         {
             input: "#create[number,rational]: @pi\n",
             output: {
-                "remaining": "\n",
+                "remaining": "",
                 "extraction": {
                     "types": [
                         "#atom",
@@ -1917,6 +1915,166 @@ testParse({
             output: {
                 "remaining": "",
                 "extraction": {
+                    "types": [
+                        "#mapping"
+                    ],
+                    "contains": [
+                        {
+                            "types": [
+                                "#keyedValue"
+                            ],
+                            "key": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "test"
+                            },
+                            "value": {
+                                "types": [
+                                    "#atom"
+                                ],
+                                "format": "@",
+                                "value": "this"
+                            }
+                        },
+                        {
+                            "types": [
+                                "#keyedValue"
+                            ],
+                            "key": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "test"
+                            },
+                            "value": {
+                                "types": [
+                                    "#atom",
+                                    "#number"
+                                ],
+                                "value": "2",
+                                "format": "@"
+                            }
+                        }
+                    ]
+                }
+            },
+        },
+        {
+            input:
+                `\n`+
+                `    test: @this\n`+
+                `    test: @2\n`+
+                `    test: \n`+
+                `        nested: 1\n`+
+                `        nested2: 2\n`+
+                "",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#mapping"
+                    ],
+                    "contains": [
+                        {
+                            "types": [
+                                "#keyedValue"
+                            ],
+                            "key": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "test"
+                            },
+                            "value": {
+                                "types": [
+                                    "#atom"
+                                ],
+                                "format": "@",
+                                "value": "this"
+                            }
+                        },
+                        {
+                            "types": [
+                                "#keyedValue"
+                            ],
+                            "key": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "test"
+                            },
+                            "value": {
+                                "types": [
+                                    "#atom",
+                                    "#number"
+                                ],
+                                "value": "2",
+                                "format": "@"
+                            }
+                        },
+                        {
+                            "types": [
+                                "#keyedValue"
+                            ],
+                            "key": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "test"
+                            },
+                            "value": {
+                                "types": [
+                                    "#mapping"
+                                ],
+                                "contains": [
+                                    {
+                                        "types": [
+                                            "#keyedValue"
+                                        ],
+                                        "key": {
+                                            "types": [
+                                                "#string"
+                                            ],
+                                            "format": "unquoted",
+                                            "value": "nested"
+                                        },
+                                        "value": {
+                                            "types": [
+                                                "#atom",
+                                                "#number"
+                                            ],
+                                            "value": "1"
+                                        }
+                                    },
+                                    {
+                                        "types": [
+                                            "#keyedValue"
+                                        ],
+                                        "key": {
+                                            "types": [
+                                                "#string"
+                                            ],
+                                            "format": "unquoted",
+                                            "value": "nested2"
+                                        },
+                                        "value": {
+                                            "types": [
+                                                "#atom",
+                                                "#number"
+                                            ],
+                                            "value": "2"
+                                        }
+                                    }
+                                ]
+                            }
+                        }
+                    ]
                 }
             },
         },
@@ -1946,7 +2104,7 @@ testParse({
             var {remaining, extraction} = each(remaining)
             if (extraction) {
                 // 
-                // handle preceding whitespace
+                // handle adding leadingWhitespace
                 // 
                 leadingWhitespace && (extraction.leadingWhitespace = leadingWhitespace)
                 // 
@@ -1963,14 +2121,19 @@ testParse({
                 var {remaining, extraction: comment} = parseComment(remaining)
                 if (comment) {
                     extraction.comment = comment
-                } else {
-                    var {remaining, extraction: trailingWhitespace} = parseLeadingWhitespace(remaining)
-                    // TODO: fail on non-comment non-newline non-end-document after a value
-                    if (trailingWhitespace) {
-                        extraction.trailingWhitespace = trailingWhitespace
-                    }
                 }
 
+                var {remaining, extraction: trailingWhitespace} = parseLeadingWhitespace(remaining)
+                if (trailingWhitespace) {
+                    extraction.trailingWhitespace = trailingWhitespace
+                }
+                // TODO: fail on non-comment non-newline non-end-document after a value
+                var {remaining, extraction: discard} = extractFirst({pattern: /^(\n|$)/, from: remaining})
+                // if there is something after the whitespace, on the same line, thats an issue
+                if (discard === null) {
+                    // TODO: fix this error message
+                    throw Error(`When trying to parse the value on ${remainingXdataString.split("\n")[0]}\nI found this value:\n${JSON.stringify(extraction)}\nbut the line after it should be empty and instead I got:\n${JSON.stringify(remaining.split("\n")[0])}\n`)
+                }
                 
                 return {
                     remaining,
@@ -2217,7 +2380,7 @@ testParse({
             input: `
     testing: does this work?`,
             output: {
-                "remaining": "",
+                "remaining": "\n",
                 "extraction": {
                     "types": [
                         "#mapping"
@@ -2256,7 +2419,7 @@ testParse({
                 "remaining": "\n    testing: does this work?\n    - how about this?\n    - or this @atom\n    ",
                 "extraction": null,
                 "was": "testing: does this work?\n- how about this?\n- or this @atom\n",
-                "shouldBe": "testing: does this work?\n1:how about this?\n2:or this @atom\n"
+                "errorMessage": "Having both keys (key: value) and list elements (- value) in the same container currently isn't supported\nJust change:\n\n    testing: does this work?\n    - how about this?\n    - or this @atom\n    \nTo be:\n\n    testing: does this work?\n    1:how about this?\n    2:or this @atom\n    "
             },
         },
         {
@@ -2266,7 +2429,7 @@ testParse({
     - or this @atom
     `,
             output: {
-                "remaining": "",
+                "remaining": "\n",
                 "extraction": {
                     "types": [
                         "#listing"
@@ -2304,7 +2467,7 @@ testParse({
     # so I was thinking
     `,
             output: {
-                "remaining": "",
+                "remaining": "\n",
                 "extraction": {
                     "types": [
                         "#mapping"
@@ -2354,7 +2517,6 @@ testParse({
         }
     ],
     ifParsedWith: parseContainer = (remainingXdataString) => {
-        console.debug(`remainingXdataString is:`,remainingXdataString)
         // 
         // handling leading comment/whitespace
         // 
@@ -2371,7 +2533,6 @@ testParse({
                 }
             }
         }
-        console.debug(`parseContainer: remaining is:`,remaining)
         // 
         // handle block
         // 
@@ -2390,19 +2551,18 @@ testParse({
         let contains = []
         let itemCounter = 0
         let foundAtLeastOne = true
-        console.debug(`originalBlock is:`,originalBlock)
         while (foundAtLeastOne) {
             foundAtLeastOne = false
             for (let each of [parseBlankLine, parseComment, parseListElement, parseMapElement]) {
                 var {remaining: block, extraction} = each(block)
                 
                 // for future debugging:
-                ;(each == parseBlankLine) && console.debug(`parseBlankLine`)
-                ;(each == parseComment) && console.debug(`parseComment`)
-                ;(each == parseListElement) && console.debug(`parseListElement`)
-                ;(each == parseMapElement) && console.debug(`parseMapElement`)
-                console.debug(`remaining is:`,JSON.stringify(block))
-                console.debug(`extraction is:`,extraction)
+                // ;(each == parseBlankLine) && console.debug(`parseBlankLine`)
+                // ;(each == parseComment) && console.debug(`parseComment`)
+                // ;(each == parseListElement) && console.debug(`parseListElement`)
+                // ;(each == parseMapElement) && console.debug(`parseMapElement`)
+                // console.debug(`remaining is:`,JSON.stringify(block))
+                // console.debug(`extraction is:`,extraction)
 
                 if (extraction && each == parseListElement) {
                     isList = true
@@ -2432,11 +2592,12 @@ testParse({
                 extraction: null,
                 was: originalBlock,
                 errorMessage: 
-                    `having both keys (key: value) and list elements (- value) in the\n`+
-                    `same container currently isn't support\n`+
-                    `just change:\n`+
+                    `Having both keys (key: value) and list elements (- value) in the same container currently isn't supported\n`+
+                    `Just change:\n`+
+                    `\n`+
                     `${indent(originalBlock)}\n`+
-                    `to be:\n`+
+                    `To be:\n`+
+                    `\n`+
                     `${indent(fixedBlock)}`
                 ,
             }
@@ -2466,7 +2627,7 @@ testParse({
             }
 
             return {
-                remaining,
+                remaining: "\n"+remaining,
                 extraction
             }
         }
