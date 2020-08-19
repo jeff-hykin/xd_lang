@@ -1,12 +1,12 @@
 // 
 // todo
 // 
-//     parse main/root
-//         check version at top
+//     add the custom literal
 //     auto detect indent
-//     warning about using the wrong quotes for a key 
 //     unparse
 //         make sure format (like ") is viable for the content (like ")
+//     warning about using the wrong quotes for a key 
+//     warning for empty block talk abotu {} and [] so users know to use them
 //     create a good error system (create fallback checks like parseBadReference or parseBadLiteralString)
 //     record line numbers for errors
 
@@ -1074,129 +1074,141 @@ let parseMapElement = (remainingXdataString) => {
     }
 
 
+//
+// container block
+// 
+let parseContainerBlock = (block, nodeParsers, {comment,remainingXdataString, remaining}={}) => {
+    // TODO: clean up this
+    //     (it was extracted from parseContainer and contains too much related logic)
+    //     (e.g. it shouldn't need so many arguments)
+    let originalBlock = block // for errors
+    let isMapping, isList
+    let contains = []
+    let itemCounter = 0
+    let foundAtLeastOne = true
+    while (foundAtLeastOne) {
+        foundAtLeastOne = false
+        for (let each of nodeParsers) {
+            var {remaining: block, extraction} = each(block)
+            
+            // for future debugging:
+            // ;(each == parseBlankLine) && console.debug(`parseBlankLine`)
+            // ;(each == parseComment) && console.debug(`parseComment`)
+            // ;(each == parseListElement) && console.debug(`parseListElement`)
+            // ;(each == parseMapElement) && console.debug(`parseMapElement`)
+            // console.debug(`    remaining is:`,JSON.stringify(block))
+            // console.debug(`    extraction is:`,extraction)
+
+            if (extraction && each == parseListElement) {
+                isList = true
+                extraction.key = ++itemCounter
+            } else if (extraction && each == parseMapElement) {
+                isMapping = true
+            }
+            // TODO: check for "almost" errors here and report them
+
+            // save all the extractions
+            if (extraction) {
+                foundAtLeastOne = true
+                contains.push(extraction)
+            }
+        }
+    }
+    
+    // don't allow both (TODO: maybe allow in future)
+    // maybe allow both if there are no directly numbered keys (e.g. 1: 'thing')
+    if (isMapping && isList) {
+        // replace list elements with numbered map elements
+        let fixedBlock = originalBlock
+        let fixedCounter = 0
+        fixedBlock = fixedBlock.replace(/- /g, ()=>`${++fixedCounter}:`)
+        return {
+            remaining: remainingXdataString,
+            extraction: null,
+            was: originalBlock,
+            errorMessage: 
+                `Having both keys (key: value) and list elements (- value) in the same container currently isn't supported\n`+
+                `Just change:\n`+
+                `\n`+
+                `${indent(originalBlock)}\n`+
+                `To be:\n`+
+                `\n`+
+                `${indent(fixedBlock)}`
+            ,
+        }
+    // 
+    // prep return value
+    // 
+    } else {
+        extraction = {
+            type: null,
+            contains,
+        }
+        comment && (extraction.comment = comment)
+
+        if (isMapping) {
+            extraction.type = "#mapping"
+        } else if (isList) {
+            extraction.type = "#listing"
+        // 
+        // just comments & blank lines
+        // 
+        } else {
+            // TODO: optimize this in the future so its not re-parsed
+            return {
+                remaining: remainingXdataString,
+                extraction: null
+            }
+        }
+
+        return {
+            remaining: "\n"+remaining,
+            extraction
+        }
+    }
+}
 // 
 // 
 // CONTAINER
 // 
 // 
 let parseContainer = (remainingXdataString) => {
-        // 
-        // handling leading comment/whitespace
-        // 
-        var remaining = remainingXdataString
-        var {remaining, extraction: comment} = parseComment(remaining)
-        if (!comment) {
-            var {remaining, extraction: junkWhitespace} = parseLeadingWhitespace(remaining)
-            if (!remaining.match("\n")) {
-                // probably not a container
-                // TODO: check for "thing: blah" warn about inline list/mappings
-                return {
-                    remaining: remainingXdataString,
-                    extraction: null,
-                }
-            }
-        }
-        // 
-        // handle block
-        // 
-        var {remaining, extraction: block} = extractBlock(remaining)
-        // empty key or list value
-        if (!block) {
-            // TODO: look for failed block (not all the way indented or something)
-            let failLine = remainingXdataString.split("\n")[0]
+    // 
+    // handling leading comment/whitespace
+    // 
+    var remaining = remainingXdataString
+    var {remaining, extraction: comment} = parseComment(remaining)
+    if (!comment) {
+        var {remaining, extraction: junkWhitespace} = parseLeadingWhitespace(remaining)
+        if (!remaining.match("\n")) {
+            // probably not a container
+            // TODO: check for "thing: blah" warn about inline list/mappings
             return {
                 remaining: remainingXdataString,
                 extraction: null,
-            }
-        }
-        let originalBlock = block // for errors
-        let isMapping, isList
-        let contains = []
-        let itemCounter = 0
-        let foundAtLeastOne = true
-        while (foundAtLeastOne) {
-            foundAtLeastOne = false
-            for (let each of [parseBlankLine, parseComment, parseListElement, parseMapElement]) {
-                var {remaining: block, extraction} = each(block)
-                
-                // for future debugging:
-                // ;(each == parseBlankLine) && console.debug(`parseBlankLine`)
-                // ;(each == parseComment) && console.debug(`parseComment`)
-                // ;(each == parseListElement) && console.debug(`parseListElement`)
-                // ;(each == parseMapElement) && console.debug(`parseMapElement`)
-                // console.debug(`    remaining is:`,JSON.stringify(block))
-                // console.debug(`    extraction is:`,extraction)
-
-                if (extraction && each == parseListElement) {
-                    isList = true
-                    extraction.key = ++itemCounter
-                } else if (extraction && each == parseMapElement) {
-                    isMapping = true
-                }
-                // TODO: check for "almost" errors here and report them
-
-                // save all the extractions
-                if (extraction) {
-                    foundAtLeastOne = true
-                    contains.push(extraction)
-                }
-            }
-        }
-        
-        // don't allow both (TODO: maybe allow in future)
-        // maybe allow both if there are no directly numbered keys (e.g. 1: 'thing')
-        if (isMapping && isList) {
-            // replace list elements with numbered map elements
-            let fixedBlock = originalBlock
-            let fixedCounter = 0
-            fixedBlock = fixedBlock.replace(/- /g, ()=>`${++fixedCounter}:`)
-            return {
-                remaining: remainingXdataString,
-                extraction: null,
-                was: originalBlock,
-                errorMessage: 
-                    `Having both keys (key: value) and list elements (- value) in the same container currently isn't supported\n`+
-                    `Just change:\n`+
-                    `\n`+
-                    `${indent(originalBlock)}\n`+
-                    `To be:\n`+
-                    `\n`+
-                    `${indent(fixedBlock)}`
-                ,
-            }
-        // 
-        // prep return value
-        // 
-        } else {
-            extraction = {
-                type: null,
-                contains,
-            }
-            comment && (extraction.comment = comment)
-
-            if (isMapping) {
-                extraction.type = "#mapping"
-            } else if (isList) {
-                extraction.type = "#listing"
-            // 
-            // just comments & blank lines
-            // 
-            } else {
-                // TODO: optimize this in the future so its not re-parsed
-                return {
-                    remaining: remainingXdataString,
-                    extraction: null
-                }
-            }
-
-            return {
-                remaining: "\n"+remaining,
-                extraction
             }
         }
     }
+    // 
+    // handle block
+    // 
+    var {remaining, extraction: block} = extractBlock(remaining)
+    if (block) {
+        return parseContainerBlock(
+            block,
+            [parseBlankLine, parseComment, parseListElement, parseMapElement],
+            {comment,remainingXdataString, remaining}
+        )
+    }
 
-
+    // TODO: look for failed block (not all the way indented or something)
+    // TODO: good message about empty key or list value
+    let failLine = remainingXdataString.split("\n")[0]
+    return {
+        remaining: remainingXdataString,
+        extraction: null,
+    }
+}
 
 // 
 // 
@@ -1206,7 +1218,7 @@ let parseContainer = (remainingXdataString) => {
 let parseRoot = (remainingXdataString)=> {
     // stadardize to LF
     remainingXdataString = remainingXdataString.replace(/\r\n/,"\n")
-    
+
     var remaining = remainingXdataString
     let topNodes = []
     let foundAtLeastOneNode = true
@@ -1251,7 +1263,7 @@ let parseRoot = (remainingXdataString)=> {
             documentNodes: topNodes,
         }
     } else if (foundAtLeastOneValue) {
-        // FIXME, handle error of value and map-element / list-element existing
+        // TODO, handle error of value and map-element / list-element existing
         console.error(`remaining is:`,remaining)
         console.error(`error (probably) value and map-element / list-element existing same time`)
         return null
@@ -1261,8 +1273,7 @@ let parseRoot = (remainingXdataString)=> {
     // try parsing it as a container
     // 
     // TODO: make this cleaner (don't indent it and add the newline)
-    let inputBlock = "\n"+indent(remaining)
-    var {remaining, extraction} = parseContainer(inputBlock)
+    var {remaining, extraction} = parseContainerBlock(remaining, [parseBlankLine, parseComment, parseListElement, parseMapElement])
     if (extraction) {
         // append
         topNodes = topNodes.concat(extraction)
@@ -1273,8 +1284,8 @@ let parseRoot = (remainingXdataString)=> {
         }
     } else {
         // error: container failed and value failed and comments/blankLine failed
+        // TODO: make this a good error
         console.error(`something in the syntax isn't right, thats all I know:`,remaining)
-        // FIXME
         return null
     }
     
