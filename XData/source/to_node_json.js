@@ -3,10 +3,8 @@
 // 
 //     parse main/root
 //         check version at top
-//     make the ''' block fail without a proper end quote
 //     auto detect indent
 //     warning about using the wrong quotes for a key 
-//     handle CRLF/LF issues
 //     unparse
 //         make sure format (like ") is viable for the content (like ")
 //     create a good error system (create fallback checks like parseBadReference or parseBadLiteralString)
@@ -852,6 +850,24 @@ let parseBlockString = (remainingXdataString) => {
             }
             let isLiteralQuote = (quote && quote[0] == '"')
             let isFigurativeQuote = (quote && quote[0] == "'")
+            let checkMissingEndingQuote = ()=> {
+                if (typeof quote == 'string') {
+                    let endingQuote = RegExp(`\\n${quote}\\s*$`)
+                    if (!extraction.match(endingQuote)) {
+                        return {
+                            remaining: remainingXdataString,
+                            extraction: null,
+                            was: extraction,
+                            errorMessage:
+                                `For the quoted block: ${quote}\n${extraction}\n\n`+
+                                `I think you just need to add a ${quote} to the end of it.\n`+
+                                `Make sure it:\n`+
+                                `  - is on a newline (not at the end of text)\n`+
+                                `  - its indented exactly right (not too much or too little)`
+                        }
+                    }
+                }
+            }
             // 
             // literal MultilineBlock
             // 
@@ -859,6 +875,11 @@ let parseBlockString = (remainingXdataString) => {
                 let format = "#literal:MultilineBlock"
                 var {remaining, extraction} = extractBlock(remaining)
                 if (isLiteralQuote) {
+                    let endingQuoteIsMissing = checkMissingEndingQuote()
+                    if (endingQuoteIsMissing) {
+                        return endingQuoteIsMissing
+                    }
+                    // TODO: almost ending quote RegExp(`\\n[ \t]*${quote}\\s*$`)
                     extraction = extraction.replace(RegExp(`\\n${quote}\\s*$`),"")
                     // TODO warning about triple quotes on the same line as text
                     format = quote+":MultilineBlock"
@@ -880,6 +901,11 @@ let parseBlockString = (remainingXdataString) => {
             } else if (extraction == "#textFigurative:" || isFigurativeQuote) {
                 let format = "#figurative:MultilineBlock"
                 var {remaining, extraction} = extractBlock(remaining)
+                let endingQuoteIsMissing = checkMissingEndingQuote()
+                if (endingQuoteIsMissing) {
+                    return endingQuoteIsMissing
+                }
+
                 if (isFigurativeQuote) {
                     extraction = extraction.replace(RegExp(`\\n${quote}\\s*$`),"")
                     format = quote+":MultilineBlock"
@@ -1178,6 +1204,9 @@ let parseContainer = (remainingXdataString) => {
 // 
 // 
 let parseRoot = (remainingXdataString)=> {
+    // stadardize to LF
+    remainingXdataString = remainingXdataString.replace(/\r\n/,"\n")
+    
     var remaining = remainingXdataString
     let topNodes = []
     let foundAtLeastOneNode = true
@@ -1967,6 +1996,42 @@ testParse({ifParsedWith: parseBlockString,
                     "type": "#string",
                     "format": "#literal:InlineBlock",
                     "value": " like a billion"
+                }
+            },
+        },
+        {
+            input:
+                `'''\n`+
+                `    testing, i forgot the quote\n`+
+                "",
+            output: {
+                "remaining": "'''\n    testing, i forgot the quote\n",
+                "extraction": null,
+                "was": "testing, i forgot the quote",
+                "errorMessage": "For the quoted block: '''\ntesting, i forgot the quote\n\nI think you just need to add a ''' to the end of it.\nMake sure it:\n  - is on a newline (not at the end of text)\n  - its indented exactly right (not too much or too little)"
+            },
+        },
+        {
+            input:
+                `'''\n`+
+                `    testing, i forgot the quote\n`+
+                `     '''\n`+
+                "",
+            output: {
+                "remaining": "'''\n    testing, i forgot the quote\n     '''\n",
+                "extraction": null,
+                "was": "testing, i forgot the quote\n '''",
+                "errorMessage": "For the quoted block: '''\ntesting, i forgot the quote\n '''\n\nI think you just need to add a ''' to the end of it.\nMake sure it:\n  - is on a newline (not at the end of text)\n  - its indented exactly right (not too much or too little)"
+            },
+        },
+        {
+            input: "'''\n    testing, i forgot the quote\n    '''\n",
+            output: {
+                "remaining": "\n",
+                "extraction": {
+                    "type": "#string",
+                    "format": "''':MultilineBlock",
+                    "value": "testing, i forgot the quote"
                 }
             },
         },
