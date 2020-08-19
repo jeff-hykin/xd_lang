@@ -4,10 +4,10 @@
 //     parse main/root
 //         check version at top
 //         handle final trailing newline
-//     change #literally: to #literalText
+//     change #textLiteral: to #literalText
 //     make the ''' block fail without a proper end quote
 //     make trailing newlines in blocks require correct indent
-//     FIXME: unindented newlines after the #literally: block end
+//     FIXME: unindented newlines after the #textLiteral: block end
 //     auto detect indent
 //     warning about using the wrong quotes for a key 
 //     handle CRLF/LF issues
@@ -484,7 +484,7 @@ let parseStrongUnquotedString = (remainingXdataString) => {
         }
     }
 
-    // TODO: add good warning for almost unquoted block (forgot #literally:)
+    // TODO: add good warning for almost unquoted block (forgot #textLiteral:)
 
     // 
     // almost unquoted (but leading/trailing whitespace)
@@ -1425,8 +1425,8 @@ let parseInlineString = (remainingXdataString) => {
 
 // 
 // 
-// #literally:
-// #figuratively:
+// #textLiteral:
+// #textFigurative:
 // '''
 // block
 // '''
@@ -1439,7 +1439,7 @@ let parseBlockString
 testParse({
     expectedIo: [
         {
-            input: `#literally: like a billion`,
+            input: `#textLiteral: like a billion`,
             output: {
                 "remaining": "",
                 "extraction": {
@@ -1452,7 +1452,7 @@ testParse({
             },
         },
         {
-            input: `#figuratively: like a billion`,
+            input: `#textFigurative: like a billion`,
             output: {
                 "remaining": "",
                 "extraction": {
@@ -1465,7 +1465,7 @@ testParse({
             },
         },
         {
-            input: "#figuratively:\n    like a billion",
+            input: "#textFigurative:\n    like a billion",
             output: {
                 "remaining": "\n",
                 "extraction": {
@@ -1478,7 +1478,7 @@ testParse({
             },
         },
         {
-            input: "#literally:\n    like a billion\n    like a billion and a half",
+            input: "#textLiteral:\n    like a billion\n    like a billion and a half",
             output: {
                 "remaining": "\n",
                 "extraction": {
@@ -1488,7 +1488,7 @@ testParse({
             },
         },
         {
-            input: "#literally:  \n    like a billion\n    like a billion and a half",
+            input: "#textLiteral:  \n    like a billion\n    like a billion and a half",
             output: {
                 "remaining": "\n",
                 "extraction": {
@@ -1498,7 +1498,7 @@ testParse({
             },
         },
         {
-            input: "#literally:   # it means literally literally \n    like a billion\n    like a billion and a half",
+            input: "#textLiteral:   # it means literally literally \n    like a billion\n    like a billion and a half",
             output: {
                 "remaining": "\n",
                 "extraction": {
@@ -1515,7 +1515,7 @@ testParse({
             },
         },
         {
-            input: "#figuratively:   # it means kinda \n    like a billion\n    like a billion and a half",
+            input: "#textFigurative:   # it means kinda \n    like a billion\n    like a billion and a half",
             output: {
                 "remaining": "\n",
                 "extraction": {
@@ -1535,9 +1535,9 @@ testParse({
             },
         },
         {
-            input: "#figuratively:  asodfsdf  # it means kinda \n    like a billion\n    like a billion and a half",
+            input: "#textFigurative:  asodfsdf  # it means kinda \n    like a billion\n    like a billion and a half",
             output: {
-                "remaining": "#figuratively:  asodfsdf  # it means kinda \n    like a billion\n    like a billion and a half",
+                "remaining": "#textFigurative:  asodfsdf  # it means kinda \n    like a billion\n    like a billion and a half",
                 "extraction": null
             },
         },
@@ -1623,7 +1623,7 @@ testParse({
             },
         },
         {
-            input: "#figuratively:\n    bleh forgot quotes:\n    {#thisDocument}     testing\nunindented: 10",
+            input: "#textFigurative:\n    bleh forgot quotes:\n    {#thisDocument}     testing\nunindented: 10",
             output: {
                 "remaining": "\n\nunindented: 10",
                 "extraction": {
@@ -1662,7 +1662,7 @@ testParse({
             },
         },
         {
-            input: "#literally: like a billion\n",
+            input: "#textLiteral: like a billion\n",
             output: {
                 "remaining": "\n",
                 "extraction": {
@@ -1683,23 +1683,23 @@ testParse({
             // 
             // literal rest-of-line
             // 
-            var {remaining, extraction} = extractFirst({pattern: /^#literally:.*/, from: remainingXdataString})
+            var {remaining, extraction} = extractFirst({pattern: /^#textLiteral:.*/, from: remainingXdataString})
             if (extraction) {
                 return {
                     remaining,
                     extraction: {
                         types: [ "#string" ],
                         format: "#literal:InlineBlock",
-                        value: extraction.replace(/^#literally:/, ''),
+                        value: extraction.replace(/^#textLiteral:/, ''),
                     },
                 }
             }
             // 
             // figurative rest-of-line
             // 
-            var {remaining, extraction} = extractFirst({pattern: /^#figuratively:.*/, from: remainingXdataString})
+            var {remaining, extraction} = extractFirst({pattern: /^#textFigurative:.*/, from: remainingXdataString})
             if (extraction) {
-                extraction = extraction.replace(/^#figuratively:/, '')
+                extraction = extraction.replace(/^#textFigurative:/, '')
                 return {
                     remaining,
                     extraction: extractInterpolations(extraction,"#figurative:InlineBlock"),
@@ -1707,14 +1707,17 @@ testParse({
             }
         } else {
             let quote = getStartingQuote(remainingXdataString)
-            let pattern = quote || /^(#literally:|#figuratively:)/
+            let pattern = quote || /^(#textLiteral:|#textFigurative:)/
             var {remaining, extraction} = extractFirst({pattern, from: remainingXdataString})
             var {remaining, extraction: comment} = parseComment(remaining)
             if (!comment) {
                 var {remaining, extraction: miscWhitespace} = parseLeadingWhitespace(remaining)
                 if (!remaining.match(/^\n/)) {
-                    // TODO: improve error message
-                    console.error(`issue with the the remaining text on the line:${remainingXdataString.split("\n")[0]}`)
+                    // if there was the start of a text literal
+                    if (extraction) {
+                        // TODO: improve error message
+                        console.error(`issue with the the remaining text on the line:${remainingXdataString.split("\n")[0]}`)
+                    }
                     return {
                         remaining: remainingXdataString,
                         extraction: null,
@@ -1726,7 +1729,7 @@ testParse({
             // 
             // literal MultilineBlock
             // 
-            if (extraction == "#literally:" || isLiteralQuote) {
+            if (extraction == "#textLiteral:" || isLiteralQuote) {
                 let format = "#literal:MultilineBlock"
                 var {remaining, extraction} = extractBlock(remaining)
                 if (isLiteralQuote) {
@@ -1748,7 +1751,7 @@ testParse({
             // 
             // figurative MultilineBlock
             // 
-            } else if (extraction == "#figuratively:" || isFigurativeQuote) {
+            } else if (extraction == "#textFigurative:" || isFigurativeQuote) {
                 let format = "#figurative:MultilineBlock"
                 var {remaining, extraction} = extractBlock(remaining)
                 if (isFigurativeQuote) {
@@ -1846,7 +1849,7 @@ testParse({
             },
         },
         {
-            input: "#create[date]: #literally: 1/1/1010\n",
+            input: "#create[date]: #textLiteral: 1/1/1010\n",
             output: {
                 "remaining": "",
                 "extraction": {
@@ -2299,7 +2302,7 @@ testParse({
             },
         },
         {
-            input: "- #literally:100",
+            input: "- #textLiteral:100",
             output: {
                 "remaining": "",
                 "extraction": {
@@ -2312,7 +2315,7 @@ testParse({
             },
         },
         {
-            input: "- #figuratively:\n    200",
+            input: "- #textFigurative:\n    200",
             output: {
                 "remaining": "",
                 "extraction": {
@@ -2326,7 +2329,7 @@ testParse({
         },
     ],
     ifParsedWith: parseListElement = (remainingXdataString) => {
-        var {remaining, extraction} = extractFirst({pattern: /- /, from: remainingXdataString})
+        var {remaining, extraction} = extractFirst({pattern: /-( +| *(?=\n))/, from: remainingXdataString})
         if (extraction) {
             let result = parseValue(remaining)
             if (result.extraction) {
@@ -2397,7 +2400,7 @@ testParse({
             },
         },
         {
-            input: "1: #literally:\n     hi",
+            input: "1: #textLiteral:\n     hi",
             output: {
                 "remaining": "",
                 "extraction": {
@@ -2524,12 +2527,8 @@ testParse({
         }
 
         if (key) {
-            console.debug(`key is:`,key)
-            console.debug(`remaining is:`,remaining)
             var {remaining, extraction: colon} = extractFirst({pattern: /:( | *(?=\n))/, from: remaining})
-            console.debug(`remaining is:`,remaining)
             if (colon) {
-                console.debug(`remaining is:`,remaining)
                 var {remaining, extraction: value} = parseValue(remaining)
                 if (value) {
                     var extraction = {
@@ -2756,9 +2755,7 @@ testParse({
         // 
         // handle block
         // 
-        console.debug(`block before is:`,remaining)
         var {remaining, extraction: block} = extractBlock(remaining)
-        console.debug(`block after is:`,block)
         // empty key or list value
         if (!block) {
             // TODO: look for failed block (not all the way indented or something)
@@ -2779,12 +2776,12 @@ testParse({
                 var {remaining: block, extraction} = each(block)
                 
                 // for future debugging:
-                ;(each == parseBlankLine) && console.debug(`parseBlankLine`)
-                ;(each == parseComment) && console.debug(`parseComment`)
-                ;(each == parseListElement) && console.debug(`parseListElement`)
-                ;(each == parseMapElement) && console.debug(`parseMapElement`)
-                console.debug(`    remaining is:`,JSON.stringify(block))
-                console.debug(`    extraction is:`,extraction)
+                // ;(each == parseBlankLine) && console.debug(`parseBlankLine`)
+                // ;(each == parseComment) && console.debug(`parseComment`)
+                // ;(each == parseListElement) && console.debug(`parseListElement`)
+                // ;(each == parseMapElement) && console.debug(`parseMapElement`)
+                // console.debug(`    remaining is:`,JSON.stringify(block))
+                // console.debug(`    extraction is:`,extraction)
 
                 if (extraction && each == parseListElement) {
                     isList = true
@@ -2911,7 +2908,6 @@ let parseRoot = (remainingXdataString)=> {
     // 
     // TODO: make this cleaner (don't indent it and add the newline)
     let inputBlock = "\n"+indent(remaining)
-    console.debug(`inputBlock is:`,inputBlock)
     var {remaining, extraction} = parseContainer(inputBlock)
     if (extraction) {
         // append
@@ -3099,6 +3095,14 @@ testParse({
                                                     ],
                                                     "value": "2.3",
                                                     "key": 3
+                                                },
+                                                {
+                                                    "types": [
+                                                        "#atom",
+                                                        "#number"
+                                                    ],
+                                                    "value": "2.4",
+                                                    "key": 4
                                                 }
                                             ],
                                             "key": 2
