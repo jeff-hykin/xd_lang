@@ -1924,6 +1924,48 @@ testParse({
     }
 })
 
+
+// 
+// 
+// 
+// 
+// 
+let parseContainer
+testParse({
+    expectedIo: [
+        {
+            input: "myKey: 10",
+            output: {
+            },
+        },
+        {
+            input: "infinite: @infinite",
+            output: {
+            },
+        },
+    ],
+    ifParsedWith: parseContainer = (remainingXdataString) => {
+        // FIXME attempt to parse a direct value inside root
+        let isMapping, isList
+        let list = []
+        let itemCounter = -1
+        // FIXME try parsing a version
+        for (let each of [parseBlankLine, parseComment, parseListElement, parseKey]) {
+            var {remaining, extraction} = each(remaining)
+            if (extraction && each == parseListElement) {
+                isList = true
+                extraction.key = ++itemCounter
+                list.push(extraction)
+            } else if (extraction && each == parseKey) {
+                isMapping == true
+            }
+        }
+
+        // FIXME: isMapping && isList , !isMapping && !isList
+        
+    }
+})
+
 // # Method (any language)
 // - try parsing version
 // - try parsing a blank line
