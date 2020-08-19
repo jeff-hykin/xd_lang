@@ -1785,6 +1785,9 @@ testParse({
     }
 })
 
+// 
+// LIST ELEMENT
+// 
 let parseListElement
 testParse({
     expectedIo: [
@@ -1843,6 +1846,9 @@ testParse({
     }
 })
 
+// 
+// MAP ELEMENT
+// 
 let parseMapElement
 testParse({
     expectedIo: [
@@ -2251,7 +2257,6 @@ testParse({
 })
 
 // FIXME: parseRoot
-// TODO: add warn on list element
 
 // # Method (any language)
 // - try parsing version
