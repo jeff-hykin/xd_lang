@@ -5,13 +5,20 @@
     //     creating a hash of names->indicies
     // parse main/root
     //     check version at top
+    //     handle final trailing newline
+    // change #literally: to #literalText
+    // change atom's to named atoms
+    // change comments so their content doesn't include the "#"
+    // make the ''' block fail without a proper end quote
+    // make trailing newlines in blocks require correct indent
+    // auto detect indent
+    // handle CRLF/LF issues
+    // convert types to just type and extract out custom types
     // unparse
-        // make sure format (like ") is viable for the content (like ")
+    //     make sure format (like ") is viable for the content (like ")
     // add a simple "shouldn't matched but didn't because __ an improved version would be ___"
     // create a good error system (create fallback checks like parseBadReference or parseBadLiteralString)
-    // record line numbers
-    // change atom's to named atoms
-
+    // record line numbers for errors
 
 // 
 // tools
@@ -37,7 +44,7 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
         for (let each of expectedIo) {
             let {input, output} = each
             let nextExpectedOutput = JSON.stringify(output)
-            console.debug(`    input is:`,JSON.stringify(input))
+            console.log(`    input is:`,JSON.stringify(input))
             let result
             let wasError
             try {
@@ -80,14 +87,12 @@ let extractBlock = (string) => {
         extraction: null,
     }
 }
-
 let parseLeadingWhitespace = (remainingXdataString) => {
     let result = extractFirst({pattern: /^( |\t)*/, from: remainingXdataString,})
     // ensure it is always a string
     result.extraction = result.extraction || ""
     return result
 }
-
 let parseWrappingWhitespaceFor = (parserFunc, remainingXdataString) => {
     var {remaining, extraction: leadingWhitespace} = parseLeadingWhitespace(remainingXdataString)
     var {remaining, extraction} = parserFunc(remaining)
@@ -113,21 +118,22 @@ let parseWrappingWhitespaceFor = (parserFunc, remainingXdataString) => {
 // 
 // 
 let parseBlankLine = (remainingXdataString, indent) => {
-    let {remaining, extraction} = extractFirst({pattern: /^\s*$/, from: remainingXdataString,})
+    let {remaining, extraction: blankLine} = extractFirst({pattern: /^\s*$/, from: remainingXdataString,})
     // return null if no match
-    if (!extraction) {
-        return {
-            remaining: remainingXdataString,
-            extraction: null,
-        }
-    } else {
+    if (blankLine) {
+        // remove trailing newline
+        blankLine = blankLine.replace(/\n$/,"")
         return {
             remaining,
             extraction: {
                 types: ["#blankLines"],
-                content: extraction
+                content: blankLine
             }
         }
+    }
+    return {
+        remaining: remainingXdataString,
+        extraction: null,
     }
 }
 
@@ -151,7 +157,7 @@ testParse({
                     "types": [
                         "#comment"
                     ],
-                    "content": "# it means literally literally \n",
+                    "content": "# it means literally literally ",
                     "leadingWhitespace": "    "
                 }
             },
@@ -184,11 +190,13 @@ testParse({
     ],
     ifParsedWith: parseComment = (remainingXdataString, indent) => {
         var {remaining, extraction: leadingWhitespace } = parseLeadingWhitespace(remainingXdataString)
-        var {remaining, extraction} = extractFirst({pattern:/^#( .*|)(\n|$)/, from: remaining})
-        if (extraction) {
+        var {remaining, extraction: comment} = extractFirst({pattern:/^#( .*|)(\n|$)/, from: remaining})
+        if (comment) {
+            // remove trailing newline
+            comment = comment.replace(/\n$/, "")
             extraction = {
                 types: ["#comment"],
-                content: extraction
+                content: comment
             }
             leadingWhitespace && (extraction.leadingWhitespace = leadingWhitespace)
             return {
@@ -410,16 +418,17 @@ let parseWeakUnquotedString = (remainingXdataString) => {
 // 
 let parseStrongUnquotedString = (remainingXdataString) => {
     // - start with a-zA-Z, then anything except colon or trailing whitespace until line/block end. Error on colons and trailing whitespace
-    let {remaining, extraction} = extractFirst({pattern: /^[a-zA-Z]([^:\n]*[^\s:])?$/, from: remainingXdataString})
+    let {remaining, extraction: unquotedString} = extractFirst({pattern: /^[a-zA-Z]([^:\n]*[^\s:])?(\n|$)/, from: remainingXdataString})
     // TODO: add good warning for leading/trailing whitespace (maybe and "almost" strongUnquotedString)
     
-    if (extraction) {
+    if (unquotedString) {
+        unquotedString = unquotedString.replace(/\n$/,"")
         return {
             remaining,
             extraction: {
                 types: ["#string"],
                 format: "unquoted",
-                value: extraction,
+                value: unquotedString,
             }
         }
     }
@@ -1394,10 +1403,10 @@ testParse({
                         "types": [
                             "#comment"
                         ],
-                        "content": "# it means literally literally \n",
+                        "content": "# it means literally literally ",
                         "leadingWhitespace": "   "
                     }
-                },
+                }
             },
         },
         {
@@ -1414,10 +1423,10 @@ testParse({
                         "types": [
                             "#comment"
                         ],
-                        "content": "# it means kinda \n",
+                        "content": "# it means kinda ",
                         "leadingWhitespace": "   "
                     }
-                },
+                }
             },
         },
         {
@@ -1563,7 +1572,6 @@ testParse({
             if (extraction == "#literally:" || isLiteralQuote) {
                 let format = "#literal:MultilineBlock"
                 var {remaining, extraction} = extractBlock(remaining)
-                console.debug(`extraction is:`,extraction)
                 if (isLiteralQuote) {
                     extraction = extraction.replace(RegExp(`\\n${quote}\\s*$`),"")
                     // TODO warning about triple quotes on the same line as text
@@ -1641,14 +1649,32 @@ testParse({
                 }
             },
         },
-        // {
-        //     input: "-10",
-        //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
-        // },
-        // {
-        //     input: "-10.234234",
-        //     output: { remaining: '' , extraction: { types: ['#key']    , value: { types: ["#string"],            format: "unquoted", value: 'myKey'    }      } },
-        // },
+        {
+            input: "this is a test",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "unquoted",
+                    "value": "this is a test"
+                }
+            },
+        },
+        {
+            input: "this is a test\n",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "unquoted",
+                    "value": "this is a test"
+                }
+            },
+        },
     ],
     ifParsedWith: parseValue = (remainingXdataString, indent) => {
         var remaining = remainingXdataString
@@ -1669,7 +1695,7 @@ testParse({
             }
         }
         
-        // FIXME: add recursive option
+        // FIXME: add recursive call to container
 
         // try normal values
         for (let each of [parseEmptyContainer, parseKeywordAtom, parseNumber, parseAtom, parseInlineString, parseReference, parseBlockString]) {
@@ -1894,21 +1920,21 @@ testParse({
         if (key) {
             var {remaining, extraction: colon} = extractFirst({pattern: /:( | *$)/, from: remaining})
             if (colon) {
-                var {remaining, extraction: value, comment} = parseValue(remaining)
+                var {remaining, extraction: value} = parseValue(remaining)
                 if (value) {
                     var extraction = {
                         types: ["#keyedValue"],
                         key,
                         value,
                     }
-                    comment && (extraction.comment = comment)
+                    value.comment && (extraction.comment = value.comment)
                     return {
                         remaining,
                         extraction,
                     }
                 } else {
                     // TODO: improve error message;
-                    throw Error(`found a key ${key}, but couldn't make sense of the value after the :`)
+                    throw Error(`found a key ${key.value}, but couldn't make sense of the value after the :`)
                 }
             }
         }
@@ -1917,8 +1943,6 @@ testParse({
             remaining: remainingXdataString,
             extraction: null,
         }
-
-        // FIXME: either ": " or ":\n" don't allow non-space
     }
 })
 
@@ -1931,37 +1955,255 @@ let parseContainer
 testParse({
     expectedIo: [
         {
-            input: "myKey: 10",
+            input: `
+    testing: does this work?`,
             output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#mapping"
+                    ],
+                    "contains": [
+                        {
+                            "types": [
+                                "#keyedValue"
+                            ],
+                            "key": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "testing"
+                            },
+                            "value": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "does this work?"
+                            }
+                        }
+                    ]
+                }
             },
         },
         {
-            input: "infinite: @infinite",
+            input: `
+    testing: does this work?
+    - how about this?
+    - or this @atom
+    `,
             output: {
+                "remaining": "\n    testing: does this work?\n    - how about this?\n    - or this @atom\n    ",
+                "extraction": null,
+                "was": "testing: does this work?\n- how about this?\n- or this @atom\n",
+                "shouldBe": "testing: does this work?\n1:how about this?\n2:or this @atom\n"
             },
         },
+        {
+            input: `
+    # Im doing tests wbu
+    - how about this?
+    - or this @atom
+    `,
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#listing"
+                    ],
+                    "contains": [
+                        {
+                            "types": [
+                                "#comment"
+                            ],
+                            "content": "# Im doing tests wbu"
+                        },
+                        {
+                            "types": [
+                                "#string"
+                            ],
+                            "format": "unquoted",
+                            "value": "how about this?",
+                            "key": 1
+                        },
+                        {
+                            "types": [
+                                "#string"
+                            ],
+                            "format": "unquoted",
+                            "value": "or this @atom",
+                            "key": 2
+                        }
+                    ]
+                }
+            },
+        },
+        {
+            input: `
+    testing: does this work?
+    # so I was thinking
+    `,
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#mapping"
+                    ],
+                    "contains": [
+                        {
+                            "types": [
+                                "#keyedValue"
+                            ],
+                            "key": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "testing"
+                            },
+                            "value": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "does this work?"
+                            }
+                        },
+                        {
+                            "types": [
+                                "#comment"
+                            ],
+                            "content": "# so I was thinking"
+                        }
+                    ]
+                }
+            },
+        },
+        {
+            input: `
+    # so I was thinking
+        # thses are actually
+
+        # just blank lines
+        # not a container
+    `,
+            output: {
+                "remaining": "\n    # so I was thinking\n        # thses are actually\n\n        # just blank lines\n        # not a container\n    ",
+                "extraction": null
+            },
+        }
     ],
     ifParsedWith: parseContainer = (remainingXdataString) => {
-        // FIXME: parse comments, then parse block
-        // FIXME attempt to parse a direct value inside root
-        let isMapping, isList
-        let list = []
-        let itemCounter = -1
-        for (let each of [parseBlankLine, parseComment, parseListElement, parseMapElement]) {
-            var {remaining, extraction} = each(remaining)
-            if (extraction && each == parseListElement) {
-                isList = true
-                extraction.key = ++itemCounter
-                list.push(extraction)
-            } else if (extraction && each == parseMapElement) {
-                isMapping == true
+        // 
+        // handling leading comment/whitespace
+        // 
+        var remaining = remainingXdataString
+        var {remaining, extraction: comment} = parseComment(remaining)
+        if (!comment) {
+            var {remaining, extraction: junkWhitespace} = parseLeadingWhitespace(remaining)
+            if (!remaining.match("\n")) {
+                // probably not a container
+                // TODO: check for "thing: blah" warn about inline list/mappings
+                return {
+                    remaining: remainingXdataString,
+                    extraction: null,
+                }
             }
         }
+        // 
+        // handle block
+        // 
+        var {remaining, extraction: block} = extractBlock(remaining)
+        // empty key or list value
+        if (!block) {
+            // TODO: look for failed block (not all the way indented or something)
+            let failLine = remainingXdataString.split("\n")[0]
+            return {
+                remaining: remainingXdataString,
+                extraction: null,
+            }
+        }
+        let originalBlock = block // for errors
+        let isMapping, isList
+        let contains = []
+        let itemCounter = 0
+        let foundAtLeastOne = true
+        while (foundAtLeastOne) {
+            foundAtLeastOne = false
+            for (let each of [parseBlankLine, parseComment, parseListElement, parseMapElement]) {
+                var {remaining: block, extraction} = each(block)
+                
+                // for future debugging:
+                // ;(each == parseBlankLine) && console.debug(`parseBlankLine`)
+                // ;(each == parseComment) && console.debug(`parseComment`)
+                // ;(each == parseListElement) && console.debug(`parseListElement`)
+                // ;(each == parseMapElement) && console.debug(`parseMapElement`)
 
-        // FIXME: isMapping && isList , !isMapping && !isList
+                if (extraction && each == parseListElement) {
+                    isList = true
+                    extraction.key = ++itemCounter
+                } else if (extraction && each == parseMapElement) {
+                    isMapping = true
+                }
+                // TODO: check for "almost" errors here and report them
 
+                // save all the extractions
+                if (extraction) {
+                    foundAtLeastOne = true
+                    contains.push(extraction)
+                }
+            }
+        }
+        
+        // don't allow both (TODO: maybe allow in future)
+        // maybe allow both if there are no directly numbered keys (e.g. 1: 'thing')
+        if (isMapping && isList) {
+            // replace list elements with numbered map elements
+            let fixedBlock = originalBlock
+            let fixedCounter = 0
+            fixedBlock = fixedBlock.replace(/- /g, ()=>`${++fixedCounter}:`)
+            return {
+                remaining: remainingXdataString,
+                extraction: null,
+                was: originalBlock,
+                shouldBe: fixedBlock,
+            }
+        // 
+        // prep return value
+        // 
+        } else {
+            extraction = {
+                types: null,
+                contains,
+            }
+            comment && (extraction.comment = comment)
+
+            if (isMapping) {
+                extraction.types = ["#mapping"]
+            } else if (isList) {
+                extraction.types = ["#listing"]
+            // 
+            // just comments & blank lines
+            // 
+            } else {
+                // TODO: optimize this in the future so its not re-parsed
+                return {
+                    remaining: remainingXdataString,
+                    extraction: null
+                }
+            }
+
+            return {
+                remaining,
+                extraction
+            }
+        }
     }
 })
+
+// FIXME: parseRoot
+// TODO: add warn on list element
 
 // # Method (any language)
 // - try parsing version
