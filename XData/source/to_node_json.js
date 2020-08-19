@@ -1,8 +1,6 @@
 // 
 // todo
 // 
-//     change all the tests
-//     convert types to just type and extract out custom types
 //     parse main/root
 //         check version at top
 //         handle final trailing newline
@@ -14,7 +12,6 @@
 //     handle CRLF/LF issues
 //     unparse
 //         make sure format (like ") is viable for the content (like ")
-//     add a simple "shouldn't matched but didn't because __ an improved version would be ___"
 //     create a good error system (create fallback checks like parseBadReference or parseBadLiteralString)
 //     record line numbers for errors
 
@@ -1172,12 +1169,18 @@ let parseRoot = (remainingXdataString)=> {
     let topNodes = []
     let foundAtLeastOneNode = true
     let foundAtLeastOneValue = false
-
+    
+    // check edgecase of a single trailing newline (that would normally be consumed by the last value/comment)
     let handleNewline = ()=>{
         if (topNodes.length > 0) {
             let lastNode = topNodes[topNodes.length-1]
-        } 
-        // FIXME
+            if (lastNode.type != "#blankLines") {
+                if (remainingXdataString.match(/\n$/)) {
+                    return { endsWithSingleNewline: true }
+                }
+            }
+        }
+        return {}
     }
 
     // 
@@ -1202,6 +1205,7 @@ let parseRoot = (remainingXdataString)=> {
     if (remaining.length == 0) {
         return {
             isContainer: false,
+            ...handleNewline(),
             documentNodes: topNodes,
         }
     } else if (foundAtLeastOneValue) {
@@ -1222,6 +1226,7 @@ let parseRoot = (remainingXdataString)=> {
         topNodes = topNodes.concat(extraction)
         return {
             isContainer: true,
+            ...handleNewline(),
             documentNodes: topNodes,
         }
     } else {
@@ -2719,6 +2724,7 @@ testParse({ifParsedWith: parseRoot,
                 "",
             output: {
                 "isContainer": true,
+                "endsWithSingleNewline": true,
                 "documentNodes": [
                     {
                         "type": "#mapping",
@@ -2789,25 +2795,21 @@ testParse({ifParsedWith: parseRoot,
                             }
                         ]
                     }
+                ],
+            },
+        },
+        {
+            input: "5\n",
+            output: {
+                "isContainer": false,
+                "endsWithSingleNewline": true,
+                "documentNodes": [
+                    {
+                        "type": "#number",
+                        "value": "5"
+                    }
                 ]
             },
         },
-
-        // TODO:
-        // {
-        //     input: "5\n",
-        //     output: {
-        //         "documentNodes": [
-        //             {
-        //                 "types": [
-        //                     "#atom",
-        //                     "#number"
-        //                 ],
-        //                 "value": "5"
-        //             }
-        //         ],
-        //         "isContainer": false
-        //     },
-        // },
     ],
 })
