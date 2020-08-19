@@ -178,7 +178,7 @@ testParse({
                     "types": [
                         "#comment"
                     ],
-                    "content": "# it means literally literally ",
+                    "content": "it means literally literally ",
                     "leadingWhitespace": "    "
                 }
             },
@@ -191,7 +191,7 @@ testParse({
                     "types": [
                         "#comment"
                     ],
-                    "content": "# hello",
+                    "content": "hello",
                     "leadingWhitespace": " "
                 }
             },
@@ -204,7 +204,7 @@ testParse({
                     "types": [
                         "#comment"
                     ],
-                    "content": "#"
+                    "content": ""
                 }
             },
         },
@@ -217,7 +217,7 @@ testParse({
             comment = comment.replace(/\n$/, "")
             extraction = {
                 types: ["#comment"],
-                content: comment
+                content: comment.replace(/# ?/, ""),
             }
             leadingWhitespace && (extraction.leadingWhitespace = leadingWhitespace)
             return {
@@ -539,7 +539,7 @@ let parseStrongUnquotedString = (remainingXdataString) => {
 }
 
 // 
-// quoteSizeNeeded
+// quoteNeededFor
 // 
 let literalQuoteNeededToContain = (string) => {
     let singleQuotes = findAll(/"+/, almostUnquotedString)
@@ -1514,7 +1514,7 @@ testParse({
                         "types": [
                             "#comment"
                         ],
-                        "content": "# it means literally literally ",
+                        "content": "it means literally literally ",
                         "leadingWhitespace": "   "
                     }
                 }
@@ -1534,7 +1534,7 @@ testParse({
                         "types": [
                             "#comment"
                         ],
-                        "content": "# it means kinda ",
+                        "content": "it means kinda ",
                         "leadingWhitespace": "   "
                     }
                 }
@@ -1626,6 +1626,58 @@ testParse({
                         }
                     ]
                 },
+            },
+        },
+        {
+            input: "#figuratively:\n    bleh forgot quotes:\n    {#thisDocument}     testing\nunindented: 10",
+            output: {
+                "remaining": "\nunindented: 10",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "#figurative:MultilineBlock",
+                    "contains": [
+                        {
+                            "types": [
+                                "#stringPiece"
+                            ],
+                            "value": "bleh forgot quotes:\n"
+                        },
+                        {
+                            "types": [
+                                "#reference"
+                            ],
+                            "accessList": [
+                                {
+                                    "types": [
+                                        "#system"
+                                    ],
+                                    "value": "#thisDocument"
+                                }
+                            ]
+                        },
+                        {
+                            "types": [
+                                "#stringPiece"
+                            ],
+                            "value": "     testing"
+                        }
+                    ]
+                }
+            },
+        },
+        {
+            input: "#literally: like a billion\n",
+            output: {
+                "remaining": "\n",
+                "extraction": {
+                    "types": [
+                        "#string"
+                    ],
+                    "format": "#literal:InlineBlock",
+                    "value": " like a billion"
+                }
             },
         },
     ],
@@ -2224,7 +2276,7 @@ testParse({
                             "types": [
                                 "#comment"
                             ],
-                            "content": "# Im doing tests wbu"
+                            "content": "Im doing tests wbu"
                         },
                         {
                             "types": [
@@ -2281,7 +2333,7 @@ testParse({
                             "types": [
                                 "#comment"
                             ],
-                            "content": "# so I was thinking"
+                            "content": "so I was thinking"
                         }
                     ]
                 }
