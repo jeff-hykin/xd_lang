@@ -1,7 +1,6 @@
 // 
 // todo
 // 
-//     have all values extract their comment and trailing newline
 //     parse main/root
 //         check version at top
 //         handle final trailing newline
@@ -10,6 +9,7 @@
 //     make trailing newlines in blocks require correct indent
 //     FIXME: unindented newlines after the #literally: block end
 //     auto detect indent
+//     warning about using the wrong quotes for a key 
 //     handle CRLF/LF issues
 //     convert types to just type and extract out custom types
 //     unparse
@@ -360,11 +360,8 @@ testParse({
         },
     ],
     ifParsedWith: parseNumber = (remainingXdataString) => {
-        var {remaining, extraction} = extractFirst({ pattern: /^(-?([0-9]+\.[0-9]+|@?[0-9][0-9]*))(?!\d|\.)/, from: remainingXdataString, })
-        if (extraction) {
-            var rawNumberString = extraction
-            // remove the trailingWhitespace from the number
-            var {remaining: rawNumberString, extraction: trailingWhitespace} = extractFirst({pattern: /\s*$/, from: rawNumberString})
+        var {remaining, extraction: rawNumberString} = extractFirst({ pattern: /^(-?([0-9]+\.[0-9]+|@?[0-9][0-9]*))(?!\d|\.)/, from: remainingXdataString, })
+        if (rawNumberString) {
             // check atomic format
             var {remaining: rawNumberString, extraction: isAtomicFormat} = extractFirst({pattern: /@/, from: rawNumberString})
             
@@ -475,6 +472,7 @@ let parseStrongUnquotedString = (remainingXdataString) => {
     var {remaining, extraction: unquotedString} = extractFirst({pattern: /^[a-zA-Z]([^:\n]*[^\s:])?(\n|$)/, from: remainingXdataString})
     
     if (unquotedString) {
+        // remove trailing newline before saving
         unquotedString = unquotedString.replace(/\n$/,"")
         return {
             remaining,
@@ -2251,11 +2249,16 @@ testParse({
                     extraction.trailingWhitespace = trailingWhitespace
                 }
                 // TODO: fail on non-comment non-newline non-end-document after a value
-                var {remaining, extraction: discard} = extractFirst({pattern: /^(\n|$)/, from: remaining})
+                var {remaining, extraction: endOfLine} = extractFirst({pattern: /^(\n|$)/, from: remaining})
                 // if there is something after the whitespace, on the same line, thats an issue
-                if (discard === null) {
+                if (endOfLine === null) {
                     // TODO: fix this error message
-                    throw Error(`When trying to parse the value on ${remainingXdataString.split("\n")[0]}\nI found this value:\n${JSON.stringify(extraction)}\nbut the line after it should be empty and instead I got:\n${JSON.stringify(remaining.split("\n")[0])}\n`)
+                    return {
+                        remaining: remainingXdataString,
+                        extraction: null,
+                        was: extraction,
+                        errorMessage: `When trying to parse the value on ${remainingXdataString.split("\n")[0]}\nI found this value:\n${JSON.stringify(extraction)}\nbut the line after it should be empty and instead I got:\n${JSON.stringify(remaining.split("\n")[0])}\n`
+                    }
                 }
                 
                 return {
@@ -2423,6 +2426,64 @@ testParse({
             },
         },
         {
+            input: "\"Hello World\": whats up",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#keyedValue"
+                    ],
+                    "key": {
+                        "types": [
+                            "#string"
+                        ],
+                        "format": "\"",
+                        "value": "Hello World"
+                    },
+                    "value": {
+                        "types": [
+                            "#string"
+                        ],
+                        "format": "unquoted",
+                        "value": "whats up"
+                    }
+                }
+            },
+        },
+        {
+            input: "\"list of \":\n    - 1",
+            output: {
+                "remaining": "",
+                "extraction": {
+                    "types": [
+                        "#keyedValue"
+                    ],
+                    "key": {
+                        "types": [
+                            "#string"
+                        ],
+                        "format": "\"",
+                        "value": "list of "
+                    },
+                    "value": {
+                        "types": [
+                            "#listing"
+                        ],
+                        "contains": [
+                            {
+                                "types": [
+                                    "#atom",
+                                    "#number"
+                                ],
+                                "value": "1",
+                                "key": 1
+                            }
+                        ]
+                    }
+                }
+            },
+        },
+        {
             input: "@Hello  : @world",
             output: {
                 "remaining": "",
@@ -2463,8 +2524,12 @@ testParse({
         }
 
         if (key) {
-            var {remaining, extraction: colon} = extractFirst({pattern: /:( | *$)/, from: remaining})
+            console.debug(`key is:`,key)
+            console.debug(`remaining is:`,remaining)
+            var {remaining, extraction: colon} = extractFirst({pattern: /:( | *(?=\n))/, from: remaining})
+            console.debug(`remaining is:`,remaining)
             if (colon) {
+                console.debug(`remaining is:`,remaining)
                 var {remaining, extraction: value} = parseValue(remaining)
                 if (value) {
                     var extraction = {
@@ -2637,7 +2702,39 @@ testParse({
                 "remaining": "\n    # so I was thinking\n        # thses are actually\n\n        # just blank lines\n        # not a container\n    ",
                 "extraction": null
             },
-        }
+        },
+        {
+            input: "\n    hello: world",
+            output: {
+                "remaining": "\n",
+                "extraction": {
+                    "types": [
+                        "#mapping"
+                    ],
+                    "contains": [
+                        {
+                            "types": [
+                                "#keyedValue"
+                            ],
+                            "key": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "hello"
+                            },
+                            "value": {
+                                "types": [
+                                    "#string"
+                                ],
+                                "format": "unquoted",
+                                "value": "world"
+                            }
+                        }
+                    ]
+                }
+            },
+        },
     ],
     ifParsedWith: parseContainer = (remainingXdataString) => {
         // 
@@ -2768,26 +2865,272 @@ testParse({
 let parseRoot = (remainingXdataString)=> {
     var remaining = remainingXdataString
     let topNodes = []
-    let foundAtLeastOne = true
+    let foundAtLeastOneNode = true
+    let foundAtLeastOneValue = false
+
+    let handleNewline = ()=>{
+        if (topNodes.length > 0) {
+            let lastNode = topNodes[topNodes.length-1]
+        } 
+        // FIXME
+    }
+
+    // 
     // first try a value
-    while (foundAtLeastOne) {
-        foundAtLeastOne = false
+    // 
+    while (foundAtLeastOneNode) {
+        foundAtLeastOneNode = false
         for (let each of [parseBlankLine, parseComment, parseValue]) {
-            var {remaining: block, extraction} = each(block)
+            var {remaining, extraction} = each(remaining)
             // save all the extractions
             if (extraction) {
-                foundAtLeastOne = true
+                foundAtLeastOneNode = true
                 topNodes.push(extraction)
+                if (each == parseValue) {
+                    foundAtLeastOneValue = true
+                }
             }
         }
     }
-    // check for trailing 
+    
+    // check for document end
+    if (remaining.length == 0) {
+        return {
+            isContainer: false,
+            documentNodes: topNodes,
+        }
+    } else if (foundAtLeastOneValue) {
+        // FIXME, handle error of value and map-element / list-element existing
+        console.error(`remaining is:`,remaining)
+        console.error(`error (probably) value and map-element / list-element existing same time`)
+        return null
+    }
 
-    var {remaining, extraction} = parseValue(remainingXdataString)
-    remainingXdataString
-    // parse value or unindented container
+    // 
+    // try parsing it as a container
+    // 
+    // TODO: make this cleaner (don't indent it and add the newline)
+    let inputBlock = "\n"+indent(remaining)
+    console.debug(`inputBlock is:`,inputBlock)
+    var {remaining, extraction} = parseContainer(inputBlock)
+    if (extraction) {
+        // append
+        topNodes = topNodes.concat(extraction)
+        return {
+            isContainer: true,
+            documentNodes: topNodes,
+        }
+    } else {
+        // error: container failed and value failed and comments/blankLine failed
+        console.error(`something in the syntax isn't right, thats all I know:`,remaining)
+        // FIXME
+        return null
+    }
+    
+    // TODO: check for trailing newline
+    // TODO: get the version
 }
-// FIXME: parseRoot
+testParse({
+    expectedIo: [
+        {
+            input: "5",
+            output: {
+                "isContainer": false,
+                "documentNodes": [
+                    {
+                        "types": [
+                            "#atom",
+                            "#number"
+                        ],
+                        "value": "5"
+                    }
+                ],
+            },
+        },
+        {
+            input: "-5000",
+            output: {
+                "isContainer": false,
+                "documentNodes": [
+                    {
+                        "types": [
+                            "#atom",
+                            "#number"
+                        ],
+                        "value": "-5000"
+                    }
+                ],
+            },
+        },
+        {
+            input: "hello: world",
+            output: {
+                "isContainer": true,
+                "documentNodes": [
+                    {
+                        "types": [
+                            "#mapping"
+                        ],
+                        "contains": [
+                            {
+                                "types": [
+                                    "#keyedValue"
+                                ],
+                                "key": {
+                                    "types": [
+                                        "#string"
+                                    ],
+                                    "format": "unquoted",
+                                    "value": "hello"
+                                },
+                                "value": {
+                                    "types": [
+                                        "#string"
+                                    ],
+                                    "format": "unquoted",
+                                    "value": "world"
+                                }
+                            }
+                        ]
+                    }
+                ],
+            },
+        },
+        {
+            input:
+                `"list of lists":\n`+
+                `    - \n`+
+                `        - 1.1\n`+
+                `        - 1.2\n`+
+                `        - 1.3\n`+
+                `    -\n`+
+                `        - 2.1\n`+
+                `        - 2.2\n`+
+                `        - 2.3\n`+
+                `        - 2.4\n`+
+                "",
+            output: {
+                "isContainer": true,
+                "documentNodes": [
+                    {
+                        "types": [
+                            "#mapping"
+                        ],
+                        "contains": [
+                            {
+                                "types": [
+                                    "#keyedValue"
+                                ],
+                                "key": {
+                                    "types": [
+                                        "#string"
+                                    ],
+                                    "format": "\"",
+                                    "value": "list of lists"
+                                },
+                                "value": {
+                                    "types": [
+                                        "#listing"
+                                    ],
+                                    "contains": [
+                                        {
+                                            "types": [
+                                                "#listing"
+                                            ],
+                                            "contains": [
+                                                {
+                                                    "types": [
+                                                        "#atom",
+                                                        "#number"
+                                                    ],
+                                                    "value": "1.1",
+                                                    "key": 1
+                                                },
+                                                {
+                                                    "types": [
+                                                        "#atom",
+                                                        "#number"
+                                                    ],
+                                                    "value": "1.2",
+                                                    "key": 2
+                                                },
+                                                {
+                                                    "types": [
+                                                        "#atom",
+                                                        "#number"
+                                                    ],
+                                                    "value": "1.3",
+                                                    "key": 3
+                                                }
+                                            ],
+                                            "key": 1
+                                        },
+                                        {
+                                            "types": [
+                                                "#blankLines"
+                                            ],
+                                            "content": ""
+                                        },
+                                        {
+                                            "types": [
+                                                "#listing"
+                                            ],
+                                            "contains": [
+                                                {
+                                                    "types": [
+                                                        "#atom",
+                                                        "#number"
+                                                    ],
+                                                    "value": "2.1",
+                                                    "key": 1
+                                                },
+                                                {
+                                                    "types": [
+                                                        "#atom",
+                                                        "#number"
+                                                    ],
+                                                    "value": "2.2",
+                                                    "key": 2
+                                                },
+                                                {
+                                                    "types": [
+                                                        "#atom",
+                                                        "#number"
+                                                    ],
+                                                    "value": "2.3",
+                                                    "key": 3
+                                                }
+                                            ],
+                                            "key": 2
+                                        }
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+        },
+
+        // TODO:
+        // {
+        //     input: "5\n",
+        //     output: {
+        //         "documentNodes": [
+        //             {
+        //                 "types": [
+        //                     "#atom",
+        //                     "#number"
+        //                 ],
+        //                 "value": "5"
+        //             }
+        //         ],
+        //         "isContainer": false
+        //     },
+        // },
+    ],
+    ifParsedWith: parseRoot,
+})
 
 // # Method (any language)
 // - try parsing version
