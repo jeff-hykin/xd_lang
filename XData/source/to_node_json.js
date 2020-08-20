@@ -1,6 +1,10 @@
 // 
 // todo
 // 
+//     allow figurative strings as keys
+//          allow nested accessLists
+//     handle accessing thinginsignisngn
+//     remove requirement for matching quote
 //     fix the custom #create bug
 //     fix messed up blank line
 //     add the custom literal
@@ -12,7 +16,17 @@
 //     create a good error system (create fallback checks like parseBadReference or parseBadLiteralString)
 //     record line numbers for errors
 
-// 
+// types are
+    // #blankLines
+    // #comment
+    // #number
+    // #namedAtom
+    // #string
+    // #stringPiece
+    // #reference
+    // #system
+    // #mapping
+    // #listing
 const systemKeys = [ "#key:","#value", "#thisDocument", "#thisFile", "#input", "#create" ] // TODO: improve the #create, its only hear because of checks inside comment, but causes extra matching inside #reference
 const indentUnit = "    "
 // 
@@ -230,7 +244,7 @@ let parseEmptyContainer = (remainingData1String) => {
             remaining,
             extraction: {
                 type: "#listing",
-                value: extraction,
+                contains: [],
             }
         }
     }
@@ -255,6 +269,7 @@ let parseKeywordAtom = (remainingData1String) => {
             remaining,
             extraction: {
                 type: "#namedAtom",
+                format: "keyword",
                 value: extraction,
             }
         }
@@ -347,7 +362,7 @@ let parseWeakUnquotedString = (remainingData1String) => {
             remaining,
             extraction: {
                 type: "#string",
-                format: "unquoted",
+                format: "unquotedWeak",
                 value: extraction,
             }
         }
@@ -393,7 +408,7 @@ let parseStrongUnquotedString = (remainingData1String) => {
             remaining,
             extraction: {
                 type: "#string",
-                format: "unquoted",
+                format: "unquotedStrong",
                 value: unquotedString,
             }
         }
@@ -815,7 +830,7 @@ let parseBlockString = (remainingData1String) => {
                     remaining,
                     extraction: {
                         type: "#string",
-                        format: "#literal:InlineBlock",
+                        format: "literal:InlineBlock",
                         value: extraction.replace(/^#textLiteral:/, ''),
                     },
                 }
@@ -828,7 +843,7 @@ let parseBlockString = (remainingData1String) => {
                 extraction = extraction.replace(/^#textFigurative:/, '')
                 return {
                     remaining,
-                    extraction: extractInterpolations(extraction,"#figurative:InlineBlock"),
+                    extraction: extractInterpolations(extraction,"figurative:InlineBlock"),
                 }
             }
         } else {
@@ -874,7 +889,7 @@ let parseBlockString = (remainingData1String) => {
             // literal MultilineBlock
             // 
             if (extraction == "#textLiteral:" || isLiteralQuote) {
-                let format = "#literal:MultilineBlock"
+                let format = "literal:MultilineBlock"
                 var {remaining, extraction} = extractBlock(remaining)
                 if (isLiteralQuote) {
                     let endingQuoteIsMissing = checkMissingEndingQuote()
@@ -901,7 +916,7 @@ let parseBlockString = (remainingData1String) => {
             // figurative MultilineBlock
             // 
             } else if (extraction == "#textFigurative:" || isFigurativeQuote) {
-                let format = "#figurative:MultilineBlock"
+                let format = "figurative:MultilineBlock"
                 var {remaining, extraction} = extractBlock(remaining)
                 let endingQuoteIsMissing = checkMissingEndingQuote()
                 if (endingQuoteIsMissing) {
@@ -1068,15 +1083,10 @@ let parseMapElement = (remainingData1String) => {
             if (colon) {
                 var {remaining, extraction: value} = parseValue(remaining)
                 if (value) {
-                    var extraction = {
-                        type: "#keyedValue",
-                        key,
-                        value,
-                    }
-                    value.comment && (extraction.comment = value.comment)
+                    value.key = key
                     return {
                         remaining,
-                        extraction,
+                        extraction: value,
                     }
                 } else {
                     // TODO: improve error message;
@@ -1842,7 +1852,7 @@ let parseRoot = (remainingData1String)=> {
 //                 "remaining": "",
 //                 "extraction": {
 //                     "type": "#string",
-//                     "format": "#literal:InlineBlock",
+//                     "format": "literal:InlineBlock",
 //                     "value": " like a billion"
 //                 }
 //             },
@@ -1853,7 +1863,7 @@ let parseRoot = (remainingData1String)=> {
 //                 "remaining": "",
 //                 "extraction": {
 //                     "type": "#string",
-//                     "format": "#figurative:InlineBlock",
+//                     "format": "figurative:InlineBlock",
 //                     "value": " like a billion"
 //                 }
 //             },
@@ -1864,7 +1874,7 @@ let parseRoot = (remainingData1String)=> {
 //                 "remaining": "\n",
 //                 "extraction": {
 //                     "type": "#string",
-//                     "format": "#figurative:MultilineBlock",
+//                     "format": "figurative:MultilineBlock",
 //                     "value": "like a billion"
 //                 }
 //             },
@@ -1874,7 +1884,7 @@ let parseRoot = (remainingData1String)=> {
 //             output: {
 //                 "remaining": "\n",
 //                 "extraction": {
-//                     "format": "#literal:MultilineBlock",
+//                     "format": "literal:MultilineBlock",
 //                     "value": "like a billion\nlike a billion and a half"
 //                 }
 //             },
@@ -1884,7 +1894,7 @@ let parseRoot = (remainingData1String)=> {
 //             output: {
 //                 "remaining": "\n",
 //                 "extraction": {
-//                     "format": "#literal:MultilineBlock",
+//                     "format": "literal:MultilineBlock",
 //                     "value": "like a billion\nlike a billion and a half",
 //                 },
 //             },
@@ -1894,7 +1904,7 @@ let parseRoot = (remainingData1String)=> {
 //             output: {
 //                 "remaining": "\n",
 //                 "extraction": {
-//                     "format": "#literal:MultilineBlock",
+//                     "format": "literal:MultilineBlock",
 //                     "value": "like a billion\nlike a billion and a half",
 //                     "comment": {
 //                         "type": "#comment",
@@ -1910,7 +1920,7 @@ let parseRoot = (remainingData1String)=> {
 //                 "remaining": "\n",
 //                 "extraction": {
 //                     "type": "#string",
-//                     "format": "#figurative:MultilineBlock",
+//                     "format": "figurative:MultilineBlock",
 //                     "value": "like a billion\nlike a billion and a half",
 //                     "comment": {
 //                         "type": "#comment",
@@ -2001,7 +2011,7 @@ let parseRoot = (remainingData1String)=> {
 //                 "remaining": "\n\nunindented: 10",
 //                 "extraction": {
 //                     "type": "#string",
-//                     "format": "#figurative:MultilineBlock",
+//                     "format": "figurative:MultilineBlock",
 //                     "contains": [
 //                         {
 //                             "type": "#stringPiece",
@@ -2030,7 +2040,7 @@ let parseRoot = (remainingData1String)=> {
 //                 "remaining": "\n",
 //                 "extraction": {
 //                     "type": "#string",
-//                     "format": "#literal:InlineBlock",
+//                     "format": "literal:InlineBlock",
 //                     "value": " like a billion"
 //                 }
 //             },
@@ -2137,7 +2147,7 @@ let parseRoot = (remainingData1String)=> {
 //                 "remaining": "",
 //                 "extraction": {
 //                     "type": "#string",
-//                     "format": "#literal:InlineBlock",
+//                     "format": "literal:InlineBlock",
 //                     "value": " 1/1/1010",
 //                     "customTypes": ["date"],
 //                 }
@@ -2405,7 +2415,7 @@ let parseRoot = (remainingData1String)=> {
 //                 "remaining": "",
 //                 "extraction": {
 //                     "type": "#string",
-//                     "format": "#literal:InlineBlock",
+//                     "format": "literal:InlineBlock",
 //                     "value": "100"
 //                 }
 //             },
@@ -2416,7 +2426,7 @@ let parseRoot = (remainingData1String)=> {
 //                 "remaining": "",
 //                 "extraction": {
 //                     "type": "#string",
-//                     "format": "#figurative:MultilineBlock",
+//                     "format": "figurative:MultilineBlock",
 //                     "value": "200"
 //                 }
 //             },
@@ -2473,7 +2483,7 @@ let parseRoot = (remainingData1String)=> {
 //                         "value": "1"
 //                     },
 //                     "value": {
-//                         "format": "#literal:MultilineBlock",
+//                         "format": "literal:MultilineBlock",
 //                         "value": " hi"
 //                     }
 //                 }
