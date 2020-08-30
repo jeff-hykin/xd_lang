@@ -64,126 +64,172 @@ let stringifyKey = (selfNode) => {
 }
 
 let convertStringValue = (stringNode) => {
-    let isValueString = typeof parsedObject.value == 'string'
+    // main string format logic:
+    // Step 1: remove undefined
+    // Step 2: empty strings need quotes (and thats it, skip other logic)
+    // Step 3: is upquotedStrong/unquotedWeak invalid?
+    // Step 4: needs to be figurative or not?
+    // Step 5: Does it need to be mutliline/quoted?
+    // Step 6: If quoted (and quotes are valid), how many quotes are needed?
+
+    const isKey = stringNode.isKey
+    let format = stringNode.format
+    
+    // 
+    // interpolated or not?
+    // 
+    let hasInterpolation = typeof stringNode.value != 'string'
     let valueIsh 
-    if (isValueString) {
+    if (!hasInterpolation) {
         valueIsh = stringNode.value
-    } else if (parsedObject.contains.length == 0) {
-        parsedObject.value = ""
+    } else if (stringNode.contains.length == 0) {
+        stringNode.value = ""
         valueIsh = ""
-        isValueString = true
+        hasInterpolation = false
     } else {
         // combine all the string #stringPiece's as a stand-in value
-        valueIsh = parsedObject.contains.filter(each=>(each.type == "#stringPiece")).join(" ")
+        valueIsh = stringNode.contains.filter(each=>(each.type == "#stringPiece")).join(" ")
     }
-    if (parsedObject.isKey) {
-        // if it has a newline it needs a figurative quote
-        if (valueIsh.match(/\n/g)) {
-            parsedObject.format = "'"
+    
+    // 
+    // Step 1: remove undefined format
+    //
+    if (!(typeof format != 'string' && format.length == 0)) {
+        if (isKey) {
+            format = "unquotedWeak"
         } else {
-            // if undefined, then minor-upgrade to unquotedWeak
-            if (parsedObject.format == undefined) {
-                parsedObject.format = "unquotedWeak"
-            }
-            
-            // empty string needs quotes, use "" unless figurative was specified
-            if (valueIsh.length = 0) {
-                if (parsedObject.format[0] == "'" || parsedObject.format.startsWith("figurative")) {
-                    return "''"
-                } else {
-                    return '""'
-                }
-            }
-            
-            // if unquotedWeak, then minor-upgrade to a literal
-            if (parsedObject.format == "unquotedWeak" && !valueIsh.match(/^([a-zA-Z][a-zA-Z_0-9]*)$/)) {
-                parsedObject.format = '"'
-            }
+            format = "unquotedStrong"
         }
-        
-        // convert names to quote preferences
-        if (parsedObject.format.startsWith("figurative")) {
-            parsedObject.format = "'"
-        } else if (parsedObject.format.startsWith("literal")) {
-            parsedObject.format = '"'
-        }
-
-        // 
-        // formats are now locked-in to being either unquoted, single, or double quoted
-        //
+    }
 
     // 
-    // if not a key
-    // 
-    } else {
-        // prefer to be as close to the given format as possible
-        // only "upgrade" the format, never auto-downgrade
-        
-        
-        // 
-        // can be literal
-        // 
-        if (isValueString) {
-            // need to be upgraded
-            if (parsedObject.format == undefined || parsedObject.format == "unquotedWeak") {
-                parsedObject.format = "unquotedStrong"
-            }
-            
-            // need to be upgraded
-            if (parsedObject.format == "unquotedStrong" && !parsedObject.value.match(/^[a-zA-Z]([^:\n]*[^\s:])?$/)) {
-                parsedObject.format = "literal:InlineBlock"
-            }
-        // 
-        // needs figurative
-        // 
+    // Step 2: empty strings need quotes
+    //
+    if (valueIsh.length == 0) {
+        // if figurative, then use figurative quotes
+        if (format[0] == "'" || format.startsWith("figurative")) {
+            // FIXME: allow for empty multi-quotes
+            // (right now this just converts them)
+            return "''"
+        // otherwise literal quotes are needed
         } else {
-            // upgrade to smallest figurative
-            if (parsedObject.format == undefined || parsedObject.format == "unquotedWeak" || parsedObject.format == "literal:InlineBlock") {
-                parsedObject.format = "figurative:InlineBlock"
+            return '""'
+        }
+    }
+
+    // 
+    // Step 3: upgrade away from unquotedWeak/unquotedStrong if needed
+    // 
+    if (format == "unquotedWeak" || format == "unquotedStrong") {
+        // key side
+        if (!isKey) {
+            const validWeakUnquotedPattern = /^([a-zA-Z][a-zA-Z_0-9]*)$/
+            if (valueIsh.match(validWeakUnquotedPattern)) {
+                format = "unquotedWeak"
+            // then minor-upgrade to a literal quote if it can't be unquotedWeak
+            } else {
+                format = '"'
+            }
+        // value side
+        } else {
+            const validStrongUnquotedPattern = /^[a-zA-Z]([^:\n]*[^\s:])?$/
+            if (stringNode.value.match(validStrongUnquotedPattern)) {
+                format = "unquotedStrong"
+            // the minor upgrade to literal block
+            } else {
+                format = "literal:InlineBlock"
+            }
+        }
+    }
+
+    // 
+    // Step 4: figurative or not
+    // 
+    let containsNewline = valueIsh.match(/\n/g)
+    let needsToBeFigurative = hasInterpolation || (isKey && containsNewline)
+    if (needsToBeFigurative) {
+        // keys only have one flavor of figurative (quoted)
+        // note the number of quotes is calculated later
+        if (isKey) {
+            format = "'"
+        } else {
+            // then format needs to be upgraded to smallest figurative
+            if (format == "unquotedStrong" || format == "literal:InlineBlock") {
+                format = "figurative:InlineBlock"
             }
             
             // switch from literal quotes to figurative
-            if (parsedObject.format[0] == '"') {
-                parsedObject.format = parsedObject.format.replace(/"/g, "'")
+            if (format[0] == '"') {
+                format = format.replace(/"/g, "'")
             }
             
             // switch from literal MultilineBlock to figurative MultilineBlock
-            if (parsedObject.format == 'literal:MultilineBlock') {
-                parsedObject.format = "figurative:MultilineBlock"
-            }
-        }
-        
-        let containsNewline = !valueIsh.match(/^[^\n]*$/)
-        if (containsNewline) {
-            // FIXME: need to upgrade inline literal quotes
-
-            // need upgrade inline blocks to MultilineBlock
-            if (parsedObject.format.match(/:InlineBlock/g) && !valueIsh.match(/^[^\n]*$/)) {
-                parsedObject.format = parsedObject.format.replace(/InlineBlock/g, "MultilineBlock")
+            if (format == 'literal:MultilineBlock') {
+                format = "figurative:MultilineBlock"
             }
         }
     }
+
+    // 
+    // Step 5: mutliline/quoted or not
+    // 
+    if (isKey) {
+        // all blocks must be converted to quotes if its a key
+        if (format.startsWith("figurative")) {
+            format = "'"
+        } else if (format.startsWith("literal")) {
+            format = '"'
+        }
+    // if value-side
+    } else if (containsNewline) {
+        // upgrade literal types to Multiline
+        if (
+            format == "unquotedStrong" ||
+            format == "literal:InlineBlock" ||
+            format[0] == '"'
+        ) {
+            stringNode = "literal:MultilineBlock"
+        // upgrade figurative blocks
+        // NOTE: why not upgrade the figurative quotes too?
+        //       TLDR: The auto upgrade would be good for 90% of the time
+        //             but would make it impossible to reach the other 10% when needed
+        //       newlines can be escaped, so upgrading that to a block would be nice
+        //       but it wouldn't allow for any way to specify that a quoted string
+        //       should be prefered as not-multiline output
+        } else if (format == "figurative:InlineBlock") {
+            format = "figurative:MultilineBlock"
+        }
+    }
+
+    // 
+    // Step 6: number of quotes
+    // 
 
     // at this point the format will either be viable
     // OR it will be a quote of some kind that simply needs to be upgraded
 
-    // calculate number of quotes needed
-    if (parsedObject.format[0] == '"') {
+    // literal
+    let quote = format[0]
+    if (quote == '"' || quote == "'") {
         // only upgrade if needed
-        let minQuoteSize = minimumViableQuoteSize(parsedObject.value, '"')
-        if (minQuoteSize > parsedObject.format.length) {
-            parsedObject.format = ('"').repeat(minQuoteSize)
+        let minQuoteSize = minimumViableQuoteSize(valueIsh, quote)
+        if (minQuoteSize > format.length) {
+            quote = (quote).repeat(minQuoteSize)
         }
-    } else {
-        let stringContentsToCheck = parsedObject.value
-        if (!isValueString) {
-            stringContentsToCheck = parsedObject.contains.filter(each=>(each.type == "#stringPiece")).join(" ")
-        }
-        let minQuoteSize = minimumViableQuoteSize(kindaConcatStringPieces, "'")
-        if (minQuoteSize > parsedObject.format.length) {
-            parsedObject.format = ("'").repeat(minQuoteSize)
-        }
+        // remove all quotes
+        format = format.replace(RegExp(quote, "g"), "")
+        // add correct amount to front (covers both block quotes and inline quotes)
+        format = quote + format
     }
+
+    // 
+    // String generation
+    // 
+        // At this point the format should be 100% viable
+        // now it is just a matter of creating the output
+        // FIXME: how to decide if escaped characters should be escaped or not
+
+    stringNode.format = format
 }
 
 let stringFormatAllowsForContents = ({format, contents}) => {
