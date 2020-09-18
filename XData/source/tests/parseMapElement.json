@@ -1,0 +1,147 @@
+{
+    "from": "../to_node_json.js",
+    "import": [
+        "components",
+        "parseMapElement"
+    ],
+    "expectedIo": [
+        {
+            "inputs": [
+                "myKey: 10"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#keyedValue",
+                    "key": {
+                        "type": "#string",
+                        "format": "unquotedStrong",
+                        "value": "myKey"
+                    },
+                    "value": {
+                        "type": "#number",
+                        "value": "10"
+                    }
+                }
+            }
+        },
+        {
+            "inputs": [
+                "infinite: @infinite"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#keyedValue",
+                    "key": {
+                        "type": "#string",
+                        "format": "unquotedStrong",
+                        "value": "infinite"
+                    },
+                    "value": {
+                        "type": "#namedAtom",
+                        "format": "@",
+                        "value": "infinite"
+                    }
+                }
+            }
+        },
+        {
+            "inputs": [
+                "1: #textLiteral:\n     hi"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#keyedValue",
+                    "key": {
+                        "type": "#number",
+                        "value": "1"
+                    },
+                    "value": {
+                        "format": "literal:MultilineBlock",
+                        "value": " hi"
+                    }
+                }
+            }
+        },
+        {
+            "inputs": [
+                "Hello World: whats up"
+            ],
+            "output": {
+                "remaining": "Hello World: whats up",
+                "extraction": null
+            }
+        },
+        {
+            "inputs": [
+                "\"Hello World\": whats up"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#keyedValue",
+                    "key": {
+                        "type": "#string",
+                        "format": "\"",
+                        "value": "Hello World"
+                    },
+                    "value": {
+                        "type": "#string",
+                        "format": "unquotedStrong",
+                        "value": "whats up"
+                    }
+                }
+            }
+        },
+        {
+            "inputs": [
+                "\"list of \":\n    - 1"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#keyedValue",
+                    "key": {
+                        "type": "#string",
+                        "format": "\"",
+                        "value": "list of "
+                    },
+                    "value": {
+                        "type": "#listing",
+                        "contains": [
+                            {
+                                "type": "#number",
+                                "value": "1",
+                                "key": 1
+                            }
+                        ]
+                    }
+                }
+            }
+        },
+        {
+            "inputs": [
+                "@Hello  : @world"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#keyedValue",
+                    "key": {
+                        "type": "#namedAtom",
+                        "format": "@",
+                        "value": "Hello",
+                        "leadingWhitespace": "  "
+                    },
+                    "value": {
+                        "type": "#namedAtom",
+                        "format": "@",
+                        "value": "world"
+                    }
+                }
+            }
+        }
+    ]
+}
