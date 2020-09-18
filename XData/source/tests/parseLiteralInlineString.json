@@ -1,0 +1,87 @@
+{
+    "from": "../to_node_json.js",
+    "import": [
+        "components",
+        "parseLiteralInlineString"
+    ],
+    "expectedIo": [
+        {
+            "inputs": [
+                "\"string\""
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "\"",
+                    "value": "string"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "\"\""
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "\"",
+                    "value": ""
+                }
+            }
+        },
+        {
+            "inputs": [
+                "\"\"\"string\"\"\""
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "\"\"\"",
+                    "value": "string"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "\"\"\"\"string\"\"\"\""
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "\"\"\"",
+                    "value": "\"string\""
+                }
+            }
+        },
+        {
+            "inputs": [
+                "\"\"\"\"\"string\"\"\"\"\""
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "\"\"\"",
+                    "value": "\"\"string\"\""
+                }
+            }
+        },
+        {
+            "inputs": [
+                "\"\"\"\"\"\""
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "\"\"\"",
+                    "value": ""
+                }
+            }
+        }
+    ]
+}
