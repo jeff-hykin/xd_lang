@@ -9,13 +9,18 @@ let regenerateTestTemplate = (filepath) => {
     let resultingTool = get({keyList: testObject.import, from: requiredFile})
 
     for (let each of testObject.expectedIo) {
-        each.output = resultingTool(...each.inputs)
+        try {
+            each.output = resultingTool(...each.inputs)
+        } catch (error) {
+            each.output = error
+        }
     }
     
     // overwrite the test file
     fs.writeFileSync(filepath, JSON.stringify(testObject, 0, 4))
-
-    console.debug(`resultingTool is:`,resultingTool)
 }
 
-regenerateTestTemplate(path.join(__dirname, "./tests/minimumViableQuoteSize.json"))
+
+for (let each of fs.readdirSync(path.join(__dirname,"./tests"))) {
+    regenerateTestTemplate(path.join(__dirname, `./tests/${each}`))
+}

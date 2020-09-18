@@ -1,35 +1,6 @@
-// // basically all can have leadingWhitespace / trailingWhitespace
-// // any key can have a comment that goes after the key (same line as key)
-// // any value in a list element can have a comment
-let findAll = (regexPattern, sourceString) => {
-    let output = []
-    let match
-    // make sure the pattern has the global flag
-    let regexPatternWithGlobal = RegExp(regexPattern,[...new Set("g"+regexPattern.flags)].join(""))
-    while (match = regexPatternWithGlobal.exec(sourceString)) {
-        // get rid of the string copy
-        delete match.input
-        // store the match data
-        output.push(match)
-    } 
-    return output
-}
+let { minimumViableQuoteSize, indent, findAll } = require("./tools")
+
 const defaultIndent = "    "
-let indent = (string, indentUnit) => {
-    return string.toString().replace(/(^|\n)/g, `$1${indentUnit}`)
-}
-let minimumViableQuoteSize = (stringContent, quote) => {
-    let quotes = findAll(RegExp(`${quote}+`), stringContent)
-    let maxQuoteSize = Math.max(...quotes.map(each=>each[0].length))
-    let minViableQuoteSize = 1
-    if (maxQuoteSize > 0) {
-        let logBase = 3
-        let logOfSizeBaseThree = Math.log(maxQuoteSize+1) / Math.log(logBase)
-        let closestLargerPowerOfThree = Math.ceil(logOfSizeBaseThree)
-        minViableQuoteSize = 3**closestLargerPowerOfThree
-    }
-    return minViableQuoteSize
-}
 let stringifyKey = (selfNode) => {
     if (selfNode.key == undefined) {
         return ""

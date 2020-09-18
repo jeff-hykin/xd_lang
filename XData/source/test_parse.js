@@ -1,5 +1,5 @@
-let { testParse } = require("../tools")
-let { components } = require("../to_node_json")
+let { testParse } = require("./tools")
+let { components } = require("./to_node_json")
 let {
     parseComment,
     parseNumber,

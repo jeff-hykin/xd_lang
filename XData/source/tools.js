@@ -64,6 +64,9 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
 }
 
 let minimumViableQuoteSize = (stringContent, quote) => {
+    if (stringContent == null || quote == null) {
+        return null
+    }
     let quotes = findAll(RegExp(`${quote}+`), stringContent)
     let maxQuoteSize = Math.max(...quotes.map(each=>each[0].length))
     let minViableQuoteSize = 1
