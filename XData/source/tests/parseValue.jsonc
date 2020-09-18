@@ -166,14 +166,15 @@
             }
         },
         {
-            "inputs":
-                `\n`+
-                `    test: @this\n`+
-                `    test: @2\n`+
-                `    test: \n`+
-                `        nested: 1\n`+
-                `        nested2: 2\n`+
-                "",
+            "inputs": [
+                //\n
+                //    test: @this\n
+                //    test: @2\n
+                //    test: \n
+                //        nested: 1\n
+                //        nested2: 2\n
+                "\n    test: @this\n    test: @2\n    test: \n        nested: 1\n        nested2: 2\n"
+            ],
             "output": {
                 "remaining": "",
                 "extraction": {
@@ -247,17 +248,18 @@
             }
         },
         {
-            "inputs":
-                `\n`+
-                `    test: @this\n`+
-                `    test: @2\n`+
-                `    test: \n`+
-                `        nested: 1\n`+
-                `   \n`+
-                `        \n`+
-                `   \n`+
-                `        nested2: 2\n`+
-                "",
+            "inputs": [
+                //\n
+                //    test: @this\n
+                //    test: @2\n
+                //    test: \n
+                //        nested: 1\n
+                //   \n
+                //        \n
+                //   \n
+                //        nested2: 2\n
+                "\n    test: @this\n    test: @2\n    test: \n        nested: 1\n   \n        \n   \n        nested2: 2\n",
+            ],
             "output": {
                 "remaining": "",
                 "extraction": {
