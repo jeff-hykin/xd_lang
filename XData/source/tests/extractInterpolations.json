@@ -1,0 +1,95 @@
+{
+    "from": "../to_node_json.js",
+    "import": [
+        "components",
+        "extractInterpolations"
+    ],
+    "expectedIo": [
+        {
+            "inputs": [
+                "hello world"
+            ],
+            "output": {
+                "type": "#string",
+                "value": "hello world"
+            }
+        },
+        {
+            "inputs": [
+                "hello world {#thisDocument}"
+            ],
+            "output": {
+                "type": "#string",
+                "contains": [
+                    {
+                        "type": "#stringPiece",
+                        "value": "hello world "
+                    },
+                    {
+                        "type": "#reference",
+                        "accessList": [
+                            {
+                                "type": "#system",
+                                "value": "#thisDocument"
+                            }
+                        ]
+                    }
+                ]
+            }
+        },
+        {
+            "inputs": [
+                "hello world\nThis is {#thisDocument} so "
+            ],
+            "output": {
+                "type": "#string",
+                "contains": [
+                    {
+                        "type": "#stringPiece",
+                        "value": "hello world\nThis is "
+                    },
+                    {
+                        "type": "#reference",
+                        "accessList": [
+                            {
+                                "type": "#system",
+                                "value": "#thisDocument"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "#stringPiece",
+                        "value": " so "
+                    }
+                ]
+            }
+        },
+        {
+            "inputs": [
+                "\n    testing\n    {#thisDocument}     testing"
+            ],
+            "output": {
+                "type": "#string",
+                "contains": [
+                    {
+                        "type": "#stringPiece",
+                        "value": "\n    testing\n    "
+                    },
+                    {
+                        "type": "#reference",
+                        "accessList": [
+                            {
+                                "type": "#system",
+                                "value": "#thisDocument"
+                            }
+                        ]
+                    },
+                    {
+                        "type": "#stringPiece",
+                        "value": "     testing"
+                    }
+                ]
+            }
+        }
+    ]
+}

@@ -1,0 +1,273 @@
+{
+    "from": "../to_node_json.js",
+    "import": [
+        "components",
+        "parseBlockString"
+    ],
+    "expectedIo": [
+        {
+            "inputs": [
+                "#textLiteral: like a billion"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "literal:InlineBlock",
+                    "value": " like a billion"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "#textFigurative: like a billion"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "figurative:InlineBlock",
+                    "value": " like a billion"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "#textFigurative:\n    like a billion"
+            ],
+            "output": {
+                "remaining": "\n",
+                "extraction": {
+                    "type": "#string",
+                    "format": "figurative:MultilineBlock",
+                    "value": "like a billion"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "#textLiteral:\n    like a billion\n    like a billion and a half"
+            ],
+            "output": {
+                "remaining": "\n",
+                "extraction": {
+                    "format": "literal:MultilineBlock",
+                    "value": "like a billion\nlike a billion and a half"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "#textLiteral:  \n    like a billion\n    like a billion and a half"
+            ],
+            "output": {
+                "remaining": "\n",
+                "extraction": {
+                    "format": "literal:MultilineBlock",
+                    "value": "like a billion\nlike a billion and a half"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "#textLiteral:   # it means literally literally \n    like a billion\n    like a billion and a half"
+            ],
+            "output": {
+                "remaining": "\n",
+                "extraction": {
+                    "format": "literal:MultilineBlock",
+                    "value": "like a billion\nlike a billion and a half",
+                    "comment": {
+                        "type": "#comment",
+                        "content": "it means literally literally ",
+                        "leadingWhitespace": "   "
+                    }
+                }
+            }
+        },
+        {
+            "inputs": [
+                "#textFigurative:   # it means kinda \n    like a billion\n    like a billion and a half"
+            ],
+            "output": {
+                "remaining": "\n",
+                "extraction": {
+                    "type": "#string",
+                    "format": "figurative:MultilineBlock",
+                    "value": "like a billion\nlike a billion and a half",
+                    "comment": {
+                        "type": "#comment",
+                        "content": "it means kinda ",
+                        "leadingWhitespace": "   "
+                    }
+                }
+            }
+        },
+        {
+            "inputs": [
+                "#textFigurative:  asodfsdf  # it means kinda \n    like a billion\n    like a billion and a half"
+            ],
+            "output": {
+                "remaining": "#textFigurative:  asodfsdf  # it means kinda \n    like a billion\n    like a billion and a half",
+                "extraction": null
+            }
+        },
+        {
+            "inputs": [
+                "'''\n    testing\n        testing\n    '''\n                "
+            ],
+            "output": {
+                "remaining": "\n",
+                "extraction": {
+                    "type": "#string",
+                    "format": "''':MultilineBlock",
+                    "value": "testing\n    testing"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "\"\"\"\n    testing\n        testing\n    \"\"\"\n                "
+            ],
+            "output": {
+                "remaining": "\n",
+                "extraction": {
+                    "format": "\"\"\":MultilineBlock",
+                    "value": "testing\n    testing"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "\"\n    testing\n        testing\n    \"\n                "
+            ],
+            "output": {
+                "remaining": "\n",
+                "extraction": {
+                    "format": "\":MultilineBlock",
+                    "value": "testing\n    testing"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "\n    bleh forgot quotes:\n    {#thisDocument}     testing"
+            ],
+            "output": {
+                "remaining": "\n    bleh forgot quotes:\n    {#thisDocument}     testing",
+                "extraction": null
+            }
+        },
+        {
+            "inputs": [
+                "'''\n    testing\n       {10} testing{   \"dataaaa\"}\n    '''\n                "
+            ],
+            "output": {
+                "remaining": "\n",
+                "extraction": {
+                    "type": "#string",
+                    "format": "''':MultilineBlock",
+                    "contains": [
+                        {
+                            "type": "#stringPiece",
+                            "value": "testing\n   "
+                        },
+                        {
+                            "type": "#number",
+                            "value": "10"
+                        },
+                        {
+                            "type": "#stringPiece",
+                            "value": " testing"
+                        },
+                        {
+                            "type": "#string",
+                            "format": "\"",
+                            "value": "dataaaa",
+                            "leadingWhitespace": "   "
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "inputs": [
+                "#textFigurative:\n    bleh forgot quotes:\n    {#thisDocument}     testing\nunindented: 10"
+            ],
+            "output": {
+                "remaining": "\n\nunindented: 10",
+                "extraction": {
+                    "type": "#string",
+                    "format": "figurative:MultilineBlock",
+                    "contains": [
+                        {
+                            "type": "#stringPiece",
+                            "value": "bleh forgot quotes:\n"
+                        },
+                        {
+                            "type": "#reference",
+                            "accessList": [
+                                {
+                                    "type": "#system",
+                                    "value": "#thisDocument"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "#stringPiece",
+                            "value": "     testing"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "inputs": [
+                "#textLiteral: like a billion\n"
+            ],
+            "output": {
+                "remaining": "\n",
+                "extraction": {
+                    "type": "#string",
+                    "format": "literal:InlineBlock",
+                    "value": " like a billion"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "'''\n    testing, i forgot the quote\n"
+            ],
+            "output": {
+                "remaining": "'''\n    testing, i forgot the quote\n",
+                "extraction": null,
+                "was": "testing, i forgot the quote",
+                "errorMessage": "For the quoted block: '''\ntesting, i forgot the quote\n\nI think you just need to add a ''' to the end of it.\nMake sure it:\n  - is on a newline (not at the end of text)\n  - its indented exactly right (not too much or too little)"
+            }
+        },
+        {
+            "inputs": [
+                "'''\n    testing, i forgot the quote\n     '''\n"
+            ],
+            "output": {
+                "remaining": "'''\n    testing, i forgot the quote\n     '''\n",
+                "extraction": null,
+                "was": "testing, i forgot the quote\n '''",
+                "errorMessage": "For the quoted block: '''\ntesting, i forgot the quote\n '''\n\nI think you just need to add a ''' to the end of it.\nMake sure it:\n  - is on a newline (not at the end of text)\n  - its indented exactly right (not too much or too little)"
+            }
+        },
+        {
+            "inputs": [
+                "'''\n    testing, i forgot the quote\n    '''\n"
+            ],
+            "output": {
+                "remaining": "\n",
+                "extraction": {
+                    "type": "#string",
+                    "format": "''':MultilineBlock",
+                    "value": "testing, i forgot the quote"
+                }
+            }
+        }
+    ]
+}

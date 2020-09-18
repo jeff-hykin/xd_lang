@@ -1,0 +1,111 @@
+{
+    "from": "../to_node_json.js",
+    "import": [
+        "components",
+        "parseFigurativeInlineString"
+    ],
+    "expectedIo": [
+        {
+            "inputs": [
+                "'strings'"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "'",
+                    "value": "strings"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "'''strings'''"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "'''",
+                    "value": "strings"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "''''strings''''"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "'''",
+                    "value": "'strings'"
+                }
+            }
+        },
+        {
+            "inputs": [
+                "'''strings and {@interpolations}'''"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "'''",
+                    "contains": [
+                        {
+                            "type": "#stringPiece",
+                            "value": "strings and "
+                        },
+                        {
+                            "type": "#namedAtom",
+                            "format": "@",
+                            "value": "interpolations"
+                        }
+                    ]
+                }
+            }
+        },
+        {
+            "inputs": [
+                "'''strings and {@interpolations} with more {#thisDocument} interpolations'''"
+            ],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "format": "'''",
+                    "contains": [
+                        {
+                            "type": "#stringPiece",
+                            "value": "strings and "
+                        },
+                        {
+                            "type": "#namedAtom",
+                            "format": "@",
+                            "value": "interpolations"
+                        },
+                        {
+                            "type": "#stringPiece",
+                            "value": " with more "
+                        },
+                        {
+                            "type": "#reference",
+                            "accessList": [
+                                {
+                                    "type": "#system",
+                                    "value": "#thisDocument"
+                                }
+                            ]
+                        },
+                        {
+                            "type": "#stringPiece",
+                            "value": " interpolations"
+                        }
+                    ]
+                }
+            }
+        }
+    ]
+}
