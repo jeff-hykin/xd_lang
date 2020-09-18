@@ -1,0 +1,10 @@
+{
+    "from": "../tools.js",
+    "import": ["minimumViableQuoteSize"],
+    "expectedIo": [
+        {
+            "inputs": [],
+            "output": null
+        }
+    ]
+}

@@ -63,11 +63,23 @@ let testParse = ({ expectedIo, ifParsedWith}) => {
     }, 0)
 }
 
-
+let minimumViableQuoteSize = (stringContent, quote) => {
+    let quotes = findAll(RegExp(`${quote}+`), stringContent)
+    let maxQuoteSize = Math.max(...quotes.map(each=>each[0].length))
+    let minViableQuoteSize = 1
+    if (maxQuoteSize > 0) {
+        let logBase = 3
+        let logOfSizeBaseThree = Math.log(maxQuoteSize+1) / Math.log(logBase)
+        let closestLargerPowerOfThree = Math.ceil(logOfSizeBaseThree)
+        minViableQuoteSize = 3**closestLargerPowerOfThree
+    }
+    return minViableQuoteSize
+}
 
 module.exports = {
     findAll,
     extractFirst,
     indent,
     testParse,
+    minimumViableQuoteSize,
 }
