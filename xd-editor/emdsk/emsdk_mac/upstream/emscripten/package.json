@@ -1,7 +1,7 @@
 {
   "private": true,
   "devDependencies": {
-    "ws": "~0.4.28"
+    "ws": "~3.3.1"
   },
   "dependencies": {
     "google-closure-compiler": "20200224.0.0",
