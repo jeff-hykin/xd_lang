@@ -274,200 +274,205 @@ let stringFormatAllowsForContents = ({format, contents}) => {
     //         """,
 }
 
-let toString = (parsedObject)=> {
-    // for easy empty strings
-    if (!parsedObject) {
-        return ""
-    } else if (parsedObject.documentNodes instanceof Array) {
-        let output = ""
-        for (let each in parsedObject.documentNodes) {
-            output += toString(each)+"\n"
-        }
-        if (parsedObject.endsWithSingleNewline) {
-            output += "\n"
-        }
-        return output
-    } else {
-        // which type
-        switch (parsedObject.type) {
-            case "#blankLines":
-                // TODO: custom types
-                return `${parsedObject.content}`
-                break
-            
-            case "#comment":
-                // TODO: custom types
-                return `${parsedObject.leadingWhitespace||""}# ${parsedObject.content}`
-                break
-
-            case "#number":
-                // TODO: custom types
-                let value = parsedObject.value
-                let isNegative = (value[0] == "-") ? "-" : ""
-                let isAtomicFormat = (parsedObject.format == "@") ? "@" : ""
-                value = value.replace(/^-/,"")
-                // FIXME check decimal/non-decimal (decimal overrides atomic format)
-                if (value.match(/\./g)) {
-                    return `${stringifyKey(parsedObject)}${parsedObject.leadingWhitespace||""}${isNegative}${value}${parsedObject.trailingWhitespace||""}`
-                }
-                return `${stringifyKey(parsedObject)}${parsedObject.leadingWhitespace||""}${isNegative}${isAtomicFormat}${value}${parsedObject.trailingWhitespace||""}${toString(parsedObject.comment)}`
-                break
-
-            case "#namedAtom":
-                // TODO: custom types
-                let value = parsedObject.value
-                let isNegative = (value[0] == "-") ? "-" : ""
-                let isAtomicFormat = (parsedObject.format == "@") ? "@" : ""
-                value = value.replace(/^-/,"")
-                return `${stringifyKey(parsedObject)}${parsedObject.leadingWhitespace||""}${isNegative}${isAtomicFormat}${value}${parsedObject.trailingWhitespace||""}${toString(parsedObject.comment)}`
-                break
-        
-            case "#system":
-                return `${parsedObject.value}`
-                break
-
-            case "#reference":
-                if (parsedObject.accessList.length == 1) {
-                    return `${stringifyKey(parsedObject)}${toString(parsedObject.accessList.pop())}`
-                } else {
-                    return `${stringifyKey(parsedObject)}${parsedObject.accessList.pop()}${parsedObject.accessList.map(each=>`[${toString(each)}]`)}${parsedObject.trailingWhitespace||""}${toString(parsedObject.comment)}`
-                }
-                break
-
-            case "#listing":
-                // TODO: custom types
-                if (parsedObject.contains.length == 0) {
-                    return `${stringifyKey(parsedObject)}${parsedObject.leadingWhitespace||""}[]${parsedObject.trailingWhitespace||""}${toString(parsedObject.comment)}`
-                }
-                let indent = parsedObject.indent || defaultIndent
-                let output = ""
-                for (let each of parsedObject.contains) {
-                    output += toString(each) + "\n"
-                }
-                // put attached comments before the indented block
-                return stringifyKey(parsedObject)+toString(parsedObject.comment)+"\n"+indent(output, indent)
-                break
-
-            case "#mapping":
-                // TODO: custom types
-                if (parsedObject.contains.length == 0) {
-                    return `${stringifyKey(parsedObject)}${parsedObject.leadingWhitespace||""}{}${parsedObject.trailingWhitespace||""}${toString(parsedObject.comment)}`
-                }
-                let indent = parsedObject.indent || defaultIndent
-                let output = ""
-                for (let each of parsedObject.contains) {
-                    output += toString(each) + "\n"
-                }
-                // put attached comments before the indented block
-                return stringifyKey(parsedObject)+toString(parsedObject.comment)+"\n"+indent(output, indent)
-                break
-
-            case "#stringPiece":
-                return parsedObject.value
-
-            case "#string":
-                if (parsedObject.isKey) {
-                    // if it can be an inline literal
-                    if (parsedObject.value != undefined) {
-                        // if undefined, then minor-upgrade to unquotedWeak
-                        if (parsedObject.format == undefined) {
-                            parsedObject.format = "unquotedWeak"
-                        }
-                        // if unquotedWeak, then minor-upgrade to a literal
-                        if (parsedObject.format == "unquotedWeak" && !contents.match(/^([a-zA-Z][a-zA-Z_0-9]*)$/)) {
-                            parsedObject.format = '"'
-                        }
-                        // make sure theres enough quotes
-                        if (parsedObject.format[0] == '"') {
-                            findAll(/"+/, parsedObject.value)
-                            
-                            if (parsedObject.value)
-                        }
-                    }
-                    // check for figurative string
-
-                                    case "unquotedWeak":
-                    return contents.match(/^([a-zA-Z][a-zA-Z_0-9]*)$/)
-                    break
-
-                case "unquotedStrong":
-                    return contents.match(/^[a-zA-Z]([^:\n]*[^\s:])?$/)
-                    break
-
-                case "literal:InlineBlock":
-                    return contents.match(/^[^\n]*$/)
-                    break
-                }
-                let value = parsedObject.value
-                let isNegative = (value[0] == "-") ? "-" : ""
-                let isAtomicFormat = (parsedObject.format == "@") ? "@" : ""
-                value = value.replace(/^-/,"")
-                return `${parsedObject.leadingWhitespace||""}${isNegative}${isAtomicFormat}${value}${parsedObject.trailingWhitespace||""}${toString(parsedObject.comment)}`
-                break
-        
-            default:
-                throw Error(`Node type not recognized:\n${JSON.stringify(parsedObject)}`)
-        }
-    }
+module.exports = {
+    minimumViableQuoteSize,
+    convertStringValue,
 }
 
-// // #blankLines
-//     content
+// let toString = (parsedObject)=> {
+//     // for easy empty strings
+//     if (!parsedObject) {
+//         return ""
+//     } else if (parsedObject.documentNodes instanceof Array) {
+//         let output = ""
+//         for (let each in parsedObject.documentNodes) {
+//             output += toString(each)+"\n"
+//         }
+//         if (parsedObject.endsWithSingleNewline) {
+//             output += "\n"
+//         }
+//         return output
+//     } else {
+//         // which type
+//         switch (parsedObject.type) {
+//             case "#blankLines":
+//                 // TODO: custom types
+//                 return `${parsedObject.content}`
+//                 break
+            
+//             case "#comment":
+//                 // TODO: custom types
+//                 return `${parsedObject.leadingWhitespace||""}# ${parsedObject.content}`
+//                 break
+
+//             case "#number":
+//                 // TODO: custom types
+//                 let value = parsedObject.value
+//                 let isNegative = (value[0] == "-") ? "-" : ""
+//                 let isAtomicFormat = (parsedObject.format == "@") ? "@" : ""
+//                 value = value.replace(/^-/,"")
+//                 // FIXME check decimal/non-decimal (decimal overrides atomic format)
+//                 if (value.match(/\./g)) {
+//                     return `${stringifyKey(parsedObject)}${parsedObject.leadingWhitespace||""}${isNegative}${value}${parsedObject.trailingWhitespace||""}`
+//                 }
+//                 return `${stringifyKey(parsedObject)}${parsedObject.leadingWhitespace||""}${isNegative}${isAtomicFormat}${value}${parsedObject.trailingWhitespace||""}${toString(parsedObject.comment)}`
+//                 break
+
+//             case "#namedAtom":
+//                 // TODO: custom types
+//                 let value = parsedObject.value
+//                 let isNegative = (value[0] == "-") ? "-" : ""
+//                 let isAtomicFormat = (parsedObject.format == "@") ? "@" : ""
+//                 value = value.replace(/^-/,"")
+//                 return `${stringifyKey(parsedObject)}${parsedObject.leadingWhitespace||""}${isNegative}${isAtomicFormat}${value}${parsedObject.trailingWhitespace||""}${toString(parsedObject.comment)}`
+//                 break
+        
+//             case "#system":
+//                 return `${parsedObject.value}`
+//                 break
+
+//             case "#reference":
+//                 if (parsedObject.accessList.length == 1) {
+//                     return `${stringifyKey(parsedObject)}${toString(parsedObject.accessList.pop())}`
+//                 } else {
+//                     return `${stringifyKey(parsedObject)}${parsedObject.accessList.pop()}${parsedObject.accessList.map(each=>`[${toString(each)}]`)}${parsedObject.trailingWhitespace||""}${toString(parsedObject.comment)}`
+//                 }
+//                 break
+
+//             case "#listing":
+//                 // TODO: custom types
+//                 if (parsedObject.contains.length == 0) {
+//                     return `${stringifyKey(parsedObject)}${parsedObject.leadingWhitespace||""}[]${parsedObject.trailingWhitespace||""}${toString(parsedObject.comment)}`
+//                 }
+//                 let indent = parsedObject.indent || defaultIndent
+//                 let output = ""
+//                 for (let each of parsedObject.contains) {
+//                     output += toString(each) + "\n"
+//                 }
+//                 // put attached comments before the indented block
+//                 return stringifyKey(parsedObject)+toString(parsedObject.comment)+"\n"+indent(output, indent)
+//                 break
+
+//             case "#mapping":
+//                 // TODO: custom types
+//                 if (parsedObject.contains.length == 0) {
+//                     return `${stringifyKey(parsedObject)}${parsedObject.leadingWhitespace||""}{}${parsedObject.trailingWhitespace||""}${toString(parsedObject.comment)}`
+//                 }
+//                 let indent = parsedObject.indent || defaultIndent
+//                 let output = ""
+//                 for (let each of parsedObject.contains) {
+//                     output += toString(each) + "\n"
+//                 }
+//                 // put attached comments before the indented block
+//                 return stringifyKey(parsedObject)+toString(parsedObject.comment)+"\n"+indent(output, indent)
+//                 break
+
+//             case "#stringPiece":
+//                 return parsedObject.value
+
+//             case "#string":
+//                 if (parsedObject.isKey) {
+//                     // if it can be an inline literal
+//                     if (parsedObject.value != undefined) {
+//                         // if undefined, then minor-upgrade to unquotedWeak
+//                         if (parsedObject.format == undefined) {
+//                             parsedObject.format = "unquotedWeak"
+//                         }
+//                         // if unquotedWeak, then minor-upgrade to a literal
+//                         if (parsedObject.format == "unquotedWeak" && !contents.match(/^([a-zA-Z][a-zA-Z_0-9]*)$/)) {
+//                             parsedObject.format = '"'
+//                         }
+//                         // make sure theres enough quotes
+//                         if (parsedObject.format[0] == '"') {
+//                             findAll(/"+/, parsedObject.value)
+                            
+//                             if (parsedObject.value)
+//                         }
+//                     }
+//                     // check for figurative string
+
+//                                     case "unquotedWeak":
+//                     return contents.match(/^([a-zA-Z][a-zA-Z_0-9]*)$/)
+//                     break
+
+//                 case "unquotedStrong":
+//                     return contents.match(/^[a-zA-Z]([^:\n]*[^\s:])?$/)
+//                     break
+
+//                 case "literal:InlineBlock":
+//                     return contents.match(/^[^\n]*$/)
+//                     break
+//                 }
+//                 let value = parsedObject.value
+//                 let isNegative = (value[0] == "-") ? "-" : ""
+//                 let isAtomicFormat = (parsedObject.format == "@") ? "@" : ""
+//                 value = value.replace(/^-/,"")
+//                 return `${parsedObject.leadingWhitespace||""}${isNegative}${isAtomicFormat}${value}${parsedObject.trailingWhitespace||""}${toString(parsedObject.comment)}`
+//                 break
+        
+//             default:
+//                 throw Error(`Node type not recognized:\n${JSON.stringify(parsedObject)}`)
+//         }
+//     }
+// }
+
+// // // #blankLines
+// //     content
 
 
-// // #comment
-//     content
+// // // #comment
+// //     content
 
 
-// // #number
-//     value
-//     formats: [ undefined, "@" ]
-//     // considerations: negative/positive
+// // // #number
+// //     value
+// //     formats: [ undefined, "@" ]
+// //     // considerations: negative/positive
 
 
-// // #namedAtom
-//     value: extraction,
-//     formats: ["@", "keyword", undefined ]
-//     // considerations: negative/positive
+// // // #namedAtom
+// //     value: extraction,
+// //     formats: ["@", "keyword", undefined ]
+// //     // considerations: negative/positive
 
-// // #string
-//     value: extraction,
-//     formats: `
-//         undefined,
-//         unquotedWeak,
-//         unquotedStrong,
-//         #literal:InlineBlock,
-//         #literal:MultilineBlock,
-//         #figurative:InlineBlock,
-//         #figurative:MultilineBlock,
-//         ''':MultilineBlock,
-//         ''',
-//         """:MultilineBlock,
-//         """,
-//     `
-//     contains:
+// // // #string
+// //     value: extraction,
+// //     formats: `
+// //         undefined,
+// //         unquotedWeak,
+// //         unquotedStrong,
+// //         #literal:InlineBlock,
+// //         #literal:MultilineBlock,
+// //         #figurative:InlineBlock,
+// //         #figurative:MultilineBlock,
+// //         ''':MultilineBlock,
+// //         ''',
+// //         """:MultilineBlock,
+// //         """,
+// //     `
+// //     contains:
 
-// // #reference
-//     accessList,
-
-
-// // #system
-//     value: extraction,
+// // // #reference
+// //     accessList,
 
 
-// // #mapping
-//     contains: [],
-
-// // #listing
-//     contains: []
+// // // #system
+// //     value: extraction,
 
 
-// // #keyedValue
-//     key,
-//     value,
+// // // #mapping
+// //     contains: [],
+
+// // // #listing
+// //     contains: []
 
 
-// document container
-// isContainer: false,
-// endsWithSingleNewline,
-// documentNodes: topNodes,
+// // // #keyedValue
+// //     key,
+// //     value,
+
+
+// // document container
+// // isContainer: false,
+// // endsWithSingleNewline,
+// // documentNodes: topNodes,
