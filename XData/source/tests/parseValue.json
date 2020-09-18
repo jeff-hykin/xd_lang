@@ -61,12 +61,13 @@
             "comment": [
                 "FIXME: this doesn't have the correct output"
             ],
-            "inputs": ["#create[date]: this is a test\n"],
+            "inputs": [
+                "#create[date]: this is a test\n"
+            ],
             "output": {
                 "remaining": "",
                 "extraction": {
                     "type": "#string",
-                    "customTypes": ["date"],
                     "format": "unquotedStrong",
                     "value": "this is a test"
                 }
@@ -75,7 +76,9 @@
                 "remaining": "",
                 "extraction": {
                     "type": "#string",
-                    "customTypes": ["date"],
+                    "customTypes": [
+                        "date"
+                    ],
                     "format": "unquotedStrong",
                     "value": "this is a test"
                 }
