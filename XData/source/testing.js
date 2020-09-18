@@ -7,7 +7,9 @@ let regenerateTestTemplate = (filepath) => {
     let importPath = path.join(path.dirname(filepath), testObject.from)
     let requiredFile = require(importPath)
     let resultingTool = get({keyList: testObject.import, from: requiredFile})
-
+    
+    console.debug(`resultingTool is:`,resultingTool)
+    
     for (let each of testObject.expectedIo) {
         try {
             each.output = resultingTool(...each.inputs)
