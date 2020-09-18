@@ -1,16 +1,14 @@
 const path = require('path')
-const jsonc = require('jsonc')
 const fs = require("fs")
 const {get} = require("good-js")
 
 let regenerateTestTemplate = (filepath) => {
     let testObject = require(filepath)
-    jsonc.readSync(filepath)
     let importPath = path.join(path.dirname(filepath), testObject.from)
     let requiredFile = require(importPath)
     let resultingTool = get({keyList: testObject.import, from: requiredFile})
     
-    console.log(`testing:`,resultingTool)
+    console.debug(`testing:`,resultingTool)
     
     for (let each of testObject.expectedIo) {
         try {
@@ -21,7 +19,7 @@ let regenerateTestTemplate = (filepath) => {
     }
     
     // overwrite the test file
-    jsonc.writeSync(filepath, testObject, {space: 4})
+    fs.writeFileSync(filepath, JSON.stringify(testObject, 0, 4))
 }
 
 

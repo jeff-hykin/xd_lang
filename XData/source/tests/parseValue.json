@@ -57,19 +57,30 @@
                 }
             }
         },
-        // FIXME
-        // {
-        //     "inputs": ["#create[date]: this is a test\n"],
-        //     "output": {
-        //         "remaining": "",
-        //         "extraction": {
-        //             "type": "#string",
-        //             "customTypes": ["date"],
-        //             "format": "unquotedStrong",
-        //             "value": "this is a test"
-        //         }
-        //     },
-        // },
+        {
+            "comment": [
+                "FIXME: this doesn't have the correct output"
+            ],
+            "inputs": ["#create[date]: this is a test\n"],
+            "output": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "customTypes": ["date"],
+                    "format": "unquotedStrong",
+                    "value": "this is a test"
+                }
+            },
+            "correctOutput": {
+                "remaining": "",
+                "extraction": {
+                    "type": "#string",
+                    "customTypes": ["date"],
+                    "format": "unquotedStrong",
+                    "value": "this is a test"
+                }
+            }
+        },
         {
             "inputs": [
                 "#create[date]: #textLiteral: 1/1/1010\n"
@@ -82,7 +93,7 @@
                     "value": " 1/1/1010",
                     "customTypes": [
                         "date"
-                    ],
+                    ]
                 }
             }
         },
@@ -99,7 +110,7 @@
                     "customTypes": [
                         "number",
                         "rational"
-                    ],
+                    ]
                 }
             }
         },
@@ -166,13 +177,15 @@
             }
         },
         {
+            "comment": [
+                "\n",
+                "    test: @this\n",
+                "    test: @2\n",
+                "    test: \n",
+                "        nested: 1\n",
+                "        nested2: 2\n"
+            ],
             "inputs": [
-                //\n
-                //    test: @this\n
-                //    test: @2\n
-                //    test: \n
-                //        nested: 1\n
-                //        nested2: 2\n
                 "\n    test: @this\n    test: @2\n    test: \n        nested: 1\n        nested2: 2\n"
             ],
             "output": {
@@ -248,17 +261,19 @@
             }
         },
         {
+            "comment":[
+                "\n",
+                "    test: @this\n",
+                "    test: @2\n",
+                "    test: \n",
+                "        nested: 1\n",
+                "   \n",
+                "        \n",
+                "   \n",
+                "        nested2: 2\n"
+            ],
             "inputs": [
-                //\n
-                //    test: @this\n
-                //    test: @2\n
-                //    test: \n
-                //        nested: 1\n
-                //   \n
-                //        \n
-                //   \n
-                //        nested2: 2\n
-                "\n    test: @this\n    test: @2\n    test: \n        nested: 1\n   \n        \n   \n        nested2: 2\n",
+                "\n    test: @this\n    test: @2\n    test: \n        nested: 1\n   \n        \n   \n        nested2: 2\n"
             ],
             "output": {
                 "remaining": "",
@@ -335,6 +350,6 @@
                     ]
                 }
             }
-        },
+        }
     ]
 }
