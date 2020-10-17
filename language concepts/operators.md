@@ -1,2 +1,6 @@
 # operators
+Update: operators have a format (infix, prefix) 
+- the infix ones must have spaces (a + b), 
+- the prefix (urnary) ones must have no space ( -a + !b )
+
 Operators are symbolic; they cannot contain any letters. There are no special operators. There's no "and", "or", or "new" operator. Operators get converted into function calls at compile time, they just have additional information about where to place the ()'s based on the order of operations (Eval compiles the code before running it). The colon, comma, square brackets, and parentheses are the only symbols that are both not-literals and not-operators. Operators have to be declared at compile time. Operators can be user defined. There is a simple infix-operator definition with a fixed precedence and also an advanced definition. Operators must work on valid XD code, they can't perform magic like functions with block syntax. Operators have their precedence defined as a floating point number and a direction of either left or right. A decimal number is used for precedence because it is an absolute scale (no need to know what other operators are placed at) but, unlike an integer, it also allows putting any operator between any other two operators.

@@ -1,4 +1,34 @@
 # Punctuation
+
+There's only 4 special punctuation things: `()`'s `[]`'s `,` and `:`
+
+The colon allows for changing the parsing rules for the next block of code
+```
+# example 1
+literalOutput: anything is possible here )@:$("::::,,*!(%U#!_(%}|{}{}[]))),
+
+# example 2
+today = date: 2020/12/1 12:20am 
+```
+The above code would run just fine. The colon doesn't always change the parsing rules, but it can, the function (ex: `literalOutput`) decides exactly what the parsing rules are.
+The only other part of XD that can change the parsing rules are literal's like strings and comments
+```
+# I can have []'s in here
+a << "this is a string so it can have [] and ()"
+```
+
+Ignoring those two cases (the `:` and literal values), everything else in a program happens in the "base XD context". Everytime you see the `()`'s `[]`'s `,` or `:` in the base XD context:
+- the `()` means "do whats inside the paraenthese first". (They're executed left-to-right when there's a tie)
+- the `[]` means a container. `[ 9 ]` is a container, with a `9` inside of it.
+- the `,` can only be used inside of a container, ex: `[ 9, 10, 11 ]`
+- the `:` is the "block" operator. It grabs the a block of raw code and gives it to a item (like a function call)
+
+That is all of punctuation! Everything else is an operator.
+
+
+
+OLDER DOC:
+
 All of the punctuation can be changed/swapped, but can't be removed.
 This includes comments, list start/end, hashmap start/end, function calls, and line separators.
 Lists use [ ]'s with commas inbetween values
