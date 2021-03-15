@@ -1,0 +1,71 @@
+XD
+    builtins
+    punctuation (and keywords)
+        - comments
+        - paraentheses
+        - item call
+        - colon call
+        - pattern mapping
+        - destructure
+        - phrase and operator definition
+        - equality definition
+    literals
+        - lists
+        - strings
+        - regex
+        - dates
+        - numbers
+    operators & phrases
+        - any format
+    valid item pattern
+        - hello
+        - 𝝰
+
+new ideas:
+    - there is a key difference between a serializable value and a namespace address
+    - item + namespace already is an atom, #universe@true
+    - no access to memory addresses/object ids, the namespace IS the id
+    - new names default to a local namespace
+    - exising names in a parent scope are automaticall inherited
+    - a "shouldntChange" attribute can be used on stuff like #universe@true to prevent an accidental local mutation
+    - phrases dont need paraentheses
+    - use squiggle brackets as a meta kind of punctuation
+
+# map: (namespaced item) -> (namespaced item)
+    a@true -> 10  # same as a@(#universe@true) -> #universe@10
+
+# map: (serializable value) -> (namespaced item)
+    a(3)   -> 3 + 3 # maps to #universe@6 (if someone redefines #universe@6, this will automaticallly have a different value)
+    a[1]   -> [5]   # creates a new list in this scope, then maps to #this#scope{{enumeration of list}}
+
+# map: (serializable value) -> (serializable value)
+    a(3)   ->> 3 + 3 # maps to 6
+    a[1]   ->> [5]   # creates a new list in this scope, then maps to it
+
+# map: (serializable value) -> (functional value)
+    a(3)   ==> 3 + 3  # actually maps to 3 + 3 (will cache the computation if the operator is pure) 
+    a[1]   ==> [5]
+    a([2]) ==> [2]
+
+# map: (pattern) -> (functional value)
+    
+    # create an adjective (a function that returns a boolean and accepts all inputs)
+    isOver18 = #function:
+        #output ->> false
+        if #input#isARealNumber & (#input > 18)
+            #output ->> true
+    
+    # use the adjective as a filter
+    ageCheck{#input isOver18} ==> 'you can drink because you're #input[0] years old'
+    
+    # one-liner function
+    isNotOver18{#input} ==> #not isOver18(#input)
+    
+    ageCheck{#input isNotOver18} ==> 'you cant drink because you're #input[0] years old'
+    
+    # fix things after the fact
+    isNegative{#input} ==> #input#isARealNumber & #input < 0
+    
+    # this isn't an infinte loop, but rather an un-definition
+    ageCheck{#input isNegative} -> ageCheck(#input)
+    

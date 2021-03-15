@@ -1,5 +1,49 @@
 # items
 
+For people familar with programming, items can be though of as variables. For everyone else, just think of them as a physical item. The data inside XD Lang can be thought of like a web of items, with every item being connected to another item. The connections between the items have names, they're not just generic conncetions.
+
+```
+firstItem -> 10
+```
+
+Above we have two items, the `firstItem` item and the `10` item, and we connected them by value.
+
+```
+secondItem -> firstItem
+firstItem -> secondItem
+```
+
+Now we have two items that are connected to eachother. This isn't particularly useful, but it is possible and is not totally useless. The arrow `->` connects the items by value. So it would be true that `secondItem#value = firstItem`. And that is not just pseudocode, the `#value` is the name of the connection, and the `#` just means it is part of the system (built-in) connections.
+
+```
+secondItem#value -> 10
+# this is the same as
+firstItem -> 10
+```
+
+Now you might be wondering what the value of `firstItem` before we connected it with `10`? Thats easy, the value of `firstItem` is... itself! Think of it like Googling "Google" and clicking on the first link. XD data is like a web, and webs are allowed to be a circle... probably.
+
+Lets talk about more exciting connections.
+
+```
+secondItem@3
+```
+
+There are three items above. First `secondItem`, then `3`, and then a new item "secondItem@3"
+
+
+
+Whenever we start naming things, we are creating definitions. And where do definitions belong? Dictionaries. In XD Lang, it is very easy to create your own dictionary. The file containing the code is the first dictionary, but you can create your own dictionary as well.
+
+
+
+#
+#
+# old version
+#
+#
+
+
 Items are what'd you'd typically think of as a variable. In mathematics mappings and functions are no different (the definition of a function is a mapping from inputs to outputs). However, in most languages maps and functions are separate concepts. XD tries to go back to mathematics and join the concept without loosing performance.
 
 Every item is mapping. The only thing that isn't an item is an operator, and that is because operators are replaced with functions at compile time (so in some ways they are also items). In Python they're called dictionaries, in Ruby they're called hash maps.
