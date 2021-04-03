@@ -59,6 +59,31 @@ class StringLiteralKey extends Node {
             },  
         })
     }
+    static toXdataString(stringLiteralKey) {
+        // 
+        // quote size
+        // 
+        const minimumSize = tools.minimumViableQuoteSize(stringLiteralKey.components.content, `"`)
+        let normalSize = 0
+        try { normalSize = stringLiteralKey.options.quoteSize } catch (error) {}
+        if (!normalSize) { try { normalSize = stringLiteralKey.components.openingQuote.length } catch (error) {} }
+        if (!normalSize) { normalSize = 0 }
+        const quoteSize = Math.max(minimumSize, normalSize)
+        const quote = (`"`).repeat(quoteSize)
+        
+        // 
+        // check for newlines
+        // 
+        if (content.match(/\n/g)) {
+            // FIXME: need to create a figureative string instead 
+            throw Error(`293859yt3gbk`)
+        }
+
+        // 
+        // combine everything
+        // 
+        return quote + content + quote + (stringLiteralKey.postWhitespace || "")
+    }
 }
 class StringLiteralReferenceEvaulation extends Node {
     converterName = "StringLiteral"
@@ -136,6 +161,8 @@ class StringLiteral extends Converter {
     coreToNode({remainingString, form}) {
         if (form == "key") {
             return StringLiteralKey.fromXdataString(remainingString)
+        } else {
+            // FIXME: do the other forms
         }
     }
     fixUpNode({ nodeWithModifications, originalNode }) {
@@ -143,6 +170,11 @@ class StringLiteral extends Converter {
         return nodeWithModifications
     }
     nodeToXdataString(node) {
+        if (node.form == "key") {
+            return StringLiteralKey.toXdataString(node)
+        } else {
+            // FIXME: do the other forms
+        }
 
     }
 }
