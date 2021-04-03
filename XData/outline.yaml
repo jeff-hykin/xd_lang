@@ -1,0 +1,179 @@
+(documentToNode): # given string
+    loop:
+        (commentToNode):
+            regex: "/ */"
+            regex: "/# /"
+            regex: "/.+/"
+            regex: "/\n|\z/"
+        (blankLineToNode):
+            regex: "/ *(\n|\z)/"
+        
+    optional:
+        oneOf:
+            (emptyMapToNode):
+                regex: "/\{/"
+                regex: "/ */"
+                regex: "/\}/"
+            (emptyListToNode):
+                regex: "/\[/"
+                regex: "/ */"
+                regex: "/\]/"
+            (mapToNode): # given unindented string
+                loop:
+                    oneOf:
+                        (commentToNode):
+                        (blankLineToNode):
+                        group:
+                            (keyToNode):
+                                oneOf:
+                                    (atomKeyToNode):
+                                        regex: "/[a-zA-Z_][a-zA-Z_0-9]*/"
+                                    (numberLiteralKeyToNode):
+                                        regex: "/(-|+)?/"
+                                        regex: "/\d+(\.\d+)?/"
+                                    (stringLiteralKeyToNode):
+                                        oneOf:
+                                            regex: '/"/'
+                                            regex: '/[^\n"]*/'
+                                            regex: '/"/'
+                                            group:
+                                                findDoubleQuotesThatAreAPerfectCube:
+                                                loop:
+                                                    oneOf:
+                                                        a sequence of double quotes thats smaller than the starting quote: 
+                                                        as many characters as possible that don't have the quote or newline:
+                                                findMatchingDoubleQuotesThatAreAPerfectCube:
+                                    (stringFigurativeKeyToNode):
+                                        findSingleQuotesThatAreAPerfectCube:
+                                        loop:
+                                            oneOf:
+                                                group:
+                                                    (escapeSectionToNode):
+                                                        regex: "/\{/"
+                                                        regex: "/ */"
+                                                        oneOf:
+                                                            (literalStringInlineToNode):
+                                                            (figurativeStringInlineToNode):
+                                                            (systemCharaterToNode):
+                                                                oneOf:
+                                                                    regex: "/#tab|#newline/"
+                                                                    regex: "/#unicode\[\w+\]/"
+                                                                    regex: "/#ascii\[\w+\]/"
+                                                            (referenceToNode):
+                                                                regex: "/#valueOf/"
+                                                                optional:
+                                                                    loop:
+                                                                        regex: "/\[/"
+                                                                        regex: "/ */"
+                                                                        (keyToNode):
+                                                                        regex: "/ */"
+                                                                        regex: "/\]/"
+                                                        regex: "/ */"
+                                                        regex: "/\}/"
+                                                a sequence of single quotes thats smaller than the starting quote:
+                                        findMatchingSingleQuotesThatAreAPerfectCube:
+                                    (customKeyToNode): # ex: ~date(UTC)~
+                                        (customAttributesToNode):
+                                            regex: "/\~/"
+                                            (attributeToNode):
+                                                regex: "/[a-zA-Z_][a-zA-Z_0-9]*/"
+                                                optional:
+                                                    (attributeTreeToNode):
+                                                        regex: "/\(/"
+                                                        loop:
+                                                            (attributeToNode):
+                                                            regex: "/ */"
+                                                            regex: "/,/"
+                                                        optional:
+                                                            (attributeToNode):
+                                                        regex: "/ */"
+                                                        regex: "/\)/"
+                                            regex: "/\~/"
+                                        regex: "/ +/"
+                                        oneOf:
+                                            (literalStringInlineToNode):
+                                            (figurativeStringInlineToNode):
+                                            regex: "/[^~:'"\]\n]*?(?= *(\)|\]))/"
+                                        regex: / */
+                                        regex: "/\)/"
+                                regex: "/ */"
+                                regex: "/:/"
+                            (mapValueToNode):
+                                oneOf:
+                                    (inlineValueToNode):
+                                        oneOf:
+                                            (emptyMapToNode):
+                                            (emptyListToNode):
+                                            (specialValues):
+                                                regex: "/true|false|infinite|infinity|-infinite|-infinity|NaN|nullptr|null|nil|none|undefined/i"
+                                            (numberLiteralKeyToNode):
+                                            (atomValueToNode):
+                                                regex: "/@[a-zA-Z_][a-zA-Z_0-9]*/"
+                                            (stringLiteralKeyToNode):
+                                            (stringFigurativeKeyToNode):
+                                            (referenceToNode):
+                                            (customKeyToNode):
+                                        (commentOrEndOfLineToNode):
+                                            regex: "/ */"
+                                            oneOf:
+                                                (commentToNode):
+                                                regex: "/\n|\z/"
+                                    (lineOverlapValueToNode):
+                                        oneOf:
+                                            (stringBlockToNode):
+                                                (stringLiteralMultilineQuoteToNode):
+                                                    findDoubleQuotesThatAreAPerfectCube:
+                                                    (commentOrEndOfLineToNode):
+                                                    loop:
+                                                        regex: '/ +[^"\n]*/'
+                                                        regex: "/\n|\z/"
+                                                        
+                                                    findMatchingDoubleQuotesThatAreAPerfectCube:
+                                                    (commentOrEndOfLineToNode):
+                                                
+                                                (stringFigurativeMultilineQuoteToNode):
+                                                    findSingleQuotesThatAreAPerfectCube:
+                                                    (commentOrEndOfLineToNode):
+                                                    loop:
+                                                        regex: "/ +/" # make sure line is somewhat indented
+                                                        oneOf:
+                                                            regex: "/[^\{\n]*/"
+                                                            (escapeSectionToNode): # note: only single line escapes
+                                                        regex: "/\n|\z/"
+                                                    findMatchingSingleQuotesThatAreAPerfectCube:
+                                                    (commentOrEndOfLineToNode):
+                                                
+                                            (customValueToNode):
+                                                (customAttributesToNode):
+                                                oneOf:
+                                                    (stringBlockToNode): # quotes
+                                                    (mapToNode): # manually un-indent block before giving it to map
+                                                    (listToNode): # manually un-indent block before giving it to list
+                                                        loop:
+                                                            oneOf:
+                                                                (commentToNode):
+                                                                (blankLineToNode):
+                                                                group:
+                                                                    regex: "/- /"
+                                                                    (mapValueToNode):
+                                    (nextLineValueToNode):
+                                        (commentOrEndOfLineToNode):
+                                        get indented block:
+                                            oneOf:
+                                                (mapToNode):
+                                                (listToNode):
+                                                (nextLineInlineValue):
+                                                    loop:
+                                                        (commentOrEndOfLineToNode):
+                                                    (inlineValueToNode):
+            (listToNode):
+            (topLevelValueToNode):
+                oneOf:
+                    (stringBlockToNode -- but without the indent)
+                    (customValueToNode -- but without the indent)
+                    (inlineValueToNode)
+
+# todo: consider units, e.g. 100kilos
+# todo: consider units, e.g. 100 e10
+# ~grams~ 100: ~number(integer(base8))~ DEAD lbs_of_beef
+# ~grams~ 100: ~number~ 12.1343e100
