@@ -44,6 +44,11 @@ const Node = module.exports.Node = class extends Component {
     startLocation = null
     endLocation = null
     components = {}
+    options = {}
+    constructor({components, options}) {
+        this.components = components
+        this.options = options
+    }
     getEndLocation(startLocation=(new StringLocation())) {
         let runningEndLocation = startLocation
         for (const [key, each] of Object.entries(this.components)) {
