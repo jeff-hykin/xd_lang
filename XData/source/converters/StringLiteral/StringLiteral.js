@@ -84,6 +84,7 @@ class StringLiteralKey extends Node {
         // 
         return quote + content + quote + (stringLiteralKey.postWhitespace || "")
     }
+    // FIXME: add tests
 }
 class StringLiteralReferenceEvaulation extends Node {
     converterName = "StringLiteral"
@@ -181,9 +182,5 @@ class StringLiteral extends Converter {
 
 
 module.exports = {
-    StringLiteralKey,
-    StringLiteralReferenceEvaulation,
-    StringLiteralRestOfLineValue,
-    StringLiteralIndentedValue,
-    StringLiteralSpanningLinesValue,
+    StringLiteral,
 }
