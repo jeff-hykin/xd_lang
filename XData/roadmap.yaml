@@ -1,0 +1,123 @@
+completed:
+
+non-recursive:
+    commentOrEndOfLineToNode
+    emptyListToNode
+    emptyMapToNode
+    systemCharaterToNode
+    atomKeyToNode
+    atomValueToNode
+    numberKeyToNode
+    literalStringInlineToNode
+    specialValues
+    stringLiteralKeyToNode
+    stringLiteralMultilineQuoteToNode
+
+simple-recursive:
+    attributeToNode
+    customAttributesToNode
+
+complex-recursive:
+    documentToNode
+    mapToNode
+    keyToNode
+    customKeyToNode
+    mapValueToNode
+    inlineValueToNode
+    customValueToNode
+    listToNode
+    escapeSectionToNode
+    figurativeStringInlineToNode
+    lineOverlapValueToNode
+    nextLineInlineValue
+    nextLineValueToNode
+    referenceToNode
+    stringBlockToNode
+    stringFigurativeKeyToNode
+    stringFigurativeMultilineQuoteToNode
+    topLevelValueToNode
+
+order:
+    # just always do the basecase first
+
+dependency tree:
+    (documentToNode)
+        (commentOrEndOfLineToNode)
+            (commentToNode)
+            (blankLineToNode)
+        
+        (emptyMapToNode)
+        (emptyListToNode)
+        (mapToNode)
+            (commentOrEndOfLineToNode)
+            (keyToNode)
+                (atomKeyToNode)
+                (numberKeyToNode)
+                (stringLiteralKeyToNode)
+                (stringFigurativeKeyToNode)
+                    (escapeSectionToNode)
+                        (literalStringInlineToNode)
+                        (figurativeStringInlineToNode)
+                        (systemCharaterToNode)
+                        (referenceToNode)
+                            (keyToNode)
+                (customKeyToNode)
+                    (customAttributesToNode)
+                        (attributeToNode)
+                    (literalStringInlineToNode)
+                    (figurativeStringInlineToNode)
+            (mapValueToNode)
+                (inlineValueToNode)
+                    (emptyMapToNode)
+                    (emptyListToNode)
+                    (specialValues)
+                    (numberKeyToNode)
+                    (atomValueToNode)
+                    (stringLiteralKeyToNode)
+                    (stringFigurativeKeyToNode)
+                    (referenceToNode)
+                    (commentOrEndOfLineToNode)
+                (lineOverlapValueToNode)
+                        (stringBlockToNode)
+                            (stringLiteralMultilineQuoteToNode)
+                                (commentOrEndOfLineToNode)
+                            (stringFigurativeMultilineQuoteToNode)
+                                (escapeSectionToNode)
+                                (commentOrEndOfLineToNode)
+                        (customValueToNode)
+                            (customAttributesToNode)
+                
+                (nextLineValueToNode)
+                    (commentOrEndOfLineToNode)
+                        (mapToNode)
+                        (listToNode)
+                            (commentOrEndOfLineToNode)
+                            (mapValueToNode)
+                        (nextLineInlineValue)
+                            (commentOrEndOfLineToNode)
+                            (inlineValueToNode)
+        (listToNode)
+        (topLevelValueToNode)
+            (stringBlockToNode -- but without the indent)
+            (customValueToNode -- but without the indent)
+            (inlineValueToNode)
+
+unique structures:
+    forms: [ topLevel, key, referenceEvaulation, restOfLineValue, spanningLinesValue, indentedValue ]
+    document(topLevel)
+        comment(topLevel, restOfLineValue, indentedValue)
+        blankLine(topLevel, restOfLineValue, indentedValue)
+        emptyMap(topLevel, restOfLineValue, indentedValue)
+        emptyList(topLevel, restOfLineValue, indentedValue)
+        map(topLevel, indentedValue)
+            keyValue(indentedValue)
+                [keyPart]
+                    atom(key, referenceEvaulation, restOfLineValue, indentedValue)
+                    number(key, referenceEvaulation, restOfLineValue, indentedValue)
+                    stringLiteral(key, referenceEvaulation, restOfLineValue, spanningLinesValue, indentedValue)
+                    stringFigurative(key, referenceEvaulation, restOfLineValue, spanningLinesValue, indentedValue)
+                    custom(key, referenceEvaulation, restOfLineValue, spanningLinesValue, indentedValue)
+                [valuePart]
+                    specialValues(restOfLineValue, indentedValue)
+                    reference(restOfLineValue, indentedValue)
+        list(topLevel, indentedValue)

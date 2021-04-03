@@ -1,12 +1,14 @@
+
 (documentToNode): # given string
     loop:
-        (commentToNode):
-            regex: "/ */"
-            regex: "/# /"
-            regex: "/.+/"
-            regex: "/\n|\z/"
-        (blankLineToNode):
-            regex: "/ *(\n|\z)/"
+        (commentOrEndOfLineToNode):
+            (commentToNode):
+                regex: "/ */"
+                regex: "/# /"
+                regex: "/.+/"
+                regex: "/\n|\z/"
+            (blankLineToNode):
+                regex: "/ *(\n|\z)/"
         
     optional:
         oneOf:
@@ -21,8 +23,7 @@
             (mapToNode): # given unindented string
                 loop:
                     oneOf:
-                        (commentToNode):
-                        (blankLineToNode):
+                        (commentOrEndOfLineToNode):
                         group:
                             (keyToNode):
                                 oneOf:
@@ -78,16 +79,15 @@
                                             (attributeToNode):
                                                 regex: "/[a-zA-Z_][a-zA-Z_0-9]*/"
                                                 optional:
-                                                    (attributeTreeToNode):
-                                                        regex: "/\(/"
-                                                        loop:
-                                                            (attributeToNode):
-                                                            regex: "/ */"
-                                                            regex: "/,/"
-                                                        optional:
-                                                            (attributeToNode):
+                                                    regex: "/\(/"
+                                                    loop:
+                                                        (attributeToNode):
                                                         regex: "/ */"
-                                                        regex: "/\)/"
+                                                        regex: "/,/"
+                                                    optional:
+                                                        (attributeToNode):
+                                                    regex: "/ */"
+                                                    regex: "/\)/"
                                             regex: "/\~/"
                                         regex: "/ +/"
                                         oneOf:
@@ -112,12 +112,7 @@
                                             (stringLiteralKeyToNode):
                                             (stringFigurativeKeyToNode):
                                             (referenceToNode):
-                                            (customKeyToNode):
                                         (commentOrEndOfLineToNode):
-                                            regex: "/ */"
-                                            oneOf:
-                                                (commentToNode):
-                                                regex: "/\n|\z/"
                                     (lineOverlapValueToNode):
                                         oneOf:
                                             (stringBlockToNode):
@@ -145,23 +140,21 @@
                                                 
                                             (customValueToNode):
                                                 (customAttributesToNode):
-                                                oneOf:
-                                                    (stringBlockToNode): # quotes
-                                                    (mapToNode): # manually un-indent block before giving it to map
-                                                    (listToNode): # manually un-indent block before giving it to list
-                                                        loop:
-                                                            oneOf:
-                                                                (commentToNode):
-                                                                (blankLineToNode):
-                                                                group:
-                                                                    regex: "/- /"
-                                                                    (mapValueToNode):
+                                                regex: /.+/
+                                                find indented block:
+                                    
                                     (nextLineValueToNode):
                                         (commentOrEndOfLineToNode):
                                         get indented block:
                                             oneOf:
                                                 (mapToNode):
                                                 (listToNode):
+                                                    loop:
+                                                        oneOf:
+                                                            (commentOrEndOfLineToNode):
+                                                            group:
+                                                                regex: "/- /"
+                                                                (mapValueToNode):
                                                 (nextLineInlineValue):
                                                     loop:
                                                         (commentOrEndOfLineToNode):
@@ -173,7 +166,11 @@
                     (customValueToNode -- but without the indent)
                     (inlineValueToNode)
 
-# todo: consider units, e.g. 100kilos
-# todo: consider units, e.g. 100 e10
-# ~grams~ 100: ~number(integer(base8))~ DEAD lbs_of_beef
-# ~grams~ 100: ~number~ 12.1343e100
+# todo: consider #this.file
+# todo: consider #this.file.folder
+# todo: consider #this.arguments
+# todo: consider units
+    # e.g. 100kilos
+    # todo: consider units, e.g. 100 e10
+    # ~grams~ 100: ~number(integer(base8))~ DEAD lbs_of_beef
+    # ~grams~ 100: ~number~ 12.1343e100
