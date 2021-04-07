@@ -1,4 +1,59 @@
 completed:
+    stringLiteral
+        key (no stringFigurative conversion)
+
+next:
+    stringLiteral
+        referenceEvaulation
+    stringLiteral
+        restOfLineValue
+    stringLiteral
+        spanningLinesValue
+        indentedValue
+    blankLine
+    emptyMap
+    emptyList
+    comment
+    specialValues
+        restOfLineValue
+        indentedValue
+    atom
+        key, referenceEvaulation
+    atom
+        indentedValue
+        restOfLineValue
+    number
+        key, referenceEvaulation
+        restOfLineValue
+        indentedValue
+    stringFigurative
+        (make placeholder toXData fromXData for: key, referenceEvaulation)
+    custom
+        (make placeholder toXData fromXData for: key, referenceEvaulation)
+    reference
+        restOfLineValue
+        indentedValue
+    stringFigurative
+        key, referenceEvaulation
+        restOfLineValue
+        spanningLinesValue
+        indentedValue
+    stringLiteral
+        key (with stringFigurative conversion)
+    custom
+        key, referenceEvaulation
+        restOfLineValue
+        spanningLinesValue
+        indentedValue
+    keyValue
+    map
+        topLevel
+        indentedValue
+    list
+        topLevel
+        indentedValue
+    document
+    
 
 non-recursive:
     commentOrEndOfLineToNode

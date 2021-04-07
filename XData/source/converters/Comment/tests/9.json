@@ -1,0 +1,6 @@
+{
+    "function": "coreToNode",
+    "inputs": [{ "fullString": "   #hello world", "form": null }],
+    "output": null,
+    "error": null
+}

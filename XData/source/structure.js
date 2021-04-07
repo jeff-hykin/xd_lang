@@ -64,22 +64,20 @@ const Node = module.exports.Node = class extends Component {
 // errors
 // 
 // 
-
-class ProbablyMalformedInput extends Error {
+const ProbablyMalformedInput = module.exports.ProbablyMalformedInput = class extends Error {
     constructor({ stringLocation, converterName, message }) {
         super(message)
         this.stringLocation = stringLocation
         this.converterName = converterName
     }
 }
-module.exports.ProbablyMalformedInput = ProbablyMalformedInput
 
 // 
 // 
 // converters
 // 
 // 
-class Converters {
+const Converters = module.exports.Converters = class {
     validForms = [ "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue" ]
     // be able to look up any node  
     static converterRegistry = {}
@@ -131,18 +129,29 @@ class Converters {
         // return jsonifyable object that can be converted into a valid Xdata string
         return nodeWithModifications
     }
-
+    
+    // default version is basically recursive concat
     nodeToXdataString(node) {
         const fixedNode = this.fixUpNode(node)
         let outputString = ""
         for (const [key, value] of Object.entries(fixedNode.components)) {
-            // if it is a node
-            if (value.converterName) {
-                const converter = Converters.converterRegistry[value.converterName]
-                outputString += converter.nodeToXdataString(value)
+            // if nullish then skip
+            if (value == null) {
+                // skip
+            } else if (value instanceof Object) {
+                // if it is a node
+                if (value.converterName) {
+                    const converter = Converters.converterRegistry[value.converterName]
+                    outputString += converter.nodeToXdataString(value)
+                // if its is a token
+                } else {
+                    outputString += value.string
+                }
+            // something else, thats an error
+            } else {
+                throw Error(`nodeToXdataString() one of the components wasnt an object: ${value}`)
             }
         }
         return outputString
     }
 }
-module.exports.Node = Node

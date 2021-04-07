@@ -12,8 +12,8 @@ module.exports.findAll = (regexPattern, sourceString) => {
     return output
 }
 
-module.exports.indent = (string) => {
-    return string.toString().replace(/(^|\n)/g, `$1${indentUnit}`)
+module.exports.indent = ({string, indent}) => {
+    return string.replace(/(^|\n)/g, `$1${indent}`)
 }
 
 module.exports.extractFirst = ({ pattern, from }) => {
