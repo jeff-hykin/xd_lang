@@ -1,6 +1,28 @@
 const utils = require("./utils")
 
-class StringLocation {
+
+
+// 
+// 
+// errors
+// 
+// 
+
+const ProbablyMalformedInput = module.exports.ProbablyMalformedInput = class extends Error {
+    constructor({ location, decodeAs, message }) {
+        super(message)
+        this.location = location
+        this.decodeAs = decodeAs
+    }
+}
+
+
+// 
+// 
+// basic structures
+// 
+// 
+const Location = module.exports.Location = class {
     lineIndex = 0
     characterIndex = 0
     stringIndex = 0
@@ -10,24 +32,43 @@ class StringLocation {
         this.stringIndex = stringIndex
     }
 }
-module.exports.StringLocation = StringLocation
+const Context = module.exports.Context = class extends Location {
+    static validNames = [ "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue" ]
+    name = ""
+    lineIndex = 0
+    characterIndex = 0
+    stringIndex = 0
+    constructor({name, stringIndex=0, lineIndex=0, characterIndex=0}) {
+        this.name = name
+        this.lineIndex = lineIndex
+        this.characterIndex = characterIndex
+        this.stringIndex = stringIndex
+        if (!this.validNames.includes(this.name)) {
+            throw Error(`Context was created with name: ${name}, but that isn't one of ${this.validNames}`)
+        }
+    }
+}
 
 // 
 // 
 // contents
 // 
 // 
+let converters = module.exports.converters = {}
 const Component = module.exports.Component = class {}
+// token is basically a helper class for strings, just adding extra methods to what would be a primitive
 const Token = module.exports.Token = class extends Component {
     string = null
-    constructor({string}) {
+    context = null
+    constructor({string, context}) {
         this.string = string
+        this.context = context
     }
-    getEndLocation(startLocation=(new StringLocation())) {
+    getEndLocation(startLocation=(new Location())) {
         const string = this.string
         if (string != null && startLocation != null) {
             const lines = string.split("\n")
-            return new StringLocation({
+            return new Location({
                 stringIndex: startLocation.stringIndex + string.length,
                 lineIndex: startLocation.lineIndex + lines.length - 1,
                 characterIndex: lines[0].length,
@@ -37,112 +78,73 @@ const Token = module.exports.Token = class extends Component {
         }
     }
 }
-
+// node is the main guy
 const Node = module.exports.Node = class extends Component {
-    converterName = ""
-    form = null
-    startLocation = null
-    endLocation = null
-    components = {}
-    options = {}
-    constructor({components, options}) {
-        this.components = components
-        this.options = options
+    decodeAs = ""
+    childComponents = {} // the order of the items in this object is significant
+    formattingInfo = {}
+    context = null
+    constructor({decodeAs, childComponents, formattingInfo, context}) {
+        this.decodeAs = decodeAs
+        this.childComponents = childComponents
+        this.formattingInfo = formattingInfo
+        this.context = context
     }
-    getEndLocation(startLocation=(new StringLocation())) {
+    getEndLocation(startLocation=(new Location())) {
         let runningEndLocation = startLocation
-        for (const [key, each] of Object.entries(this.components)) {
+        for (const [key, each] of Object.entries(this.childComponents)) {
             runningEndLocation = each.getEndLocation(runningEndLocation)
         }
         return runningEndLocation
     }
-    // TODO: add a getComments() that recursively calls getComments() on components
-}
-
-// 
-// 
-// errors
-// 
-// 
-
-class ProbablyMalformedInput extends Error {
-    constructor({ stringLocation, converterName, message }) {
-        super(message)
-        this.stringLocation = stringLocation
-        this.converterName = converterName
+    toJson() {
+        return {
+            decodeAs: this.decodeAs,
+            childComponents: this.childComponents,
+            formattingInfo: this.formattingInfo,
+            context: this.context,
+        }
     }
+    toXDataString() {
+        return converters.registry[this.decodeAs].nodeToXdataString(this)
+    }
+    // TODO: add a getComments() that recursively calls getComments() on childComponents
 }
-module.exports.ProbablyMalformedInput = ProbablyMalformedInput
 
 // 
 // 
 // converters
 // 
 // 
-class Converters {
-    validForms = [ "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue" ]
-    // be able to look up any node  
-    static converterRegistry = {}
-    constructor() {
-        Converters.converterRegistry[this.converterName] = this
-    }
 
-    get converterName() {
-        return this.constructor.name
-    }
 
-    // create an jsonifyable object from a string value
-    toNode({ fullString, stringLocation, form, }) {
-        const remainingString = fullString.slice(stringLocation.stringIndex, fullString.length)
-        let result = {}
-        const output = {
-            inputIsProbablyMalformed: null,
-            node: null,
-            stringLocation,
-        }
-        try {
-            output.node = coreToNode({remainingString, form})
-            if (output.node instanceof Node) {
-                output.stringLocation = output.node.getEndLocation(stringLocation)
+/**
+ * Function that does something
+ *
+ * @param {String} args.decoderName - a
+ * @param {Function} args.xdataStringToNode - ({ string, context }) => Node
+ * @param {Function} args.nodeToXdataString - (node) => String
+ *
+ */
+const createConverter = module.exports.createConverter = function ({
+    decoderName,
+    xdataStringToNode,
+    nodeToXdataString=null,
+}) {
+    converters[decoderName] = {
+        // default values
+        nodeToXdataString(node) {
+            let outputString = ""
+            for (const [key, value] of Object.entries(fixedNode.childComponents)) {
+                // if it is a node
+                if (value.decodeAs) {
+                    const converter = Converters.registry[value.decodeAs]
+                    outputString += converter.nodeToXdataString(value)
+                }
             }
-        } catch (error) {
-            // no big deal, dont report
-            if (error instanceof ProbablyMalformedInput) {
-                output.inputIsProbablyMalformed = error
-            // okay probably something in the code is wrong, report that
-            } else {
-                throw error
-            }
-        }
-        return output
-    }
-
-    // 
-    // children should implement the following
-    // 
-
-    coreToNode({remainingString, form}) {
-        // children should implment this
-        throw ProbablyMalformedInput({ stringLocation, converterName, message })
-        return node || null
-    }
-
-    fixUpNode({ nodeWithModifications, originalNode }) {
-        // return jsonifyable object that can be converted into a valid Xdata string
-        return nodeWithModifications
-    }
-
-    nodeToXdataString(node) {
-        const fixedNode = this.fixUpNode(node)
-        let outputString = ""
-        for (const [key, value] of Object.entries(fixedNode.components)) {
-            // if it is a node
-            if (value.converterName) {
-                const converter = Converters.converterRegistry[value.converterName]
-                outputString += converter.nodeToXdataString(value)
-            }
-        }
-        return outputString
+            return outputString
+        },
+        ...({...xdataStringToNode}),
+        ...({...nodeToXdataString}),
     }
 }
-module.exports.Node = Node
