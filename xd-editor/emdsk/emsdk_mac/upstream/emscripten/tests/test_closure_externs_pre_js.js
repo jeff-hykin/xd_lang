@@ -1,1 +1,0 @@
-someExtern.var = 42;
