@@ -1,0 +1,40 @@
+- everything is a part of a statement
+- some statements are multiple lines
+- every statement must begin with a keyword
+- keywords are redefinable
+- the core language only uses keywords, everything else can be imported with toolboxes
+
+# parsing
+- parsing:
+    tree: 
+        - keeps track of active scope (subtree)
+        - keeps track of variable names
+        - in the future will keep track of the keywords
+    top-level-mode(tree): |
+        if line empty
+        then
+            skip
+        end if 
+        if line starts with non-keyword
+        then
+            error
+        end if 
+        if line starts with keyword
+        and if the line contains non-whitespace
+        then
+            copy the rest of the line
+            delete the line from the lines
+            do tree.push(keywords[name](line, tree))
+        else 
+            set sub_tree
+            to new TreeObject(parent=tree)
+            
+            copy all the indented code
+            when finding unindented code, look up the keywords[keyword].validNames
+            if it unindented code starts with a valid name, let it continue to the next unindented/equal part
+            expect it to be closed with "end "+keyword
+            process those blocks recursively using run top-level-mode(sub_tree)
+            delete all those lines
+        end if
+            
+        

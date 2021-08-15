@@ -1,6 +1,7 @@
 completed:
     stringLiteral
         key (no stringFigurative conversion)
+    comment
 
 next:
     stringLiteral
@@ -13,7 +14,6 @@ next:
     blankLine
     emptyMap
     emptyList
-    comment
     specialValues
         restOfLineValue
         indentedValue
