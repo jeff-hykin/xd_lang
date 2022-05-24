@@ -3,16 +3,14 @@ import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 import { Comment } from "../Comment/Comment.js"
 
-export const EmptyMap = createConverter({
-    decoderName: "EmptyMap",
+export const SpecialValues = createConverter({
+    decoderName: "SpecialValues",
     xdataStringToNode({ string, context }) {
         var remaining = string
         // doesnt care about the context.name: "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue"
         let components = {
             preWhitespace: null, // token
-            openBracket: null, // token
-            whitespace: null, // token
-            closeBracket: null, // token
+            content: null, // token
             postWhitespace: null, // token
             comment: null, // node
         }
@@ -26,21 +24,8 @@ export const EmptyMap = createConverter({
         // 
         // openBracket
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /\{/, from: remaining }); if (extraction == null) { return null }
-        components.openBracket = new Token({string:extraction})
-        
-        // 
-        // preWhitespace
-        // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
-        components.whitespace = new Token({string:extraction})
-
-        
-        // 
-        // openBracket
-        // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /\}/, from: remaining }); if (extraction == null) { return null }
-        components.closeBracket = new Token({string:extraction})
+        var { remaining, extraction } = utils.extractFirst({ pattern: /true|false|infinite|infinity|-infinite|-infinity|NaN|nullptr|null|nil|none|undefined/i, from: remaining }); if (extraction == null) { return null }
+        components.content = new Token({string:extraction})
         
         // 
         // postWhitespace
@@ -55,7 +40,7 @@ export const EmptyMap = createConverter({
             components.comment = Comment.xdataStringToNode({
                 string: remaining,
                 context: context.advancedBy(
-                    (components.preWhitespace||'')+(components.openBracket||'')+(components.whitespace||'')+(components.closeBracket||'')+(components.postWhitespace||'')
+                    (components.preWhitespace||'')+(components.content||'')+(components.postWhitespace||'')
                 ),
             })
         }
@@ -64,7 +49,7 @@ export const EmptyMap = createConverter({
         // return
         // 
         return new Node({
-            decodeAs: "EmptyMap",
+            decodeAs: "SpecialValues",
             originalContext: context,
             childComponents: components,
             formattingInfo: {},  

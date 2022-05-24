@@ -23,16 +23,20 @@
                             oneOf:
                                 (inlineValueToNode):
                                     (emptyMapToNode):
+                                        regex: "/ */"
                                         regex: "/\{/"
                                         regex: "/ */"
                                         regex: "/\}/"
+                                        regex: "/ */"
                                     (emptyListToNode):
+                                        regex: "/ */"
                                         regex: "/\[/"
                                         regex: "/ */"
                                         regex: "/\]/"
-                                    (specialValues):
+                                        regex: "/ */"
+                                    (specialValuesToNode):
                                         regex: "/true|false|infinite|infinity|-infinite|-infinity|NaN|nullptr|null|nil|none|undefined/i"
-                                    (numberLiteralKeyToNode):
+                                    (numberLiteralToNode):
                                         regex: "/(-|+)?/"
                                         regex: "/\d+(\.\d+)?/"
                                     (atomValueToNode):
@@ -122,7 +126,7 @@
                                                                 oneOf:
                                                                     (atomKeyToNode):
                                                                         regex: "/[a-zA-Z_][a-zA-Z_0-9]*/"
-                                                                    (numberLiteralKeyToNode):
+                                                                    (numberLiteralToNode):
                                                                     (stringLiteralKeyToNode):
                                                                     (stringFigurativeKeyToNode):
                                                                     (customKeyToNode): # ex: ~date(UTC)~

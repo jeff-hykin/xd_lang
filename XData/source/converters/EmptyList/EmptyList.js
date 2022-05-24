@@ -51,12 +51,14 @@ export const EmptyList = createConverter({
         // 
         // comment
         // 
-        components.comment = Comment.xdataStringToNode({
-            string: remaining,
-            context: context.advancedBy(
-                (components.preWhitespace||'')+(components.openBracket||'')+(components.whitespace||'')+(components.closeBracket||'')+(components.postWhitespace||'')
-            ),
-        })
+        if (context.name != "key") {
+            components.comment = Comment.xdataStringToNode({
+                string: remaining,
+                context: context.advancedBy(
+                    (components.preWhitespace||'')+(components.openBracket||'')+(components.whitespace||'')+(components.closeBracket||'')+(components.postWhitespace||'')
+                ),
+            })
+        }
         
         // 
         // return
