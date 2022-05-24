@@ -2,17 +2,16 @@ import { Token, Node, createConverter } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 import { Comment } from "../Comment/Comment.js"
-
-export const EmptyList = createConverter({
-    decoderName: "EmptyList",
+                                        
+export const NumberLiteral = createConverter({
+    decoderName: "NumberLiteral",
     xdataStringToNode({ string, context }) {
         var remaining = string
         // doesnt care about the context.name: "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue"
         let components = {
             preWhitespace: null, // token
-            openBracket: null, // token
-            whitespace: null, // token
-            closeBracket: null, // token
+            sign: null, // token
+            content: null, // token
             postWhitespace: null, // token
             comment: null, // node
         }
@@ -26,23 +25,16 @@ export const EmptyList = createConverter({
         }
         
         // 
-        // openBracket
+        // sign
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /\[/, from: remaining }); if (extraction == null) { return null }
-        components.openBracket = new Token({string:extraction})
-        
-        // 
-        // preWhitespace
-        // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
-        components.whitespace = new Token({string:extraction})
+        var { remaining, extraction } = utils.extractFirst({ pattern: /(-|\+)?/, from: remaining }); if (extraction == null) { return null }
+        components.sign = new Token({string:extraction})
 
-        
         // 
-        // openBracket
+        // content
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /\]/, from: remaining }); if (extraction == null) { return null }
-        components.closeBracket = new Token({string:extraction})
+        var { remaining, extraction } = utils.extractFirst({ pattern: /\d+(\.\d+)?/, from: remaining }); if (extraction == null) { return null }
+        components.content = new Token({string:extraction})
         
         // 
         // postWhitespace
@@ -50,14 +42,14 @@ export const EmptyList = createConverter({
         var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
         components.postWhitespace = new Token({string:extraction})
         
-        // 
-        // comment
-        // 
         if (context.name != "key") {
+            // 
+            // comment
+            // 
             components.comment = Comment.xdataStringToNode({
                 string: remaining,
                 context: context.advancedBy(
-                    (components.preWhitespace||'')+(components.openBracket||'')+(components.whitespace||'')+(components.closeBracket||'')+(components.postWhitespace||'')
+                    (components.preWhitespace||'')+(components.content||'')+(components.postWhitespace||'')
                 ),
             })
         }
@@ -66,7 +58,7 @@ export const EmptyList = createConverter({
         // return
         // 
         return new Node({
-            decodeAs: "EmptyList",
+            decodeAs: "NumberLiteral",
             originalContext: context,
             childComponents: components,
             formattingInfo: {},  

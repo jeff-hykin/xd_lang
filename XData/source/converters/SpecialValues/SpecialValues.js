@@ -22,7 +22,7 @@ export const SpecialValues = createConverter({
         components.preWhitespace = new Token({string:extraction})
         
         // 
-        // openBracket
+        // content
         // 
         var { remaining, extraction } = utils.extractFirst({ pattern: /true|false|infinite|infinity|-infinite|-infinity|NaN|nullptr|null|nil|none|undefined/i, from: remaining }); if (extraction == null) { return null }
         components.content = new Token({string:extraction})

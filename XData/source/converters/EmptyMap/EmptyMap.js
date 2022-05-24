@@ -20,8 +20,10 @@ export const EmptyMap = createConverter({
         // 
         // preWhitespace
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
-        components.preWhitespace = new Token({string:extraction})
+        if (context.name != "key") {
+            var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+            components.preWhitespace = new Token({string:extraction})
+        }
         
         // 
         // openBracket
