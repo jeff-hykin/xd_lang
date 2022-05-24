@@ -1,18 +1,4 @@
-// const { StringLocation, Token } = require("./structure")
 import * as utils from "./utils.js" 
-
-export const calculateEndLocation = ({startLocation, string}) => {
-    if (string != null && startLocation != null) {
-        const lines = string.split("\n")
-        return new StringLocation({
-            stringIndex: startLocation.stringIndex + string.length,
-            lineIndex: startLocation.lineIndex + lines.length - 1,
-            columnIndex: lines[0].length,
-        })
-    } else {
-        return startLocation
-    }
-}
 
 export const minimumViableQuoteSize = (stringContent, quote) => {
     if (stringContent == null || quote == null) {

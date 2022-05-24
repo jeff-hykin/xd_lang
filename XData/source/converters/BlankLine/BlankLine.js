@@ -16,12 +16,12 @@ export const BlankLine = createConverter({
         // leading whitespace
         // 
         var { remaining, extraction } = utils.extractFirst({ pattern: /[ \t]*/, from: remaining }); if (extraction == null) { return null }
-        components.preWhitespace = new Token({string:extraction})
+        components.whitespace = new Token({string:extraction})
         
         // 
         // newline
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /\n?/, from: remaining }); if (extraction == null) { return null }
+        var { remaining, extraction } = utils.extractFirst({ pattern: /(\n?|$)/, from: remaining }); if (extraction == null) { return null }
         components.newline = new Token({string:extraction})
         
         // 

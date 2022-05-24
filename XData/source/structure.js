@@ -145,30 +145,38 @@ export const createConverter = function ({
     decoderName,
     xdataStringToNode,
     nodeToXdataString=null,
+    ...other,
 }) {
     converters[decoderName] = {
         // default values
         nodeToXdataString(node) {
-            // main case
-            let outputString = ""
-            for (const [key, component] of Object.entries(node.childComponents)) {
+            function convertComponent(component, node) {
                 // base case 1
                 if (typeof component == 'string') {
-                    outputString += component
+                    return component
                 // base case 2
                 } else if (component instanceof Token) {
-                    outputString += component.string
-                // if it is a node
+                    return component.string
+                // recursive case 1
+                } else if (component instanceof Array) {
+                    return component.map(each=>convertComponent(each)).join("")
+                // recursive case 2 // if it is a proper node
                 } else if (converters[component.decodeAs]) {
                     const converter = converters[component.decodeAs]
-                    outputString += converter.nodeToXdataString(component)
+                    return converter.nodeToXdataString(component)
                 } else {
                     throw Error(`I don't know how to convert \n${utils.toString(component)}\nof\n${utils.toString(node)}\n into an XData string. It doesnt have a .decodeAs property that is in the available decoders:\n${utils.toString(Object.keys(converters))}`)
                 }
             }
+            let outputString = ""
+            for (const [key, component] of Object.entries(node.childComponents)) {
+                outputString += convertComponent(component)
+            }
             return outputString
         },
         ...({nodeToXdataString}), // override the one above if non-null
-        xdataStringToNode
+        xdataStringToNode,
+        ...other,
     }
+    return converters[decoderName]
 }
