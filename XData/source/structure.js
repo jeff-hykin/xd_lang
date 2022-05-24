@@ -34,14 +34,17 @@ export class Location {
     duplicate() {
         return new Location(this)
     }
-    advanceBy(string) {
-        let startLocation = this
-        if (string != null) {
+    advanceBy(stringOrNode) {
+        if (typeof stringOrNode == 'string') {
+            const string = stringOrNode
             const lines = string.split("\n")
             // TODO: write a unit test to confirm this actually works
-            this.stringIndex = startLocation.stringIndex + string.length,
-            this.lineIndex = startLocation.lineIndex + lines.length - 1,
+            this.stringIndex = this.stringIndex + string.length,
+            this.lineIndex = this.lineIndex + lines.length - 1,
             this.columnIndex = lines[0].length,
+        } else if (stringOrNode instanceof Node) {
+            const node = stringOrNode
+            Object.assign(this, node.getEndLocation(this))
         }
         return this
     }
@@ -81,6 +84,12 @@ export class Token extends Component {
         this.string
         this.context
     }
+    toJson() {
+        return this.string
+    }
+    toXDataString() {
+        return this.string
+    }
     getEndLocation(startLocation=(new Location())) {
         // TODO: arguably should use this.context as starting location
         if (startLocation == null) {
@@ -113,7 +122,7 @@ export class Node extends Component {
     toJson() {
         return {
             decodeAs: this.decodeAs,
-            childComponents: this.childComponents,
+            childComponents: this.childComponents.map(each=>each.toJson()),
             formattingInfo: this.formattingInfo,
             context: this.context,
         }
