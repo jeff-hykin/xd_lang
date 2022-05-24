@@ -8,7 +8,7 @@ import * as utils from "./utils.js"
 // 
 // 
 
-export const ProbablyMalformedInput = class extends Error {
+export class ProbablyMalformedInput extends Error {
     constructor({ location, decodeAs, message }) {
         super(message)
         this.location
@@ -22,30 +22,47 @@ export const ProbablyMalformedInput = class extends Error {
 // basic structures
 // 
 // 
-export const Location = class {
+export class Location {
     lineIndex = 0
-    characterIndex = 0
+    columnIndex = 0
     stringIndex = 0
-    constructor({stringIndex=0, lineIndex=0, characterIndex=0}) {
+    constructor({stringIndex=0, lineIndex=0, columnIndex=0}) {
         this.lineIndex
-        this.characterIndex
+        this.columnIndex
         this.stringIndex
     }
+    duplicate() {
+        return new Location(this)
+    }
+    advanceBy(string) {
+        let startLocation = this
+        if (string != null) {
+            const lines = string.split("\n")
+            // TODO: write a unit test to confirm this actually works
+            this.stringIndex = startLocation.stringIndex + string.length,
+            this.lineIndex = startLocation.lineIndex + lines.length - 1,
+            this.columnIndex = lines[0].length,
+        }
+        return this
+    }
 }
-export const Context = class extends Location {
+export class Context extends Location {
     static validNames = [ "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue" ]
     name = ""
     lineIndex = 0
-    characterIndex = 0
+    columnIndex = 0
     stringIndex = 0
-    constructor({name, stringIndex=0, lineIndex=0, characterIndex=0}) {
+    constructor({name, stringIndex=0, lineIndex=0, columnIndex=0}) {
         this.name
         this.lineIndex
-        this.characterIndex
+        this.columnIndex
         this.stringIndex
         if (!this.validNames.includes(this.name)) {
             throw Error(`Context was created with name: ${name}, but that isn't one of ${this.validNames}`)
         }
+    }
+    duplicate() {
+        return new Context(this)
     }
 }
 
@@ -55,9 +72,9 @@ export const Context = class extends Location {
 // 
 // 
 export let converters = {}
-export const Component = class {}
+export class Component {}
 // token is basically a helper class for strings, just adding extra methods to what would be a primitive
-export const Token = class extends Component {
+export class Token extends Component {
     string = null
     context = null
     constructor({string, context}) {
@@ -65,21 +82,17 @@ export const Token = class extends Component {
         this.context
     }
     getEndLocation(startLocation=(new Location())) {
-        const string = this.string
-        if (string != null && startLocation != null) {
-            const line = string.split("\n")
-            return new Location({
-                stringIndex: startLocation.stringIndex + string.length,
-                lineIndex: startLocation.lineIndex + lines.length - 1,
-                characterIndex: lines[0].length,
-            })
-        } else {
-            return startLocation
+        // TODO: arguably should use this.context as starting location
+        if (startLocation == null) {
+            return null
         }
+        startLocation = startLocation.duplicate()
+        startLocation.advanceBy(this.string)
+        return startLocation
     }
 }
 // node is the main guy
-export const Node = class extends Component {
+export class Node extends Component {
     decodeAs = ""
     childComponents = {} // the order of the items in this object is significant
     formattingInfo = {}

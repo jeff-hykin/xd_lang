@@ -1,11 +1,11 @@
 const Location = module.exports.Location = class {
     stringIndex = 0
     lineIndex = 0
-    characterIndex = 0
-    constructor({stringIndex=0, lineIndex=0, characterIndex=0}) {
+    columnIndex = 0
+    constructor({stringIndex=0, lineIndex=0, columnIndex=0}) {
         this.stringIndex = stringIndex
         this.lineIndex = lineIndex
-        this.characterIndex = characterIndex
+        this.columnIndex = columnIndex
     }
     stringToDistance(string) {
         const lines = string.split(/\n/)
@@ -20,10 +20,10 @@ const Location = module.exports.Location = class {
         let characterDistance
         // if more than one line, use the length of the last line
         if (lineDistance > 0) {
-            characterDistance = node.endLocation.characterIndex
+            characterDistance = node.endLocation.columnIndex
         // if on the same line, then subtract to get the distance
         } else {
-            characterDistance = node.endLocation.characterIndex - node.startLocation.characterIndex
+            characterDistance = node.endLocation.columnIndex - node.startLocation.columnIndex
         }
         
         return module.exports.Location({
@@ -37,7 +37,7 @@ const Location = module.exports.Location = class {
         elements.unshift({
             stringDistance: this.stringIndex,
             lineDistance: this.lineIndex,
-            characterDistance: this.characterIndex,
+            characterDistance: this.columnIndex,
         })
         const distances = elements.map(each=>{
             if (typeof each == 'string') {
@@ -59,7 +59,7 @@ const Location = module.exports.Location = class {
         }
         return module.exports.Location({
             lineIndex: lineDistance,
-            characterIndex: characterDistance,
+            columnIndex: characterDistance,
             stringIndex: stringDistance,
         })
     }

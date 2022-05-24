@@ -7,7 +7,7 @@ export const calculateEndLocation = ({startLocation, string}) => {
         return new StringLocation({
             stringIndex: startLocation.stringIndex + string.length,
             lineIndex: startLocation.lineIndex + lines.length - 1,
-            characterIndex: lines[0].length,
+            columnIndex: lines[0].length,
         })
     } else {
         return startLocation
