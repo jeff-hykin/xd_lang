@@ -1,4 +1,4 @@
-module.exports.findAll = (regexPattern, sourceString) => {
+export const findAll = (regexPattern, sourceString) => {
     let output = []
     let match
     // make sure the pattern has the global flag
@@ -12,11 +12,11 @@ module.exports.findAll = (regexPattern, sourceString) => {
     return output
 }
 
-module.exports.indent = ({string, indent}) => {
+export const indent = ({string, indent}) => {
     return string.replace(/(^|\n)/g, `$1${indent}`)
 }
 
-module.exports.extractFirst = ({ pattern, from }) => {
+export const extractFirst = ({ pattern, from }) => {
     let match = from.match(pattern)
     if (match) {
         return {

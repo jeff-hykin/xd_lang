@@ -1,6 +1,6 @@
-const { Token, Node, Converter } = require("../../structure")
-const utils = require("../../utils")
-const tools = require("../../xdataTools")
+import { Token, Node, Converter } from "../../structure.js"
+import * as utils from "../../utils.js"
+import * as tools from "../../xdataTools.js"
 
 // 
 // 

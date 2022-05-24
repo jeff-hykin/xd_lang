@@ -1,8 +1,8 @@
-const { Token, Node, createConverter } = require("../../structure")
-const utils = require("../../utils")
-const tools = require("../../xdataTools")
+import { Token, Node, createConverter } from "../../structure.js"
+import * as utils from "../../utils.js"
+import * as tools from "../../xdataTools.js"
 
-createConverter({
+export const String = createConverter({
     decoderName: "String",
     xdataStringToNode({ string, context }) {
         var remaining = string

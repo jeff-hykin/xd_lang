@@ -1,7 +1,7 @@
 // const { StringLocation, Token } = require("./structure")
-const utils = require("./utils")
+import * as utils from "./utils.js" 
 
-module.exports.calculateEndLocation = ({startLocation, string}) => {
+export const calculateEndLocation = ({startLocation, string}) => {
     if (string != null && startLocation != null) {
         const lines = string.split("\n")
         return new StringLocation({
@@ -14,7 +14,7 @@ module.exports.calculateEndLocation = ({startLocation, string}) => {
     }
 }
 
-module.exports.minimumViableQuoteSize = (stringContent, quote) => {
+export const minimumViableQuoteSize = (stringContent, quote) => {
     if (stringContent == null || quote == null) {
         return null
     }
@@ -30,7 +30,7 @@ module.exports.minimumViableQuoteSize = (stringContent, quote) => {
     return minViableQuoteSize
 }
 
-module.exports.extractStartingQuote = (quoteString) => {
+export const extractStartingQuote = (quoteString) => {
     if (quoteString == null) {
         return null
     }
