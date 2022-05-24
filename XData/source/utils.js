@@ -1,3 +1,9 @@
+import { toString } from "https://deno.land/x/good@0.5.13/string.js"
+
+export {
+    toString as toString
+}
+
 export const findAll = (regexPattern, sourceString) => {
     let output = []
     let match

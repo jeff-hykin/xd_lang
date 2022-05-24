@@ -50,7 +50,7 @@ export const String = createConverter({
                 // 
                     return new Node({
                         decodeAs: "String",
-                        context,
+                        originalContext: context,
                         childComponents,
                         formattingInfo: {
                             quoteSize: childComponents.openingQuote.length,
@@ -135,7 +135,7 @@ export const String = createConverter({
         // 
         // main formatting decisions
         // 
-        switch (node.context.name) {
+        switch (node.originalContext.name) {
             case "topLevel":
                 // FIXME
                 break
@@ -167,7 +167,7 @@ export const String = createConverter({
                 break
         
             default:
-                throw Error(`[from nodeToXdataString()] Invalid context name. Context = ${JSON.stringify(node.context)}`)
+                throw Error(`[from nodeToXdataString()] Invalid context name. Context = ${JSON.stringify(node.originalContext)}`)
                 break
         }
     }

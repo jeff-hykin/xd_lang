@@ -1,12 +1,10 @@
 import { FileSystem } from "https://deno.land/x/quickr@0.3.24/main/file_system.js"
-import { Context } from "./structure.js"
+import { Context, converters } from "./structure.js"
+import * as utils from "./utils.js"
 // converters
-import { Comment } from "./converters/Comment/Comment.js"
-import { String } from "./converters/String/String.js"
-const converters = [
-    Comment,
-    String,
-]
+import "./converters/String/BlankLine.js"
+import "./converters/Comment/Comment.js"
+import "./converters/String/String.js"
 
 function parse(string) {
     const topLevelNodes = []
@@ -23,16 +21,20 @@ function parse(string) {
     while (getRemaining().length > 0) {
         let allFailed = true
         const errors = []
-        for (const eachConverter of converters) {
+        for (const [decoderName, eachConverter] of Object.entries(converters)) {
             try {
                 const node = eachConverter.xdataStringToNode({
                     string: getRemaining(),
                     context: context.duplicate(),
                 })
-                allFailed = false
-                context.advanceBy(node) // increments the context location
-                topLevelNodes.push(node)
-                break
+                if (node instanceof Node) {
+                    allFailed = false
+                    context.advanceBy(node) // increments the context location
+                    topLevelNodes.push(node)
+                    break
+                } else {
+                    error.push(`${decoderName} returned ${utils.toString(node)}`)
+                }
             } catch (error) {
                 errors.push(error)
             }

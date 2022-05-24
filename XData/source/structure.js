@@ -79,19 +79,16 @@ export class Component {}
 // token is basically a helper class for strings, just adding extra methods to what would be a primitive
 export class Token extends Component {
     string = null
-    context = null
-    constructor({string, context}) {
+    originalContext = null
+    constructor({string, originalContext}) {
         this.string
-        this.context
+        this.originalContext
     }
     toJson() {
         return this.string
     }
-    toXDataString() {
-        return this.string
-    }
     getEndLocation(startLocation=(new Location())) {
-        // TODO: arguably should use this.context as starting location
+        // TODO: arguably should use this.originalContext as starting location
         if (startLocation == null) {
             return null
         }
@@ -105,12 +102,18 @@ export class Node extends Component {
     decodeAs = ""
     childComponents = {} // the order of the items in this object is significant
     formattingInfo = {}
-    context = null
-    constructor({decodeAs, childComponents, formattingInfo, context}) {
+    originalContext = null
+    constructor({decodeAs, childComponents, formattingInfo, originalContext}) {
         this.decodeAs = decodeAs
         this.childComponents = childComponents
         this.formattingInfo = formattingInfo
-        this.context = context
+        this.originalContext = originalContext
+        // make sure all childComponents inherit from Component
+        for (const [key, value] of Object.entries(childComponents)) {
+            if (typeof value == 'string') {
+                this.childComponents[key] = new Token({ string, originalContext: null })
+            }
+        }
     }
     getEndLocation(startLocation=(new Location())) {
         let runningEndLocation = startLocation
@@ -124,11 +127,8 @@ export class Node extends Component {
             decodeAs: this.decodeAs,
             childComponents: this.childComponents.map(each=>each.toJson()),
             formattingInfo: this.formattingInfo,
-            context: this.context,
+            originalContext: this.originalContext,
         }
-    }
-    toXDataString() {
-        return converters.registry[this.decodeAs].nodeToXdataString(this)
     }
     // TODO: add a getComments() that recursively calls getComments() on childComponents
 }
@@ -149,17 +149,26 @@ export const createConverter = function ({
     converters[decoderName] = {
         // default values
         nodeToXdataString(node) {
+            // main case
             let outputString = ""
-            for (const [key, value] of Object.entries(fixedNode.childComponents)) {
+            for (const [key, component] of Object.entries(node.childComponents)) {
+                // base case 1
+                if (typeof component == 'string') {
+                    outputString += component
+                // base case 2
+                } else if (component instanceof Token) {
+                    outputString += component.string
                 // if it is a node
-                if (value.decodeAs) {
-                    const converter = Converters.registry[value.decodeAs]
-                    outputString += converter.nodeToXdataString(value)
+                } else if (converters[component.decodeAs]) {
+                    const converter = converters[component.decodeAs]
+                    outputString += converter.nodeToXdataString(component)
+                } else {
+                    throw Error(`I don't know how to convert \n${utils.toString(component)}\nof\n${utils.toString(node)}\n into an XData string. It doesnt have a .decodeAs property that is in the available decoders:\n${utils.toString(Object.keys(converters))}`)
                 }
             }
             return outputString
         },
-        ...({...xdataStringToNode}),
-        ...({...nodeToXdataString}),
+        ...({nodeToXdataString}), // override the one above if non-null
+        xdataStringToNode
     }
 }
