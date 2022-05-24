@@ -11,11 +11,16 @@ export const Document = createConverter({
         if (context.name != "topLevel") {
             return null
         }
-        // doesnt care about the context.name: "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue"
+        
         let components = {
             beforeValue: [],
             value: null, // node
             afterValue: [],
+        }
+
+        let node = true
+        while (node) {
+            node = commentOrEndOfLineToNode({ string: remaining, context })
         }
 
         // 

@@ -29,7 +29,7 @@ function parse(string) {
                 })
                 if (node instanceof Node) {
                     allFailed = false
-                    context.advanceBy(node) // increments the context location
+                    context = context.advancedBy(node)
                     topLevelNodes.push(node)
                     break
                 } else {

@@ -27,26 +27,25 @@ export class Location {
     columnIndex = 0
     stringIndex = 0
     constructor({stringIndex=0, lineIndex=0, columnIndex=0}) {
-        this.lineIndex
-        this.columnIndex
-        this.stringIndex
+        this.lineIndex = stringIndex
+        this.columnIndex = lineIndex
+        this.stringIndex = columnIndex
+        Object.freeze(this)
     }
-    duplicate() {
-        return new Location(this)
-    }
-    advanceBy(stringOrNode) {
+    advancedBy(stringOrNode) {
+        let newValue = { ...this }
         if (typeof stringOrNode == 'string') {
             const string = stringOrNode
             const lines = string.split("\n")
             // TODO: write a unit test to confirm this actually works
-            this.stringIndex = this.stringIndex + string.length,
-            this.lineIndex = this.lineIndex + lines.length - 1,
-            this.columnIndex = lines[0].length,
+            newValue.stringIndex = this.stringIndex + string.length,
+            newValue.lineIndex = this.lineIndex + lines.length - 1,
+            newValue.columnIndex = lines[0].length,
         } else if (stringOrNode instanceof Node) {
             const node = stringOrNode
-            Object.assign(this, node.getEndLocation(this))
+            Object.assign(newValue, node.getEndLocation(this))
         }
-        return this
+        return newValue
     }
 }
 export class Context extends Location {
@@ -63,9 +62,7 @@ export class Context extends Location {
         if (!this.validNames.includes(this.name)) {
             throw Error(`Context was created with name: ${name}, but that isn't one of ${this.validNames}`)
         }
-    }
-    duplicate() {
-        return new Context(this)
+        Object.freeze(this)
     }
 }
 
@@ -89,12 +86,9 @@ export class Token extends Component {
     }
     getEndLocation(startLocation=(new Location())) {
         // TODO: arguably should use this.originalContext as starting location
-        if (startLocation == null) {
-            return null
+        if (startLocation instanceof Location) {
+            return startLocation.advancedBy(this.string)
         }
-        startLocation = startLocation.duplicate()
-        startLocation.advanceBy(this.string)
-        return startLocation
     }
 }
 // node is the main guy
@@ -121,6 +115,9 @@ export class Node extends Component {
             runningEndLocation = each.getEndLocation(runningEndLocation)
         }
         return runningEndLocation
+    }
+    stringAndContextResult({ string, context }) {
+        const endLocation = this.getEndLocation(context)
     }
     toJson() {
         return {
