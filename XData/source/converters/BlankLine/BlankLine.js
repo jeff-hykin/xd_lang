@@ -2,73 +2,39 @@ import { Token, Node, createConverter } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
-// 
-// 
-// forms 
-// 
-// 
-class BlankLine extends Node {
-    converterName = "BlankLine"
-    components = {
-        whitespace: null, // token
-    }
-}
-
-// 
-// converter
-// 
-class Comment extends Converter {
-    coreToNode({remainingString, form}) {
-        var remaining = remainingString
+export const BlankLine = createConverter({
+    decoderName: "BlankLine",
+    xdataStringToNode({ string, context }) {
+        var remaining = string
+        // doesnt care about the context.name: "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue"
         let components = {
-            preWhitespace: null, // token
-            commentSymbol: null, // token
-            content: null, // token
-            newline: null, // token
+            whitespace: null, // token
+            newline: null,
         }
 
         // 
         // leading whitespace
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+        var { remaining, extraction } = utils.extractFirst({ pattern: /[ \t]*/, from: remaining }); if (extraction == null) { return null }
         components.preWhitespace = new Token({string:extraction})
-
-        // 
-        // comment symbol
-        // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /# |#(?=\n)/, from: remaining }); if (extraction == null) { return null }
-        components.commentSymbol = new Token({string:extraction})
-
-        // 
-        // comment symbol
-        // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /.*/, from: remaining }); if (extraction == null) { return null }
-        components.content = new Token({string:extraction})
-
+        
         // 
         // newline
         // 
         var { remaining, extraction } = utils.extractFirst({ pattern: /\n?/, from: remaining }); if (extraction == null) { return null }
-        components.content = new Token({string:extraction})
+        components.newline = new Token({string:extraction})
         
         // 
         // return
         // 
-        return new CommentNode({
-            components,
+        return new Node({
+            decodeAs: "BlankLine",
+            originalContext: context,
+            childComponents: components,
+            formattingInfo: {},  
         })
-    }
-    fixUpNode({ nodeWithModifications, originalNode }) {
-        // set default form if needed
-        if (nodeWithModifications.form    == null) { nodeWithModifications.form    = originalNode.form    || "indentedValue" }
-        if (nodeWithModifications.newline == null) { nodeWithModifications.newline = originalNode.newline || "\n" }
-        nodeWithModifications.commentSymbol = "# " // it should always equal this
-        // TODO: probably could do better
-        return nodeWithModifications
-    }
-}
-
-
-module.exports = {
-    Comment,
-}
+    },
+    // nodeToXdataString(node) {
+    //      // defaults to combining all childComponents
+    // }
+})
