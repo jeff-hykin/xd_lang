@@ -116,8 +116,17 @@ export class Node extends Component {
         }
         return runningEndLocation
     }
-    stringAndContextResult({ string, context }) {
+    stringAndContextResult({ remainingString, context }) {
+        const editableContext = {...context}
+        const start = context.stringIndex
         const endLocation = this.getEndLocation(context)
+        const end = endLocation.stringIndex
+        const numberOfCharacters = end - start
+        Object.assign(editableContext, endLocation)
+        return {
+            remainingString: remainingString.slice(0, numberOfCharacters),
+            context: new Context(editableContext)
+        }
     }
     toJson() {
         return {
@@ -170,6 +179,22 @@ export const createConverter = function ({
                 outputString += convertComponent(component)
             }
             return outputString
+        },
+        xdataStringToParsed({ remaining, context }) {
+            const node = nodeToXdataString({ string: remaining, context })
+            if (!node) {
+                return { node, remaining, context }
+            } else {
+                var { remainingString: remaining, context } = node.stringAndContextResult({
+                    remainingString: remaining,
+                    context,
+                })
+                return {
+                    node,
+                    remaining,
+                    context,
+                }
+            }
         },
         ...({nodeToXdataString}), // override the one above if non-null
         xdataStringToNode,

@@ -1,11 +1,12 @@
 import { Token, Node, createConverter, converters } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
-import { commentOrEndOfLineToNode } from "../../xdataAggregates.js"
+import { commentOrEndOfLineToParsed } from "../../xdataAggregates.js"
 
 export const Document = createConverter({
     decoderName: "Document",
     xdataStringToNode({ string, context }) {
+        const originalContext = context
         var remaining = string
         // only works in top level
         if (context.name != "topLevel") {
@@ -17,29 +18,24 @@ export const Document = createConverter({
             value: null, // node
             afterValue: [],
         }
-
-        let node = true
+        
+        // 
+        // beforeValue
+        // 
+        var node = true
         while (node) {
-            node = commentOrEndOfLineToNode({ string: remaining, context })
+            var { node, remaining, context } = commentOrEndOfLineToParsed({ string: remaining, context })
+            if (node) {
+                components.beforeValue.push(node)
+            }
         }
-
         // 
-        // leading whitespace
+        // value
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
-        components.preWhitespace = new Token({string:extraction})
-
+        
         // 
-        // comment symbol
+        // afterValue
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /# |#(?=\n)/, from: remaining }); if (extraction == null) { return null }
-        components.commentSymbol = new Token({string:extraction})
-
-        // 
-        // comment symbol
-        // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /.*/, from: remaining }); if (extraction == null) { return null }
-        components.content = new Token({string:extraction})
 
         // 
         // newline

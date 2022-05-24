@@ -1,11 +1,11 @@
 import { Comment } from "./converters/Comment/Comment.js"
 import { BlankLine } from "./converters/BlankLine/BlankLine.js"
 
-export const commentOrEndOfLineToNode = ({ string, context }) => {
-    const node = Comment.xdataStringToNode({ string, context })
-    if (node) {
-        return node
+export const commentOrEndOfLineToParsed = ({ string, context }) => {
+    const result = Comment.xdataStringToParsed({ string, context })
+    if (result) {
+        return result
     } else {
-        return BlankLine.xdataStringToNode({ string, context })
+        return BlankLine.xdataStringToParsed({ string, context })
     }
 }
