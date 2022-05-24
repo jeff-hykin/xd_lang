@@ -36,5 +36,26 @@
             process those blocks recursively using run top-level-mode(sub_tree)
             delete all those lines
         end if
-            
-        
+
+javascript: |
+    
+    function parseFile() {
+        let context = {
+            variableScope: {},
+            keywordScope: [
+                {
+                    name: "blankLineStatement",
+                    handleLine: ({context, statementChunk}) => {
+                        
+                    },
+                },
+                {
+                    name: "blankLineStatement",
+                    handleLine: ({context, statementChunk}) => {
+                        
+                    },
+                },
+            ]
+            statements: [],
+        }
+    }

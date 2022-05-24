@@ -171,13 +171,17 @@ const parseName = ({ context, cursorLocation, string, treeNode }) => {
                     endLocation: endLocation,
                     data: {
                         name: name,
+                        is: treeNode.data.keywords[name],
                     },
                 }),
-                do: [
-                    {
-                        
-                    }
-                ]
+                // relationships
+                addConnection: {
+                    nameUsage: treeNode.data.keywords[name],
+                    alwaysReads: treeNode.data.keywords[name],
+                    mightMutate: treeNode.data.keywords[name],
+                },
+                // dynamic parsing
+                addKeyword
             }
         } else if (treeNode.data.items[name]) {
             return {
@@ -195,12 +199,8 @@ const parseName = ({ context, cursorLocation, string, treeNode }) => {
     }
 }
 
+// relationships: nameUsage, mightRead, alwaysReads, mightMutate, alwaysMutates, 
 
-// 
-// 
-// language definition
-// 
-// 
 
 /**
  * file parser
