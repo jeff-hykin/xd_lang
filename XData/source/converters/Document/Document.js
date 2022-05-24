@@ -31,19 +31,14 @@ export const Document = createConverter({
             }
         }
         // 
-        // value
+        // list
         // 
+            // FIXME: literally all other converters need to be defined before this one can be completed
         
         // 
         // afterValue
         // 
 
-        // 
-        // newline
-        // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /\n?/, from: remaining }); if (extraction == null) { return null }
-        components.newline = new Token({string:extraction})
-        
         // 
         // return
         // 
