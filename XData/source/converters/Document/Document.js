@@ -5,7 +5,8 @@ import { commentOrEndOfLineToParsed } from "../../xdataAggregates.js"
 
 export const Document = createConverter({
     decoderName: "Document",
-    xdataStringToNode({ string, context }) {
+    // Document should be the only one with a default context
+    xdataStringToNode({ string, context=new Context({ name: "topLevel", stringIndex: 0, lineIndex: 0, columnIndex: 0 }) }) {
         const originalContext = context
         var remaining = string
         // only works in top level
