@@ -158,6 +158,28 @@ export class Node extends Component {
     // TODO: add a getComments() that recursively calls getComments() on childComponents
 }
 
+export function convertComponent({component, parent, contextName}) {
+    // base case 1
+    if (typeof component == 'string') {
+        return component
+    // base case 2
+    } else if (component instanceof Token) {
+        return component.string
+    // base case 3
+    } else if (component == null) {
+        return ""
+    // recursive case 1
+    } else if (component instanceof Array) {
+        return component.map(each=>convertComponent({component: each, contextName, parent})).join("")
+    // recursive case 2 // if it is a proper node
+    } else if (converters[component.decodeAs]) {
+        const converter = converters[component.decodeAs]
+        return converter.nodeToXdataString({component, contextName})
+    } else {
+        throw Error(`I don't know how to convert \n${utils.toString(component)}\nof\n${utils.toString(parent)}\n into an XData string. It doesnt have a .decodeAs property that is in the available decoders:\n${utils.toString(Object.keys(converters))}`)
+    }
+}
+
 /**
  * Function
  *
@@ -178,33 +200,15 @@ export const createConverter = function ({
     }
     converters[decoderName] = {
         // default values
-        nodeToXdataString(node) {
-            function convertComponent(component, node) {
-                // base case 1
-                if (typeof component == 'string') {
-                    return component
-                // base case 2
-                } else if (component instanceof Token) {
-                    return component.string
-                // recursive case 1
-                } else if (component instanceof Array) {
-                    return component.map(each=>convertComponent(each)).join("")
-                // recursive case 2 // if it is a proper node
-                } else if (converters[component.decodeAs]) {
-                    const converter = converters[component.decodeAs]
-                    return converter.nodeToXdataString(component)
-                } else {
-                    throw Error(`I don't know how to convert \n${utils.toString(component)}\nof\n${utils.toString(node)}\n into an XData string. It doesnt have a .decodeAs property that is in the available decoders:\n${utils.toString(Object.keys(converters))}`)
-                }
-            }
+        nodeToXdataString({node, contextName}) {
             let outputString = ""
             for (const [key, component] of Object.entries(node.childComponents)) {
-                outputString += convertComponent(component)
+                outputString += convertComponent({component, parent: node, contextName})
             }
             return outputString
         },
         xdataStringToParsed({ remaining, context }) {
-            const node = nodeToXdataString({ string: remaining, context })
+            const node = xdataStringToNode({ string: remaining, context })
             if (!node) {
                 return { node, remaining, context }
             } else {
