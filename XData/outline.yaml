@@ -64,23 +64,16 @@
                                             oneOf:
                                                 group:
                                                     (escapeSectionToNode):
-                                                        regex: "/\{/"
-                                                        regex: "/ */"
-                                                        oneOf:
-                                                            (literalStringInlineToNode):
-                                                            (figurativeStringInlineToNode):
-                                                            (systemCharaterToNode):
-                                                            (referenceToNode):
-                                                                regex: "/#valueOf/"
-                                                                optional:
-                                                                    loop:
-                                                                        regex: "/\[/"
-                                                                        regex: "/ */"
-                                                                        (keyToNode):
-                                                                        regex: "/ */"
-                                                                        regex: "/\]/"
-                                                        regex: "/ */"
-                                                        regex: "/\}/"
+                                                        (systemCharaterToNode):
+                                                        (referenceToNode):
+                                                            regex: "/#valueOf/"
+                                                            optional:
+                                                                loop:
+                                                                    regex: "/\[/"
+                                                                    regex: "/ */"
+                                                                    (keyToNode):
+                                                                    regex: "/ */"
+                                                                    regex: "/\]/"
                                                 a sequence of single quotes thats smaller than the starting quote:
                                         findMatchingSingleQuotesThatAreAPerfectCube:
                                     (referenceToNode):
