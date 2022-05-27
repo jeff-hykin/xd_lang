@@ -1,4 +1,4 @@
-import { Token, Node, createConverter } from "../../structure.js"
+import { Token, Node, createConverter, converters } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 

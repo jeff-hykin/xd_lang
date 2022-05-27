@@ -22,6 +22,29 @@ export class ProbablyMalformedInput extends Error {
 // basic structures
 // 
 // 
+const advancedBy = (stringOrNode, object) => {
+    let newValue = { ...object }
+    if (stringOrNode == null) {
+        return object
+    } else  if (stringOrNode instanceof Array) {
+        let eachLocation = object
+        for (let eachInput of stringOrNode) {
+            eachLocation = eachLocation.advancedBy(eachInput)
+        }
+        return eachLocation
+    } else if (typeof stringOrNode == 'string') {
+        const string = stringOrNode
+        const lines = string.split("\n")
+        // TODO: write a unit test to confirm object actually works
+        newValue.stringIndex = object.stringIndex + string.length
+        newValue.lineIndex = object.lineIndex + lines.length - 1
+        newValue.columnIndex = lines[0].length
+    } else if (stringOrNode instanceof Node) {
+        const node = stringOrNode
+        Object.assign(newValue, node.getEndLocation(object))
+    }
+    return newValue
+}
 export class Location {
     lineIndex = 0
     columnIndex = 0
@@ -33,36 +56,29 @@ export class Location {
         Object.freeze(this)
     }
     advancedBy(stringOrNode) {
-        let newValue = { ...this }
-        if (typeof stringOrNode == 'string') {
-            const string = stringOrNode
-            const lines = string.split("\n")
-            // TODO: write a unit test to confirm this actually works
-            newValue.stringIndex = this.stringIndex + string.length
-            newValue.lineIndex = this.lineIndex + lines.length - 1
-            newValue.columnIndex = lines[0].length
-        } else if (stringOrNode instanceof Node) {
-            const node = stringOrNode
-            Object.assign(newValue, node.getEndLocation(this))
-        }
-        return newValue
+        return new Location(advancedBy(stringOrNode, this))
     }
 }
-export class Context extends Location {
-    static validNames = [ "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue" ]
+export class Context {
     name = ""
     lineIndex = 0
     columnIndex = 0
     stringIndex = 0
     constructor({name, stringIndex=0, lineIndex=0, columnIndex=0}) {
-        this.name
-        this.lineIndex
-        this.columnIndex
-        this.stringIndex
-        if (!this.validNames.includes(this.name)) {
-            throw Error(`Context was created with name: ${name}, but that isn't one of ${this.validNames}`)
+        this.name = name
+        this.lineIndex = lineIndex
+        this.columnIndex = columnIndex
+        this.stringIndex = stringIndex
+        if (!contextNames.has(this.name)) {
+            throw Error(`Context was created with name: ${name}, but that isn't one of ${[...contextNames]}`)
         }
         Object.freeze(this)
+    }
+    advancedBy(input) {
+        return new Context({
+            ...advancedBy(stringOrNode, this),
+            name: this.name,
+        })
     }
 }
 
@@ -71,7 +87,8 @@ export class Context extends Location {
 // contents
 // 
 // 
-export let converters = {}
+export const converters = {}
+export const contextNames = new Set()
 export class Component {}
 // token is basically a helper class for strings, just adding extra methods to what would be a primitive
 export class Token extends Component {
@@ -152,9 +169,13 @@ export class Node extends Component {
 export const createConverter = function ({
     decoderName,
     xdataStringToNode,
+    contextNames=[],
     nodeToXdataString=null,
     ...other
 }) {
+    for (const each of contextNames) {
+        contextNames.add(each)
+    }
     converters[decoderName] = {
         // default values
         nodeToXdataString(node) {

@@ -1,9 +1,10 @@
-import { Token, Node, createConverter } from "../../structure.js"
+import { Token, Node, createConverter, converters } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
 export const String = createConverter({
     decoderName: "String",
+    contextNames: [ "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue", ],
     xdataStringToNode({ string, context }) {
         var remaining = string
         let childComponents 

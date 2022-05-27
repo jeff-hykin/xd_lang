@@ -1,7 +1,6 @@
-import { Token, Node, createConverter } from "../../structure.js"
+import { Token, Node, createConverter, converters } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
-import { Comment } from "../Comment/Comment.js"
                                         
 export const NumberLiteral = createConverter({
     decoderName: "NumberLiteral",
@@ -46,7 +45,7 @@ export const NumberLiteral = createConverter({
             // 
             // comment
             // 
-            components.comment = Comment.xdataStringToNode({
+            components.comment = converters.Comment.xdataStringToNode({
                 string: remaining,
                 context: context.advancedBy(
                     (components.preWhitespace||'')+(components.content||'')+(components.postWhitespace||'')

@@ -1,10 +1,10 @@
-import { Token, Node, createConverter } from "../../structure.js"
+import { Token, Node, createConverter, converters } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
-import { Comment } from "../Comment/Comment.js"
 
 export const EmptyList = createConverter({
     decoderName: "EmptyList",
+    contextNames: [ "key" ],
     xdataStringToNode({ string, context }) {
         var remaining = string
         // doesnt care about the context.name: "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue"
@@ -54,7 +54,7 @@ export const EmptyList = createConverter({
         // comment
         // 
         if (context.name != "key") {
-            components.comment = Comment.xdataStringToNode({
+            components.comment = converters.Comment.xdataStringToNode({
                 string: remaining,
                 context: context.advancedBy(
                     (components.preWhitespace||'')+(components.openBracket||'')+(components.whitespace||'')+(components.closeBracket||'')+(components.postWhitespace||'')

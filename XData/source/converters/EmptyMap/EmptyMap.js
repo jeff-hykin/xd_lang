@@ -1,7 +1,6 @@
-import { Token, Node, createConverter } from "../../structure.js"
+import { Token, Node, createConverter, converters } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
-import { Comment } from "../Comment/Comment.js"
 
 export const EmptyMap = createConverter({
     decoderName: "EmptyMap",
@@ -54,7 +53,7 @@ export const EmptyMap = createConverter({
         // comment
         // 
         if (context.name != "key") {
-            components.comment = Comment.xdataStringToNode({
+            components.comment = converters.Comment.xdataStringToNode({
                 string: remaining,
                 context: context.advancedBy(
                     (components.preWhitespace||'')+(components.openBracket||'')+(components.whitespace||'')+(components.closeBracket||'')+(components.postWhitespace||'')
