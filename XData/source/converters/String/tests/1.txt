@@ -1,0 +1,27 @@
+String is: {
+  nodeToXdataString: [36m[Function: nodeToXdataString][39m,
+  xdataStringToParsed: [36m[Function: xdataStringToParsed][39m,
+  xdataStringToNode: [36m[Function: xdataStringToNode][39m
+}
+"howdy" is:  Node {
+  decodeAs: [32m"String"[39m,
+  childComponents: {
+    openingQuote: Token { string: [32m'"'[39m, originalContext: [90mundefined[39m },
+    content: Token { string: [32m""[39m, originalContext: [90mundefined[39m },
+    closingQuote: Token { string: [32m'howdy"'[39m, originalContext: [90mundefined[39m },
+    postWhitespace: Token { string: [32m""[39m, originalContext: [90mundefined[39m }
+  },
+  formattingInfo: { quoteSize: [33m1[39m },
+  originalContext: { name: [32m"key"[39m }
+}
+"""howdy""" Node {
+  decodeAs: [32m"String"[39m,
+  childComponents: {
+    openingQuote: Token { string: [32m'"""'[39m, originalContext: [90mundefined[39m },
+    content: Token { string: [32m""[39m, originalContext: [90mundefined[39m },
+    closingQuote: Token { string: [32m'howdy"""'[39m, originalContext: [90mundefined[39m },
+    postWhitespace: Token { string: [32m""[39m, originalContext: [90mundefined[39m }
+  },
+  formattingInfo: { quoteSize: [33m3[39m },
+  originalContext: { name: [32m"key"[39m }
+}

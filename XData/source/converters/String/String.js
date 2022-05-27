@@ -53,7 +53,7 @@ export const String = createConverter({
                         originalContext: context,
                         childComponents,
                         formattingInfo: {
-                            quoteSize: childComponents.openingQuote.length,
+                            quoteSize: childComponents.openingQuote.string.length,
                         },  
                     })
                 break
@@ -113,6 +113,7 @@ export const String = createConverter({
         }
     },
     nodeToXdataString(node) {
+        node = new Node(node) // in case it was from a plain json object, give it the methods
         const content = node.components.content
         const containsNewlines = !!content.match(/\n/g)
         
@@ -140,15 +141,18 @@ export const String = createConverter({
                 // FIXME
                 break
             case "key":
+                // contains newlines (=> figureative string required)
                 if (containsNewlines) {
                     // FIXME: need to create a figureative string instead 
                     throw Error(`Key contains newlines, but figureative strings are not yet implemented ref:293859yt3gbk`)
+                // literal string
+                } else {
+                    // 
+                    // combine everything
+                    // 
+                    return doubleQuotes + content + doubleQuotes + (node.postWhitespace || "")
                 }
 
-                // 
-                // combine everything
-                // 
-                return doubleQuotes + content + doubleQuotes + (node.postWhitespace || "")
                 break
             case "referenceEvaulation":
                 // FIXME

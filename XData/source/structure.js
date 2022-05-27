@@ -38,9 +38,9 @@ export class Location {
             const string = stringOrNode
             const lines = string.split("\n")
             // TODO: write a unit test to confirm this actually works
-            newValue.stringIndex = this.stringIndex + string.length,
-            newValue.lineIndex = this.lineIndex + lines.length - 1,
-            newValue.columnIndex = lines[0].length,
+            newValue.stringIndex = this.stringIndex + string.length
+            newValue.lineIndex = this.lineIndex + lines.length - 1
+            newValue.columnIndex = lines[0].length
         } else if (stringOrNode instanceof Node) {
             const node = stringOrNode
             Object.assign(newValue, node.getEndLocation(this))
@@ -78,8 +78,9 @@ export class Token extends Component {
     string = null
     originalContext = null
     constructor({string, originalContext}) {
-        this.string
-        this.originalContext
+        super()
+        this.string = string
+        this.originalContext = originalContext
     }
     toJson() {
         return this.string
@@ -98,6 +99,7 @@ export class Node extends Component {
     formattingInfo = {}
     originalContext = null
     constructor({decodeAs, childComponents, formattingInfo, originalContext}) {
+        super()
         this.decodeAs = decodeAs
         this.childComponents = childComponents
         this.formattingInfo = formattingInfo
@@ -151,7 +153,7 @@ export const createConverter = function ({
     decoderName,
     xdataStringToNode,
     nodeToXdataString=null,
-    ...other,
+    ...other
 }) {
     converters[decoderName] = {
         // default values

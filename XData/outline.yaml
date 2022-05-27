@@ -1,13 +1,13 @@
 
 (documentToNode): # given string
     loop:
-        (commentOrEndOfLineToNode):
-            (commentToNode):
+        (commentOrEndOfLineToNode): #DONE
+            (commentToNode): #DONE
                 regex: "/ */"
                 regex: "/# /"
                 regex: "/.+/"
                 regex: "/\n|\z/"
-            (blankLineToNode):
+            (blankLineToNode): #DONE
                 regex: "/ *(\n|\z)/"
         
     oneOf:
@@ -22,26 +22,26 @@
                         (listValueToNode):
                             oneOf:
                                 (inlineValueToNode):
-                                    (emptyMapToNode):
+                                    (emptyMapToNode): #DONE
                                         regex: "/ */"
                                         regex: "/\{/"
                                         regex: "/ */"
                                         regex: "/\}/"
                                         regex: "/ */"
-                                    (emptyListToNode):
+                                    (emptyListToNode): #DONE
                                         regex: "/ */"
                                         regex: "/\[/"
                                         regex: "/ */"
                                         regex: "/\]/"
                                         regex: "/ */"
-                                    (specialValuesToNode):
+                                    (specialValuesToNode): #DONE
                                         regex: "/true|false|infinite|infinity|-infinite|-infinity|NaN|nullptr|null|nil|none|undefined/i"
-                                    (numberLiteralToNode):
+                                    (numberLiteralToNode): #DONE
                                         regex: "/(-|+)?/"
                                         regex: "/\d+(\.\d+)?/"
-                                    (atomValueToNode):
+                                    (atomValueToNode): #DONE
                                         regex: "/@[a-zA-Z_][a-zA-Z_0-9]*/"
-                                    (stringLiteralKeyToNode):
+                                    (stringLiteralKeyToNode): #DONE
                                         oneOf:
                                             regex: '/"/'
                                             regex: '/[^\n"]*/'
