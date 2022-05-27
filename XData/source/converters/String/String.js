@@ -1,10 +1,10 @@
-import { Token, Node, createConverter, converters } from "../../structure.js"
+import { Token, Node, createConverter, converters, convertComponent } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
 export const String = createConverter({
     decoderName: "String",
-    contextNames: [ "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue", ],
+    contextNames: [ "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue", "stringFigurative" ],
     xdataStringToNode({ string, context }) {
         var remaining = string
         let childComponents 
@@ -142,10 +142,10 @@ export const String = createConverter({
                 // FIXME
                 break
             case "key":
-                // contains newlines (=> figureative string required)
+                // contains newlines (=> figurative string required)
                 if (containsNewlines) {
-                    // FIXME: need to create a figureative string instead 
-                    throw Error(`Key contains newlines, but figureative strings are not yet implemented ref:293859yt3gbk`)
+                    // FIXME: need to create a figurative string instead 
+                    throw Error(`Key contains newlines, but figurative strings are not yet implemented ref:293859yt3gbk`)
                 // literal string
                 } else {
                     // 

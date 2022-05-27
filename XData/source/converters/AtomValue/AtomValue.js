@@ -1,4 +1,4 @@
-import { Token, Node, createConverter, converters } from "../../structure.js"
+import { Token, Node, createConverter, converters, convertComponent } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
@@ -65,7 +65,16 @@ export const AtomValue = createConverter({
             formattingInfo: {},  
         })
     },
-    // nodeToXdataString(node) {
-    //      // defaults to combining all childComponents
-    // }
+    nodeToXdataString({node, contextName}) {
+        if (contextName == "key") {
+            node.childComponents.preWhitespace = null
+            node.childComponents.comment = null
+            node.childComponents.symbol = null
+        }
+        return convertComponent({
+            component: Object.values(node.childComponents),
+            parent:node,
+            contextName
+        })
+    }
 })
