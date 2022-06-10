@@ -64,7 +64,7 @@
                                             stop_if:
                                                 findMatchingSingleQuotesThatAreAPerfectCube:
                                             oneOf:
-                                                regex: /[^{]/
+                                                regex: /[^{]+/ # note: exclude \n as well when in a key or reference context
                                                 (escapeSectionToNode):
                                                     regex: /{/
                                                     (systemCharacterToNode):
@@ -102,7 +102,6 @@
                                                         regex: "/\]/"
                                                     regex: "/ */"
                                                     regex: /}/
-                                        findMatchingSingleQuotesThatAreAPerfectCube:
                                     (referenceToNode):
                                 (lineOverlapValueToNode):
                                     oneOf:
