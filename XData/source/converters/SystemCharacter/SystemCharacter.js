@@ -19,7 +19,18 @@ export const SystemCharacter = createConverter({
     contextNames: [ "key", "stringFigurative" ],
     xdataStringToNode({ string, context }) {
         var remaining = string
-        let components
+        let components = {
+            preWhitespace: null,
+            symbol: null,
+            escape: null,
+            openBracket: null,
+            openBracketWhitespace: null,
+            input: null,
+            closeBracketWhitespace: null,
+            closeBracket: null,
+            postWhitespace: null,
+            comment: null,
+        }
 
         // 
         // preWhitespace
