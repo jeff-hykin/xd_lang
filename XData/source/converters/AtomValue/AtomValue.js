@@ -70,6 +70,8 @@ export const AtomValue = createConverter({
             node.childComponents.preWhitespace = null
             node.childComponents.comment = null
             node.childComponents.symbol = null
+        } else {
+            node.childComponents.symbol = "@"
         }
         return convertComponent({
             component: Object.values(node.childComponents),
