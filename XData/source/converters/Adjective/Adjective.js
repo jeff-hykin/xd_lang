@@ -23,8 +23,7 @@ export const Adjective = createConverter({
         // 
         // content
         // 
-        while ()
-        var { remaining, extraction } = utils.extractFirst({ pattern: /\(/, from: remaining }); if (extraction == null) { return null }
+        var { remaining, extraction } = utils.extractFirst({ pattern: /[a-zA-Z_][a-zA-Z_0-9]*/, from: remaining }); if (extraction == null) { return null }
         components.content = new Token({string:extraction})
         
         // 
