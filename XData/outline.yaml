@@ -80,17 +80,18 @@
                                                                             (atomValueToNode):
                                                                             (systemCharacterToNode):
                                                                             (stringLiteralKeyToNode):
-                                                                            (stringFigurativeKeyToNode):
+                                                                            (stringFigurativeKeyToNode): #recursion
                                                                             (customKeyToNode): # (date, utc) '10-12-1990':
-                                                                                (customAttributesToNode):
+                                                                                (customAdjectives):
                                                                                     regex: "/\(/"
                                                                                     optional:
                                                                                         loop:
-                                                                                            regex: "/ */"
-                                                                                            (atomKeyToNode): # DONE
-                                                                                                regex: "/[a-zA-Z_][a-zA-Z_0-9]*/"
-                                                                                            regex: "/ */"
-                                                                                            regex: "/,/"
+                                                                                            (adjectiveToNode):
+                                                                                                regex: "/ */"
+                                                                                                (atomKeyToNode): # DONE
+                                                                                                    regex: "/[a-zA-Z_][a-zA-Z_0-9]*/"
+                                                                                                regex: "/ */"
+                                                                                                regex: "/,/"
                                                                                     regex: "/ */"
                                                                                     (atomKeyToNode):
                                                                                     regex: "/ */"
