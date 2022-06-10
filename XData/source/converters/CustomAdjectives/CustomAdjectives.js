@@ -63,8 +63,12 @@ export const CustomAdjectives = createConverter({
         // 
         // postWhitespace
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+        var { remaining, extraction } = utils.extractFirst({ pattern: / +| *$/, from: remaining }); if (extraction == null) { return null }
         context = context.advancedBy(components.postWhitespace = new Token({string:extraction}))
+        
+        // 
+        // FIXME: add comment parsing under particular contexts
+        // 
         
         // 
         // return
