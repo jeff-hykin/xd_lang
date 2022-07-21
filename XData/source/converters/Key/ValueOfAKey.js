@@ -9,7 +9,7 @@ import * as tools from "../../xdataTools.js"
 // (ValueOfAKey):
 //     oneOf:
 //         (specialValuesToNode):
-//         (numberLiteralToNode):
+//         (NumberToNode):
 //         (atomValueToNode):
 //         (systemCharacterToNode):
 //         (stringLiteralKeyToNode):
@@ -23,7 +23,7 @@ export const ValueOfAKey = createConverter({
             context,
             converters: [
                 converters.SpecialValues,
-                converters.NumberLiteral,
+                converters.Number,
                 converters.AtomValue,
                 converters.SystemCharacter,
                 converters.String,

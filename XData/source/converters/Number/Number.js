@@ -6,8 +6,8 @@ import * as tools from "../../xdataTools.js"
     // checks for: [ "keyDefinition" ]
     // creates: []
                                         
-export const NumberLiteral = createConverter({
-    decoderName: "NumberLiteral",
+export const Number = createConverter({
+    decoderName: "Number",
     xdataStringToNode({ string, context }) {
         var remaining = string
         let components = {
@@ -60,7 +60,7 @@ export const NumberLiteral = createConverter({
         // return
         // 
         return new Node({
-            decodeAs: "NumberLiteral",
+            decodeAs: "Number",
             originalContext: context,
             childComponents: components,
             formattingInfo: {},  

@@ -36,7 +36,7 @@
                                         regex: "/ */"
                                     (SpecialValues): #DONE
                                         regex: "/true|false|infinite|infinity|-infinite|-infinity|NaN|nullptr|null|nil|none|undefined/i"
-                                    (NumberLiteral): #DONE
+                                    (Number): #DONE
                                         regex: "/(-|+)?/"
                                         regex: "/\d+(\.\d+)?/"
                                     (AtomValue): #DONE
@@ -79,7 +79,7 @@
                                                                             (ValueOfAKey): #DONE
                                                                                 oneOf:
                                                                                     (SpecialValues):
-                                                                                    (NumberLiteral):
+                                                                                    (Number):
                                                                                     (AtomValue):
                                                                                     (SystemCharacter):
                                                                                     (String): #recursion
