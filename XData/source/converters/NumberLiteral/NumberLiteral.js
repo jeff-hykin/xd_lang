@@ -1,12 +1,15 @@
 import { Token, Node, createConverter, converters, convertComponent } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
+
+// context.name
+    // checks for: [ "keyDefinition" ]
+    // creates: []
                                         
 export const NumberLiteral = createConverter({
     decoderName: "NumberLiteral",
     xdataStringToNode({ string, context }) {
         var remaining = string
-        // doesnt care about the context.name: "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue"
         let components = {
             preWhitespace: null, // token
             sign: null, // token
@@ -18,7 +21,7 @@ export const NumberLiteral = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "key") {
+        if (context.name != "keyDefinition") {
             var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.preWhitespace = new Token({string:extraction})
         }
@@ -41,7 +44,7 @@ export const NumberLiteral = createConverter({
         var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
         components.postWhitespace = new Token({string:extraction})
         
-        if (context.name != "key") {
+        if (context.name != "keyDefinition") {
             // 
             // comment
             // 
@@ -64,7 +67,7 @@ export const NumberLiteral = createConverter({
         })
     },
     nodeToXdataString({node, contextName}) {
-        if (contextName == "key") {
+        if (contextName == "keyDefinition") {
             node.childComponents.preWhitespace = null
             node.childComponents.comment = null
         }

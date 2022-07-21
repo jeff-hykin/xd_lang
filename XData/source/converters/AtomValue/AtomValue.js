@@ -2,11 +2,14 @@ import { Token, Node, createConverter, converters, convertComponent } from "../.
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
+// context.name
+    // checks for: [ "keyDefinition" ]
+    // creates: []
+
 export const AtomValue = createConverter({
     decoderName: "AtomValue",
     xdataStringToNode({ string, context }) {
         var remaining = string
-        // doesnt care about the context.name: "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue"
         let components = {
             preWhitespace: null, // token
             symbol: null, // token
@@ -18,7 +21,7 @@ export const AtomValue = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "key") {
+        if (context.name != "keyDefinition") {
             var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.preWhitespace = new Token({string:extraction})
         }
@@ -26,7 +29,7 @@ export const AtomValue = createConverter({
         // 
         // symbol
         // 
-        if (context.name != "key") {
+        if (context.name != "keyDefinition") {
             var { remaining, extraction } = utils.extractFirst({ pattern: /@/i, from: remaining }); if (extraction == null) { return null }
             components.symbol = new Token({string:extraction})
         }
@@ -46,7 +49,7 @@ export const AtomValue = createConverter({
         // 
         // comment
         // 
-        if (context.name != "key") {
+        if (context.name != "keyDefinition") {
             components.comment = converters.Comment.xdataStringToNode({
                 string: remaining,
                 context: context.advancedBy(
@@ -66,7 +69,7 @@ export const AtomValue = createConverter({
         })
     },
     nodeToXdataString({node, contextName}) {
-        if (contextName == "key") {
+        if (contextName == "keyDefinition") {
             node.childComponents.preWhitespace = null
             node.childComponents.comment = null
             node.childComponents.symbol = null

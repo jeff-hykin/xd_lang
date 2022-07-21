@@ -2,11 +2,14 @@ import { Token, Node, createConverter, converters, convertComponent } from "../.
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
+// context.name
+    // checks for: []
+    // creates: []
+
 export const Comment = createConverter({
     decoderName: "Comment",
     xdataStringToNode({ string, context }) {
         var remaining = string
-        // doesnt care about the context.name: "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue"
         let components = {
             preWhitespace: null, // token
             commentSymbol: null, // token

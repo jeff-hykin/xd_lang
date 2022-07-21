@@ -2,11 +2,14 @@ import { Token, Node, createConverter, converters, convertComponent } from "../.
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
+// context.name
+    // checks for: [ "keyDefinition" ]
+    // creates: []
+
 export const SpecialValues = createConverter({
     decoderName: "SpecialValues",
     xdataStringToNode({ string, context }) {
         var remaining = string
-        // doesnt care about the context.name: "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue"
         let components = {
             preWhitespace: null, // token
             content: null, // token
@@ -17,8 +20,10 @@ export const SpecialValues = createConverter({
         // 
         // preWhitespace
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
-        components.preWhitespace = new Token({string:extraction})
+        if (context.name != "keyDefinition") {
+            var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+            components.preWhitespace = new Token({string:extraction})
+        }
         
         // 
         // content
@@ -35,7 +40,7 @@ export const SpecialValues = createConverter({
         // 
         // comment
         // 
-        if (context.name != "key") {
+        if (context.name != "keyDefinition") {
             components.comment = converters.Comment.xdataStringToNode({
                 string: remaining,
                 context: context.advancedBy(
@@ -55,7 +60,7 @@ export const SpecialValues = createConverter({
         })
     },
     nodeToXdataString({node, contextName}) {
-        if (contextName == "key") {
+        if (contextName == "keyDefinition") {
             node.childComponents.preWhitespace = null
             node.childComponents.comment = null
         }

@@ -2,12 +2,14 @@ import { Token, Node, createConverter, converters, convertComponent } from "../.
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
+// context.name
+    // checks for: []
+    // creates: []
+
 export const EmptyList = createConverter({
     decoderName: "EmptyList",
-    contextNames: [ "key" ],
     xdataStringToNode({ string, context }) {
         var remaining = string
-        // doesnt care about the context.name: "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue"
         let components = {
             preWhitespace: null, // token
             openBracket: null, // token
@@ -20,10 +22,8 @@ export const EmptyList = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "key") {
-            var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
-            components.preWhitespace = new Token({string:extraction})
-        }
+        var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+        components.preWhitespace = new Token({string:extraction})
         
         // 
         // openBracket
@@ -53,14 +53,12 @@ export const EmptyList = createConverter({
         // 
         // comment
         // 
-        if (context.name != "key") {
-            components.comment = converters.Comment.xdataStringToNode({
-                string: remaining,
-                context: context.advancedBy(
-                    (components.preWhitespace||'')+(components.openBracket||'')+(components.whitespace||'')+(components.closeBracket||'')+(components.postWhitespace||'')
-                ),
-            })
-        }
+        components.comment = converters.Comment.xdataStringToNode({
+            string: remaining,
+            context: context.advancedBy(
+                (components.preWhitespace||'')+(components.openBracket||'')+(components.whitespace||'')+(components.closeBracket||'')+(components.postWhitespace||'')
+            ),
+        })
         
         // 
         // return
@@ -73,10 +71,6 @@ export const EmptyList = createConverter({
         })
     },
     nodeToXdataString({node, contextName}) {
-        if (contextName == "key") {
-            node.childComponents.preWhitespace = null
-            node.childComponents.comment = null
-        }
         return convertComponent({
             component: Object.values(node.childComponents),
             parent:node,

@@ -2,6 +2,10 @@ import { Token, Node, createConverter, converters, convertComponent } from "../.
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
+// context.name
+    // checks for: []
+    // creates: []
+
 export const EmptyMap = createConverter({
     decoderName: "EmptyMap",
     xdataStringToNode({ string, context }) {
@@ -19,10 +23,8 @@ export const EmptyMap = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "key") {
-            var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
-            components.preWhitespace = new Token({string:extraction})
-        }
+        var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+        components.preWhitespace = new Token({string:extraction})
         
         // 
         // openBracket
@@ -52,14 +54,12 @@ export const EmptyMap = createConverter({
         // 
         // comment
         // 
-        if (context.name != "key") {
-            components.comment = converters.Comment.xdataStringToNode({
-                string: remaining,
-                context: context.advancedBy(
-                    (components.preWhitespace||'')+(components.openBracket||'')+(components.whitespace||'')+(components.closeBracket||'')+(components.postWhitespace||'')
-                ),
-            })
-        }
+        components.comment = converters.Comment.xdataStringToNode({
+            string: remaining,
+            context: context.advancedBy(
+                (components.preWhitespace||'')+(components.openBracket||'')+(components.whitespace||'')+(components.closeBracket||'')+(components.postWhitespace||'')
+            ),
+        })
         
         // 
         // return

@@ -76,14 +76,13 @@
                                                                 (keyToNode):
                                                                     oneOf:
                                                                         (vanillaKeyToNode):   # <<< TODO next
-                                                                            (emptyMapToNode):
-                                                                            (emptyListToNode):
-                                                                            (specialValuesToNode):
-                                                                            (numberLiteralToNode):
-                                                                            (atomValueToNode):
-                                                                            (systemCharacterToNode):
-                                                                            (stringLiteralKeyToNode):
-                                                                            (stringFigurativeKeyToNode): #recursion
+                                                                            oneOf:
+                                                                                (specialValuesToNode):
+                                                                                (numberLiteralToNode):
+                                                                                (atomValueToNode):
+                                                                                (systemCharacterToNode):
+                                                                                (stringLiteralKeyToNode):
+                                                                                (stringFigurativeKeyToNode): #recursion
                                                                         (customKeyToNode): # (date, utc) '10-12-1990':
                                                                             (customAdjectives): #DONE
                                                                                 regex: "/\(/"

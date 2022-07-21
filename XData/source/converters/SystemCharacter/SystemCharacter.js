@@ -2,6 +2,10 @@ import { Token, Node, createConverter, converters, convertComponent } from "../.
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
+// context.name
+    // checks for: [ "keyDefinition", "stringFigurative" ]
+    // creates: []
+
 // (systemCharacterToNode):
 //     oneOf:
 //         regex: "/#tab|#newline/"
@@ -16,7 +20,6 @@ import * as tools from "../../xdataTools.js"
 
 export const SystemCharacter = createConverter({
     decoderName: "SystemCharacter",
-    contextNames: [ "key", "stringFigurative" ],
     xdataStringToNode({ string, context }) {
         var remaining = string
         let components = {
@@ -35,7 +38,7 @@ export const SystemCharacter = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "key" && context.name != "stringFigurative") {
+        if (context.name != "keyDefinition" && context.name != "stringFigurative") {
             var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.preWhitespace = new Token({string:extraction})
             context = context.advancedBy(components.preWhitespace)
@@ -73,11 +76,12 @@ export const SystemCharacter = createConverter({
             // 
             // input
             // 
+            // TODO: consider allow hex/octal numbers
             if (components.escape.string == 'ascii') {
                 // 
                 // integer 0-255
                 // 
-                var { remaining, extraction } = utils.extractFirst({ pattern: /[12]\d\d|\d\d/, from: remaining }); if (extraction == null) { return null }
+                var { remaining, extraction } = utils.extractFirst({ pattern: /[12]\d\d|\d(\d)?/, from: remaining }); if (extraction == null) { return null }
                 components.input = new Token({string:extraction})
                 context = context.advancedBy(components.input)
             } else {
@@ -88,17 +92,6 @@ export const SystemCharacter = createConverter({
                 if (extraction != null) {
                     components.input = new Token({string:extraction})
                     context = context.advancedBy(components.input)
-                } else {
-                    // 
-                    // string
-                    // 
-                    var { node, remaining, context } = converters.String.xdataStringToParsed({
-                        string: remaining,
-                        context: new Context({
-                            ...context,
-                            name: "key",
-                        }),
-                    })
                 }
             }
 
@@ -120,7 +113,7 @@ export const SystemCharacter = createConverter({
         // 
         // postWhitespace
         // 
-        if (context.name != "key" && context.name != "stringFigurative") {
+        if (context.name != "keyDefinition" && context.name != "stringFigurative") {
             var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.postWhitespace = new Token({string:extraction})
             context = context.advancedBy(components.postWhitespace)
@@ -129,7 +122,7 @@ export const SystemCharacter = createConverter({
         // 
         // postWhitespace
         // 
-        if (context.name != "key" && context.name != "stringFigurative") {
+        if (context.name != "keyDefinition" && context.name != "stringFigurative") {
             components.comment = converters.Comment.xdataStringToNode({
                 string: remaining,
                 context: context,
@@ -148,7 +141,7 @@ export const SystemCharacter = createConverter({
         })
     },
     nodeToXdataString({node, contextName}) {
-        if (contextName == "key") {
+        if (contextName == "keyDefinition") {
             node.childComponents.preWhitespace = null
             node.childComponents.comment = null
         } else if (contextName == "stringLiteral") {

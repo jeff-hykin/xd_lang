@@ -198,15 +198,28 @@ export const createConverter = function ({
     for (const each of contextNames) {
         contextNames.add(each)
     }
-    converters[decoderName] = {
-        // default values
-        nodeToXdataString({node, contextName}) {
+    
+    // 
+    // nodeToXdataString: wrap or default 
+    // 
+    if (nodeToXdataString) {
+        const originalFunction = nodeToXdataString
+        nodeToXdataString = ({ node, contextName })=>{
+            // convert plain objects (e.g. from json) to have helper methods
+            node = new Node(node)
+            return originalFunction({ node, contextName })
+        }
+    } else {
+        nodeToXdataString = function({node, contextName}) {
             let outputString = ""
             for (const [key, component] of Object.entries(node.childComponents)) {
                 outputString += convertComponent({component, parent: node, contextName})
             }
             return outputString
-        },
+        }
+    }
+
+    converters[decoderName] = {
         xdataStringToParsed({ remaining, context }) {
             const node = xdataStringToNode({ string: remaining, context })
             if (!node) {
@@ -223,7 +236,7 @@ export const createConverter = function ({
                 }
             }
         },
-        ...({nodeToXdataString}), // override the one above if non-null
+        nodeToXdataString,
         xdataStringToNode,
         ...other,
     }

@@ -40,3 +40,13 @@ export const extractStartingQuote = (quoteString) => {
         remaining: quoteString.slice(quoteSizeGuess,quoteString.length),
     }
 }
+
+export const oneOf = ({converters, remaining, context }) => {
+    for (const eachConverter of converters) {
+        var { node, remaining, context } = eachConverter.xdataStringToParsed({ remaining, context })
+        if (node) {
+            return { node, remaining, context }
+        }
+    }
+    return { null, remaining, context }
+}
