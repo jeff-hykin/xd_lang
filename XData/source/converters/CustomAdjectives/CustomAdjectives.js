@@ -82,4 +82,6 @@ export const CustomAdjectives = createConverter({
             formattingInfo: {},  
         })
     },
+
+    // FIXME: there's a problem with the commas. When turning this back into a string, it needs to make sure all the adjectives actually have a comma, and then do logic for if there was a trailing comma last time or not
 })
