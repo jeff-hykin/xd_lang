@@ -1,11 +1,10 @@
 - everything centers around nodes:
     - every value (including comments) are nodes
     - every node must have a json representation that doesn't loose any information
-    - every node can know where it is in a file (line number, character number)
-    - nodes can be found in different contexts
-    - these are the valid contexts: [ "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue" ]
+    - nodes can be found in different contexts (named contexts)
     - nodes can have different forms/styles
     - nodes can contain other nodes
+    - nodes can contain tokens, which is just a wrapper around a string
 - converters change the nodes:
     - string (xdata) to node
     - node to xdata string
