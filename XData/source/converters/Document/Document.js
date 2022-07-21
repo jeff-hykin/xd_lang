@@ -1,7 +1,6 @@
 import { Token, Node, createConverter, converters, convertComponent } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
-import { commentOrEndOfLineToParsed } from "../../xdataAggregates.js"
 
 export const Document = createConverter({
     decoderName: "Document",
@@ -25,7 +24,7 @@ export const Document = createConverter({
         // 
         var node = true
         while (node) {
-            var { node, remaining, context } = commentOrEndOfLineToParsed({ string: remaining, context })
+            var { node, remaining, context } = converters.CommentOrBlankLine.xdataStringToParsed({ remaining, context })
             if (node) {
                 components.beforeValue.push(node)
             }
@@ -44,7 +43,7 @@ export const Document = createConverter({
         // 
         return new Node({
             decodeAs: "Document",
-            originalContext: context,
+            originalContext,
             childComponents: components,
             formattingInfo: {},  
         })
