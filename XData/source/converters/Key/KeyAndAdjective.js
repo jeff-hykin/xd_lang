@@ -2,8 +2,12 @@ import { Token, Node, createConverter, converters, convertComponent } from "../.
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
-export const CustomKey = createConverter({
-    decoderName: "CustomKey",
+// context.name
+    // checks for: []
+    // creates: []
+
+export const KeyAndAdjective = createConverter({
+    decoderName: "KeyAndAdjective",
     xdataStringToNode({ string, context }) {
         const originalContext = context
         var remaining = string
@@ -17,9 +21,9 @@ export const CustomKey = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "key") {
-            var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
-            context = context.advancedBy(components.preWhitespace = new Token({string:extraction}))
+        if (context.name != "keyDefinition") {
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining, context }); if (extraction == null) { return null }
+            components.preWhitespace = new Token({string:extraction})
         }
         
         // 
@@ -31,7 +35,7 @@ export const CustomKey = createConverter({
         // 
         // content
         // 
-        var { node, remaining, context } = converters.VanillaKey.xdataStringToParsed({ remaining, context }); if (node == null) { return null }
+        var { node, remaining, context } = converters.ValueOfAKey.xdataStringToParsed({ remaining, context }); if (node == null) { return null }
         components.content = node
 
         // 
@@ -44,7 +48,7 @@ export const CustomKey = createConverter({
         // return
         // 
         return new Node({
-            decodeAs: "CustomKey",
+            decodeAs: "KeyAndAdjective",
             originalContext,
             childComponents: components,
             formattingInfo: {},  

@@ -76,7 +76,7 @@ complex-recursive:
     documentToNode
     mapToNode
     keyToNode
-    customKeyToNode
+    KeyAndAdjectiveToNode
     mapValueToNode
     inlineValueToNode
     customValueToNode
@@ -116,7 +116,7 @@ dependency tree:
                         (systemCharaterToNode)
                         (referenceToNode)
                             (keyToNode)
-                (customKeyToNode)
+                (KeyAndAdjectiveToNode)
                     (customAttributesToNode)
                         (attributeToNode)
                     (literalStringInlineToNode)

@@ -2,6 +2,10 @@ import { Token, Node, createConverter, converters, convertComponent } from "../.
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
+// context.name
+    // checks for: []
+    // creates: [ "topLevel" ]
+
 export const Document = createConverter({
     decoderName: "Document",
     // Document should be the only one with a default context

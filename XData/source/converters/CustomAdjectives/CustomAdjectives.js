@@ -2,6 +2,10 @@ import { Token, Node, createConverter, converters, convertComponent } from "../.
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
+// context.name
+    // checks for: [ "keyDefinition" ]
+    // creates: []
+
 export const CustomAdjectives = createConverter({
     decoderName: "CustomAdjectives",
     xdataStringToNode({ string, context }) {
@@ -19,8 +23,10 @@ export const CustomAdjectives = createConverter({
         // 
         // preWhitespace
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
-        context = context.advancedBy(components.preWhitespace = new Token({string:extraction}))
+        if (context.name != "keyDefinition") {
+            var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+            context = context.advancedBy(components.preWhitespace = new Token({string:extraction}))
+        }
         
         // 
         // (
@@ -65,10 +71,6 @@ export const CustomAdjectives = createConverter({
         // 
         var { remaining, extraction } = utils.extractFirst({ pattern: / +| *$/, from: remaining }); if (extraction == null) { return null }
         context = context.advancedBy(components.postWhitespace = new Token({string:extraction}))
-        
-        // 
-        // FIXME: add comment parsing under particular contexts
-        // 
         
         // 
         // return

@@ -2,6 +2,10 @@ import { Token, Node, createConverter, converters, convertComponent } from "../.
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
+// context.name
+    // checks for: []
+    // creates: []
+
 export const Adjective = createConverter({
     decoderName: "Adjective",
     xdataStringToNode({ string, context }) {

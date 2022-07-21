@@ -34,7 +34,7 @@
                                         regex: "/ */"
                                         regex: "/\]/"
                                         regex: "/ */"
-                                    (specialValuesToNode): #DONE
+                                    (SpecialValues): #DONE
                                         regex: "/true|false|infinite|infinity|-infinite|-infinity|NaN|nullptr|null|nil|none|undefined/i"
                                     (numberLiteralToNode): #DONE
                                         regex: "/(-|+)?/"
@@ -75,15 +75,15 @@
                                                                 regex: "/ */"
                                                                 (keyToNode):
                                                                     oneOf:
-                                                                        (vanillaKeyToNode):   # <<< TODO next
+                                                                        (ValueOfAKey): #DONE
                                                                             oneOf:
-                                                                                (specialValuesToNode):
+                                                                                (SpecialValues):
                                                                                 (numberLiteralToNode):
                                                                                 (atomValueToNode):
                                                                                 (systemCharacterToNode):
                                                                                 (stringLiteralKeyToNode):
                                                                                 (stringFigurativeKeyToNode): #recursion
-                                                                        (customKeyToNode): # (date, utc) '10-12-1990':
+                                                                        (KeyAndAdjective): # (date, utc) '10-12-1990':
                                                                             (customAdjectives): #DONE
                                                                                 regex: "/\(/"
                                                                                 loop:
@@ -94,7 +94,7 @@
                                                                                         regex: "/,/"
                                                                                 regex: "/\)/"
                                                                                 regex: "/ +| *$/"
-                                                                            (vanillaKeyToNode):
+                                                                            (ValueOfAKey):
                                                                 regex: / */
                                                                 regex: /,/
                                                         regex: "/ */"

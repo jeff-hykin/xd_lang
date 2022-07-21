@@ -2,7 +2,11 @@ import { Token, Node, createConverter, converters, convertComponent } from "../.
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
-// (vanillaKeyToNode):
+// context.name
+    // checks for: []
+    // creates: []
+
+// (ValueOfAKey):
 //     oneOf:
 //         (specialValuesToNode):
 //         (numberLiteralToNode):
@@ -10,8 +14,8 @@ import * as tools from "../../xdataTools.js"
 //         (systemCharacterToNode):
 //         (stringLiteralKeyToNode):
 //         (stringFigurativeKeyToNode): #recursion
-export const VanillaKey = createConverter({
-    decoderName: "VanillaKey",
+export const ValueOfAKey = createConverter({
+    decoderName: "ValueOfAKey",
     xdataStringToNode({ string, context }) {
         var remaining = string
         var { node, remaining, context } = tools.oneOf({
