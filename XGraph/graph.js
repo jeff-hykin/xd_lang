@@ -1,3 +1,16 @@
+// TODO:
+    // delete method (yourself.delete, someoneElse[actionMapping.delete], Node { delete() {} }) + Proxy delete
+    // onShallowUpdate hooks
+        // once
+        // everytime
+    // save transactions to disk, the load and reapply them from disk
+    // add authentication to someoneElse actions
+        // add authorPublicKey to all transactions
+        // add signature to all transactions
+        // look up permissions based on authorPublicKey, verify the signature
+    // networking transactions
+        // whenAskedForValue(nodeId, timestep)
+
 const now = ()=>`${(new Date()).getTime()}${`${Math.random()}`.slice(2,6)}`-0 // timestamp in units of 100-nanoseconds, but last 4 digits are random
 const isPrimitive = (val)=>!(val instanceof Object)
 
@@ -151,13 +164,13 @@ class Node {
     }
 
     get(key) {
-        if (this.value instanceof Object) {
-            const nodeId = this.value[key]
+        if (this.innerValue instanceof Object) {
+            const nodeId = this.innerValue[key]
             if (nodeId) {
                 return nodeIdToNode[nodeId]
             }
         } else {
-            this.value = {}
+            this.innerValue = {}
         }
         const newNode = yourself.set(this, key, null)
         return newNode
@@ -172,10 +185,10 @@ class Node {
                     has: Reflect.has,
                     ownKeys: Reflect.ownKeys, // Object.keys
 
-                    get(original, key) {
+                    get: (original, key) => {
                         return nodeIdToNode[ this.innerValue[key] ]
                     },
-                    set(original, key, value) {
+                    set: (original, key, value) => {
                         return this.set(key, value)
                     },
                     // FIXME: add delete
@@ -188,4 +201,3 @@ class Node {
 }
 const Root = new Node({ id: 1 })
 Root.parents.add(Root) // to prevent it from being deleted
-
