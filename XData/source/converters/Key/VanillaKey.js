@@ -13,22 +13,16 @@ import * as tools from "../../xdataTools.js"
 export const VanillaKey = createConverter({
     decoderName: "VanillaKey",
     xdataStringToNode({ string, context }) {
-        const originalContext = context
         var remaining = string
-        let components = {
-            adjectives: null, // node
-            content: null, // node
-            postWhitespace: null,
-        }
-        
         var { node, remaining, context } = tools.oneOf({
+            remaining,
+            context,
             converters: [
                 converters.SpecialValues,
                 converters.NumberLiteral,
                 converters.AtomValue,
                 converters.SystemCharacter,
-                converters.StringLiteralKey,
-                converters.StringFigurativeKey,
+                converters.String,
             ],
         })
 

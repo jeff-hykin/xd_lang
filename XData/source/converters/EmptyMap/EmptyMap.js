@@ -10,7 +10,6 @@ export const EmptyMap = createConverter({
     decoderName: "EmptyMap",
     xdataStringToNode({ string, context }) {
         var remaining = string
-        // doesnt care about the context.name: "topLevel", "key", "referenceEvaulation", "restOfLineValue", "spanningLinesValue", "indentedValue"
         let components = {
             preWhitespace: null, // token
             openBracket: null, // token
@@ -72,10 +71,6 @@ export const EmptyMap = createConverter({
         })
     },
     nodeToXdataString({node, contextName}) {
-        if (contextName == "key") {
-            node.childComponents.preWhitespace = null
-            node.childComponents.comment = null
-        }
         return convertComponent({
             component: Object.values(node.childComponents),
             parent:node,

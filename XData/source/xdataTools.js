@@ -41,7 +41,16 @@ export const extractStartingQuote = (quoteString) => {
     }
 }
 
-export const oneOf = ({converters, remaining, context }) => {
+export const extractFirst = ({ pattern, from, context }) => {
+    const { remaining, extraction } = utils.extractFirst({ pattern, from })
+    return {
+        remaining,
+        extraction,
+        context: context.advancedBy(extraction),
+    }
+}
+
+export const oneOf = ({ remaining, context, converters, }) => {
     for (const eachConverter of converters) {
         var { node, remaining, context } = eachConverter.xdataStringToParsed({ remaining, context })
         if (node) {

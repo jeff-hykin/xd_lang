@@ -10,7 +10,7 @@ export const Comment = createConverter({
     decoderName: "Comment",
     xdataStringToNode({ string, context }) {
         var remaining = string
-        let components = {
+        let childComponents = {
             preWhitespace: null, // token
             commentSymbol: null, // token
             content: null, // token
@@ -21,25 +21,25 @@ export const Comment = createConverter({
         // leading whitespace
         // 
         var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
-        components.preWhitespace = new Token({string:extraction})
+        childComponents.preWhitespace = new Token({string:extraction})
 
         // 
         // comment symbol
         // 
         var { remaining, extraction } = utils.extractFirst({ pattern: /# |#(?=\n)/, from: remaining }); if (extraction == null) { return null }
-        components.commentSymbol = new Token({string:extraction})
+        childComponents.commentSymbol = new Token({string:extraction})
 
         // 
         // comment symbol
         // 
         var { remaining, extraction } = utils.extractFirst({ pattern: /.*/, from: remaining }); if (extraction == null) { return null }
-        components.content = new Token({string:extraction})
+        childComponents.content = new Token({string:extraction})
 
         // 
         // newline
         // 
         var { remaining, extraction } = utils.extractFirst({ pattern: /\n?/, from: remaining }); if (extraction == null) { return null }
-        components.newline = new Token({string:extraction})
+        childComponents.newline = new Token({string:extraction})
         
         // 
         // return
@@ -47,7 +47,7 @@ export const Comment = createConverter({
         return new Node({
             decodeAs: "Comment",
             originalContext: context,
-            childComponents: components,
+            childComponents,
             formattingInfo: {},  
         })
     },
