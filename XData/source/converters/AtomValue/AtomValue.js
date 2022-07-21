@@ -29,7 +29,7 @@ export const AtomValue = createConverter({
         // 
         // symbol
         // 
-        if (context.name != "keyDefinition") {
+        if (context.name != "keyDefinition" && remaining.length && remaining[0] != "@") {
             var { remaining, extraction } = utils.extractFirst({ pattern: /@/i, from: remaining }); if (extraction == null) { return null }
             components.symbol = new Token({string:extraction})
         }

@@ -36,72 +36,73 @@
                                         regex: "/ */"
                                     (SpecialValues): #DONE
                                         regex: "/true|false|infinite|infinity|-infinite|-infinity|NaN|nullptr|null|nil|none|undefined/i"
-                                    (numberLiteralToNode): #DONE
+                                    (NumberLiteral): #DONE
                                         regex: "/(-|+)?/"
                                         regex: "/\d+(\.\d+)?/"
-                                    (atomValueToNode): #DONE
+                                    (AtomValue): #DONE
                                         regex: "/@-?[a-zA-Z_][a-zA-Z_0-9]*/"
-                                    (systemCharacterToNode):
+                                    (SystemCharacter):
                                         oneOf:
                                             regex: "/#tab|#newline/"
                                             regex: "/#unicode\[\w+\]/"
                                             regex: "/#ascii\[\w+\]/"
-                                    (stringLiteralKeyToNode): #DONE
-                                        oneOf:
-                                            regex: '/"/'
-                                            regex: '/[^\n"]*/'
-                                            regex: '/"/'
-                                            group:
-                                                findDoubleQuotesThatAreAPerfectCube:
-                                                loop:
-                                                    oneOf:
-                                                        a sequence of double quotes thats smaller than the starting quote: 
-                                                        as many characters as possible that don't have the quote or newline:
-                                                findMatchingDoubleQuotesThatAreAPerfectCube:
-                                    (stringFigurativeKeyToNode):
-                                        findSingleQuotesThatAreAPerfectCube:
-                                        loop:
-                                            stop_if:
-                                                findMatchingSingleQuotesThatAreAPerfectCube:
+                                    (String):
+                                        (StringLiteral): #DONE
                                             oneOf:
-                                                regex: /[^{]+/ # note: exclude \n as well when in a key or reference context
-                                                (escapeSectionToNode):
-                                                    regex: /{/
-                                                    (systemCharacterToNode):
-                                                    (referenceToNode):
-                                                        regex: "/#valueOf/"
-                                                        regex: "/\[/"
-                                                            loop:
-                                                                regex: "/ */"
-                                                                (keyToNode):
-                                                                    oneOf:
-                                                                        (ValueOfAKey): #DONE
-                                                                            oneOf:
-                                                                                (SpecialValues):
-                                                                                (numberLiteralToNode):
-                                                                                (atomValueToNode):
-                                                                                (systemCharacterToNode):
-                                                                                (stringLiteralKeyToNode):
-                                                                                (stringFigurativeKeyToNode): #recursion
-                                                                        (KeyAndAdjective): # (date, utc) '10-12-1990':
-                                                                            (customAdjectives): #DONE
-                                                                                regex: "/\(/"
-                                                                                loop:
-                                                                                    (adjectiveToNode): #DONE
-                                                                                        regex: "/ */"
-                                                                                        regex: "/[a-zA-Z_][a-zA-Z_0-9]*/"
-                                                                                        regex: "/ */"
-                                                                                        regex: "/,/"
-                                                                                regex: "/\)/"
-                                                                                regex: "/ +| *$/"
-                                                                            (ValueOfAKey):
-                                                                regex: / */
-                                                                regex: /,/
+                                                regex: '/"/'
+                                                regex: '/[^\n"]*/'
+                                                regex: '/"/'
+                                                group:
+                                                    findDoubleQuotesThatAreAPerfectCube:
+                                                    loop:
+                                                        oneOf:
+                                                            a sequence of double quotes thats smaller than the starting quote: 
+                                                            as many characters as possible that don't have the quote or newline:
+                                                    findMatchingDoubleQuotesThatAreAPerfectCube:
+                                        (StringFigurative):
+                                            findSingleQuotesThatAreAPerfectCube:
+                                            loop:
+                                                stop_if:
+                                                    findMatchingSingleQuotesThatAreAPerfectCube:
+                                                oneOf:
+                                                    regex: /[^{]+/ # note: exclude \n as well when in a key or reference context
+                                                    (escapeSectionToNode):
+                                                        regex: /{/
+                                                        (SystemCharacter):
+                                                        (Reference):
+                                                            regex: "/#valueOf/"
+                                                            regex: "/\[/"
+                                                                loop:
+                                                                    regex: "/ */"
+                                                                    (keyToNode):
+                                                                        oneOf:
+                                                                            (ValueOfAKey): #DONE
+                                                                                oneOf:
+                                                                                    (SpecialValues):
+                                                                                    (NumberLiteral):
+                                                                                    (AtomValue):
+                                                                                    (SystemCharacter):
+                                                                                    (String): #recursion
+                                                                                    (Reference): # also recursion
+                                                                            (KeyAndAdjective): #DONE
+                                                                                (CustomAdjectives): #DONE
+                                                                                    regex: "/\(/"
+                                                                                    loop:
+                                                                                        (Adjective): #DONE
+                                                                                            regex: "/ */"
+                                                                                            regex: "/[a-zA-Z_][a-zA-Z_0-9]*/"
+                                                                                            regex: "/ */"
+                                                                                            regex: "/,/"
+                                                                                    regex: "/\)/"
+                                                                                    regex: "/ +| *$/"
+                                                                                (ValueOfAKey):
+                                                                    regex: / */
+                                                                    regex: /,/
+                                                            regex: "/ */"
+                                                            regex: "/\]/"
                                                         regex: "/ */"
-                                                        regex: "/\]/"
-                                                    regex: "/ */"
-                                                    regex: /}/
-                                    (referenceToNode):
+                                                        regex: /}/
+                                    (Reference):
                                 (lineOverlapValueToNode):
                                     oneOf:
                                         (stringBlockToNode):

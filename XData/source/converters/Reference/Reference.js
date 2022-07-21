@@ -2,6 +2,10 @@ import { Token, Node, createConverter, converters, convertComponent } from "../.
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
+// context.name
+    // checks for: []
+    // creates: []
+
 // (referenceToNode):
 //     regex: "/#valueOf/"
 //     optional:
@@ -33,7 +37,7 @@ export const Reference = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "key" && context.name != "stringFigurative") {
+        if (context.name != "keyDefinition" && context.name != "stringFigurative") {
             var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.preWhitespace = new Token({string:extraction})
             context = context.advancedBy(components.preWhitespace)
@@ -70,34 +74,7 @@ export const Reference = createConverter({
         // 
         // input
         // 
-        if (components.escape.string == 'ascii') {
-            // 
-            // integer 0-255
-            // 
-            var { remaining, extraction } = utils.extractFirst({ pattern: /[12]\d\d|\d\d/, from: remaining }); if (extraction == null) { return null }
-            components.input = new Token({string:extraction})
-            context = context.advancedBy(components.input)
-        } else {
-            // 
-            // whole number
-            // 
-            var { remaining, extraction } = utils.extractFirst({ pattern: /\d+/, from: remaining });
-            if (extraction != null) {
-                components.input = new Token({string:extraction})
-                context = context.advancedBy(components.input)
-            } else {
-                // 
-                // string
-                // 
-                var { node, remaining, context } = converters.String.xdataStringToParsed({
-                    string: remaining,
-                    context: new Context({
-                        ...context,
-                        name: "key",
-                    }),
-                })
-            }
-        }
+        
 
         // 
         // closeBracketWhitespace
@@ -116,16 +93,16 @@ export const Reference = createConverter({
         // 
         // postWhitespace
         // 
-        if (context.name != "key" && context.name != "stringFigurative") {
+        if (context.name != "keyDefinition" && context.name != "stringFigurative") {
             var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.postWhitespace = new Token({string:extraction})
             context = context.advancedBy(components.postWhitespace)
         }
         
         // 
-        // postWhitespace
+        // comment
         // 
-        if (context.name != "key" && context.name != "stringFigurative") {
+        if (context.name != "keyDefinition" && context.name != "stringFigurative") {
             components.comment = converters.Comment.xdataStringToNode({
                 string: remaining,
                 context: context,

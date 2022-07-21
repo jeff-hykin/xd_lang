@@ -27,6 +27,7 @@ export const ValueOfAKey = createConverter({
                 converters.AtomValue,
                 converters.SystemCharacter,
                 converters.String,
+                converters.Reference,
             ],
         })
 
