@@ -159,8 +159,7 @@ class Node {
     }
 
     set(key, value) {
-        yourself.set(this, key, value)
-        return this
+        return yourself.set(this, key, value)
     }
 
     get(key) {
@@ -181,12 +180,22 @@ class Node {
             return this.innerValue
         } else {
             if (!this[valueCache]) {
-                this[valueCache] = new Proxy(this.innerValue, {
-                    has: Reflect.has,
-                    ownKeys: Reflect.ownKeys, // Object.keys
+                this[valueCache] = new Proxy({}, {
+                    has: (_, ...args)=>Reflect.has(this.innerValue, ...args),
+                    ownKeys: (_, ...args)=>Reflect.ownKeys(this.innerValue, ...args),
 
                     get: (original, key) => {
-                        return nodeIdToNode[ this.innerValue[key] ]
+                        // FIXME: not sure how to handle this debugging output case
+                        if (key == Symbol.toStringTag) {
+                            // let output = `{\n`
+                            // for (let each of Object.keys(this.innerValue)) {
+                            //     output += `    ${each}: Node(),\n`
+                            // }
+                            // // output += `}`
+                            return " "
+                        }
+                        const node = nodeIdToNode[ this.innerValue[key] ]
+                        return node.value
                     },
                     set: (original, key, value) => {
                         return this.set(key, value)
@@ -201,3 +210,9 @@ class Node {
 }
 const Root = new Node({ id: 1 })
 Root.parents.add(Root) // to prevent it from being deleted
+
+// 
+// testing
+// 
+const thing = Root.set("thing", { howdy: 1 })
+console.log(thing.value)
