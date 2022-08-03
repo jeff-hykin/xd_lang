@@ -3,7 +3,7 @@ import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
 // context.name
-    // checks for: [ "keyDefinition" ]
+    // checks for: [ "mapKey" ]
     // creates: []
 
 export const SpecialValues = createConverter({
@@ -20,7 +20,7 @@ export const SpecialValues = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "keyDefinition") {
+        if (context.name != "mapKey") {
             var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.preWhitespace = new Token({string:extraction})
         }
@@ -40,7 +40,7 @@ export const SpecialValues = createConverter({
         // 
         // comment
         // 
-        if (context.name != "keyDefinition") {
+        if (context.name != "mapKey") {
             components.comment = converters.Comment.xdataStringToNode({
                 string: remaining,
                 context: context.advancedBy(
@@ -60,7 +60,7 @@ export const SpecialValues = createConverter({
         })
     },
     nodeToXdataString({node, contextName}) {
-        if (contextName == "keyDefinition") {
+        if (contextName == "mapKey") {
             node.childComponents.preWhitespace = null
             node.childComponents.comment = null
         }

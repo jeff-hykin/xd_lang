@@ -3,7 +3,7 @@ import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
 // context.name
-    // checks for: [ "keyPath" ]
+    // checks for: [ "referencePath" ]
     // creates: []
 
 export const String = createConverter({
@@ -24,7 +24,7 @@ export const String = createConverter({
         const containsNewlines = !!node.childComponents.content.match(/\n/g)
         const defaultQuoteType = node.formattingInfo?.quoteType || (node.childComponents.openingQuote || `'`)[0]
 
-        // FIXME: will need to know "keyPath" enforces on-a-single-line format
+        // FIXME: will need to know "referencePath" enforces on-a-single-line format
         
         // 
         // check if it can be a string literal

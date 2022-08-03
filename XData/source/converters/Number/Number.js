@@ -3,7 +3,7 @@ import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
 // context.name
-    // checks for: [ "keyDefinition" ]
+    // checks for: [ "mapKey" ]
     // creates: []
                                         
 export const Number = createConverter({
@@ -21,7 +21,7 @@ export const Number = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "keyDefinition") {
+        if (context.name != "mapKey") {
             var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.preWhitespace = new Token({string:extraction})
         }
@@ -44,7 +44,7 @@ export const Number = createConverter({
         var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
         components.postWhitespace = new Token({string:extraction})
         
-        if (context.name != "keyDefinition") {
+        if (context.name != "mapKey") {
             // 
             // comment
             // 
@@ -67,7 +67,7 @@ export const Number = createConverter({
         })
     },
     nodeToXdataString({node, contextName}) {
-        if (contextName == "keyDefinition") {
+        if (contextName == "mapKey") {
             node.childComponents.preWhitespace = null
             node.childComponents.comment = null
         }

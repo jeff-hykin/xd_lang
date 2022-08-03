@@ -3,7 +3,7 @@ import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
 // context.name
-    // checks for: [ "keyDefinition", ]
+    // checks for: [ "mapKey", ]
     // creates: []
 
 export const StringLiteral = createConverter({
@@ -21,7 +21,7 @@ export const StringLiteral = createConverter({
         // 
         // leading whitespace
         // 
-        if (context.name != "keyDefinition") {
+        if (context.name != "mapKey") {
             var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining, context }); if (extraction == null) { return null }
             childComponents.preWhitespace = new Token({string:extraction})
         }
@@ -46,7 +46,7 @@ export const StringLiteral = createConverter({
         // 
         // trailing whitespace
         // 
-        if (context.name != "keyDefinition") {
+        if (context.name != "mapKey") {
             var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining, context }); if (extraction == null) { return null }
             childComponents.postWhitespace = new Token({string:extraction})
         }

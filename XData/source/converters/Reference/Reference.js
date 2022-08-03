@@ -1,34 +1,34 @@
-import { Token, Node, createConverter, converters, convertComponent } from "../../structure.js"
+import { Token, Node, createConverter, converters, convertComponent, Context } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
 // context.name
-    // checks for: []
-    // creates: []
+    // checks for: ["mapKey"]
+    // creates: ["referencePath"]
 
-// (referenceToNode):
+// (Reference)[referencePath]:
+//     regex: "/ */"
 //     regex: "/#valueOf/"
-//     optional:
+//     regex: "/\[/"
 //         loop:
-//             regex: "/\[/"
 //             regex: "/ */"
-//             (keyToNode):
-//             regex: "/ */"
-//             regex: "/\]/"
+//             (Key): #DONE
+//             regex: / */
+//             regex: /,/
+//     regex: "/ */"
+//     regex: "/\]/"
+//     regex: "/ */"
 
 export const Reference = createConverter({
     decoderName: "Reference",
-    contextNames: [ "key", "stringFigurative" ],
     xdataStringToNode({ string, context }) {
+        const originalContext = context
         var remaining = string
         let components = {
             preWhitespace: null,
-            symbol: null,
-            escape: null,
+            systemToken: null,
             openBracket: null,
-            openBracketWhitespace: null,
-            input: null,
-            closeBracketWhitespace: null,
+            content: [],
             closeBracket: null,
             postWhitespace: null,
             comment: null,
@@ -37,77 +37,78 @@ export const Reference = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "keyDefinition" && context.name != "stringFigurative") {
-            var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+        if (context.name != "mapKey") {
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.preWhitespace = new Token({string:extraction})
-            context = context.advancedBy(components.preWhitespace)
         }
         
         // 
         // symbol
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /#/, from: remaining }); if (extraction == null) { return null }
-        components.symbol = new Token({string:extraction})
-        context = context.advancedBy(components.symbol)
+        var { remaining, extraction, context } = tools.extractFirst({ pattern: /#valueOf/, from: remaining }); if (extraction == null) { return null }
+        components.systemToken = new Token({string:extraction})
 
-        // 
-        // escape
-        // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /valueOf/, from: remaining }); if (extraction == null) { return null }
-        components.escape = new Token({string:extraction})
-        context = context.advancedBy(components.escape)
-        
         // 
         // openBracket
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /\[/, from: remaining }); if (extraction == null) { return null }
+        var { remaining, extraction, context } = tools.extractFirst({ pattern: /\[/, from: remaining }); if (extraction == null) { return null }
         components.openBracket = new Token({string:extraction})
-        context = context.advancedBy(components.openBracket)
         
         // 
-        // openBracketWhitespace
-        // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
-        components.openBracketWhitespace = new Token({string:extraction})
-        context = context.advancedBy(components.openBracketWhitespace)
-        
-        // 
-        // input
-        // 
-        
+        // content
+        //
+        while (1) {
+            const item = {
+                preWhitespace: null,
+                content: null,
+                preCommaWhitespace: null,
+                comma: null,
+                postWhitespace: null,
+            }
+            components.content.push(item)
 
-        // 
-        // closeBracketWhitespace
-        // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: / */i, from: remaining }); if (extraction == null) { return null }
-        components.closeBracketWhitespace = new Token({string:extraction})
-        context = context.advancedBy(components.closeBracketWhitespace)
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+            item.preWhitespace = new Token({string:extraction})
+            
+            var { node, remaining, context, } = converters.Key.xdataStringToParsed({ remaining, context }); if (node == null) { return null }
+            item.content = node
+            
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+            item.preCommaWhitespace = new Token({string:extraction})
+            
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: /,/, from: remaining });
+            if (extraction == null) {
+                break
+            }
+            item.comma = new Token({string:extraction})
+
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+            item.postWhitespace = new Token({string:extraction})
+        }
 
         // 
         // closeBracket
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /\]/i, from: remaining }); if (extraction == null) { return null }
+        var { remaining, extraction, context } = tools.extractFirst({ pattern: /\]/i, from: remaining }); if (extraction == null) { return null }
         components.closeBracket = new Token({string:extraction})
-        context = context.advancedBy(components.closeBracket)
         
         // 
         // postWhitespace
         // 
-        if (context.name != "keyDefinition" && context.name != "stringFigurative") {
-            var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+        if (context.name != "mapKey") {
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.postWhitespace = new Token({string:extraction})
-            context = context.advancedBy(components.postWhitespace)
         }
         
         // 
         // comment
         // 
-        if (context.name != "keyDefinition" && context.name != "stringFigurative") {
-            components.comment = converters.Comment.xdataStringToNode({
+        if (context.name != "mapKey") {
+            var { node, remaining, context, } = converters.Comment.xdataStringToParsed({
                 string: remaining,
                 context: context,
             })
-            context = context.advancedBy(components.comment)
+            components.comment = node
         }
         
         // 
@@ -115,13 +116,13 @@ export const Reference = createConverter({
         // 
         return new Node({
             decodeAs: "Reference",
-            originalContext: context,
+            originalContext: originalContext,
             childComponents: components,
-            formattingInfo: {},  
+            formattingInfo: {},
         })
     },
     nodeToXdataString({node, contextName}) {
-        if (contextName == "key") {
+        if (contextName == "mapKey") {
             node.childComponents.preWhitespace = null
             node.childComponents.comment = null
         } else if (contextName == "stringLiteral") {

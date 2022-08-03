@@ -69,35 +69,34 @@
                                                     (escapeSectionToNode):
                                                         regex: /{/
                                                         (SystemCharacter):
-                                                        (Reference):
+                                                        (Reference)[referencePath]:
                                                             regex: "/#valueOf/"
                                                             regex: "/\[/"
                                                                 loop:
-                                                                    (PathKey): # <<< TODO next
-                                                                        regex: "/ */"
-                                                                        (Key): #DONE
-                                                                            oneOf:
-                                                                                (ValueOfAKey): #DONE
-                                                                                    oneOf:
-                                                                                        (SpecialValues):
-                                                                                        (Number):
-                                                                                        (Atom):
-                                                                                        (SystemCharacter):
-                                                                                        (String): #recursion
-                                                                                        (Reference): # also recursion
-                                                                                (KeyAndAdjective): #DONE
-                                                                                    (CustomAdjectives): #DONE
-                                                                                        regex: "/\(/"
-                                                                                        loop:
-                                                                                            (Adjective): #DONE
-                                                                                                regex: "/ */"
-                                                                                                regex: "/[a-zA-Z_][a-zA-Z_0-9]*/"
-                                                                                                regex: "/ */"
-                                                                                                regex: "/,/"
-                                                                                        regex: "/\)/"
-                                                                                        regex: "/ +| *$/"
-                                                                                    (ValueOfAKey):
-                                                                        regex: / */
+                                                                    regex: "/ */"
+                                                                    (Key): #DONE
+                                                                        oneOf:
+                                                                            (ValueOfAKey): #DONE
+                                                                                oneOf:
+                                                                                    (SpecialValues):
+                                                                                    (Number):
+                                                                                    (Atom):
+                                                                                    (SystemCharacter):
+                                                                                    (String): #recursion
+                                                                                    (Reference): # also recursion
+                                                                            (KeyAndAdjective): #DONE
+                                                                                (CustomAdjectives): #DONE
+                                                                                    regex: "/\(/"
+                                                                                    loop:
+                                                                                        (Adjective): #DONE
+                                                                                            regex: "/ */"
+                                                                                            regex: "/[a-zA-Z_][a-zA-Z_0-9]*/"
+                                                                                            regex: "/ */"
+                                                                                            regex: "/,/"
+                                                                                    regex: "/\)/"
+                                                                                    regex: "/ +| *$/"
+                                                                                (ValueOfAKey):
+                                                                    regex: / */
                                                                     regex: /,/
                                                             regex: "/ */"
                                                             regex: "/\]/"

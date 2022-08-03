@@ -3,7 +3,7 @@ import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
 // context.name
-    // checks for: [ "keyDefinition", "stringFigurative" ]
+    // checks for: [ "mapKey", "stringFigurative" ]
     // creates: []
 
 // (systemCharacterToNode):
@@ -24,11 +24,10 @@ export const SystemCharacter = createConverter({
         var remaining = string
         let components = {
             preWhitespace: null,
-            symbol: null,
-            escape: null,
+            systemToken: null,
             openBracket: null,
             openBracketWhitespace: null,
-            input: null,
+            content: null,
             closeBracketWhitespace: null,
             closeBracket: null,
             postWhitespace: null,
@@ -38,91 +37,75 @@ export const SystemCharacter = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "keyDefinition" && context.name != "stringFigurative") {
-            var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+        if (context.name != "mapKey" && context.name != "stringFigurative") {
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.preWhitespace = new Token({string:extraction})
-            context = context.advancedBy(components.preWhitespace)
         }
         
         // 
-        // symbol
+        // systemToken
         // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /#/, from: remaining }); if (extraction == null) { return null }
-        components.symbol = new Token({string:extraction})
-        context = context.advancedBy(components.symbol)
+        var { remaining, extraction, context } = tools.extractFirst({ pattern: /#(tab|newline|unicode|ascii)/, from: remaining }); if (extraction == null) { return null }
+        components.systemToken = new Token({string:extraction})
 
-        // 
-        // escape
-        // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /tab|newline|unicode|ascii/, from: remaining }); if (extraction == null) { return null }
-        components.escape = new Token({string:extraction})
-        context = context.advancedBy(components.escape)
-        
         if (extraction == 'unicode' || extraction == 'ascii') {
             // 
             // openBracket
             // 
-            var { remaining, extraction } = utils.extractFirst({ pattern: /\[/, from: remaining }); if (extraction == null) { return null }
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: /\[/, from: remaining }); if (extraction == null) { return null }
             components.openBracket = new Token({string:extraction})
-            context = context.advancedBy(components.openBracket)
             
             // 
             // openBracketWhitespace
             // 
-            var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.openBracketWhitespace = new Token({string:extraction})
-            context = context.advancedBy(components.openBracketWhitespace)
             
             // 
-            // input
+            // content
             // 
             // TODO: consider allow hex/octal numbers
             if (components.escape.string == 'ascii') {
                 // 
                 // integer 0-255
                 // 
-                var { remaining, extraction } = utils.extractFirst({ pattern: /[12]\d\d|\d(\d)?/, from: remaining }); if (extraction == null) { return null }
-                components.input = new Token({string:extraction})
-                context = context.advancedBy(components.input)
+                var { remaining, extraction, context } = tools.extractFirst({ pattern: /[12]\d\d|\d(\d)?/, from: remaining }); if (extraction == null) { return null }
+                components.content = new Token({string:extraction})
             } else {
                 // 
                 // whole number
                 // 
-                var { remaining, extraction } = utils.extractFirst({ pattern: /\d+/, from: remaining });
+                var { remaining, extraction, context } = tools.extractFirst({ pattern: /\d+/, from: remaining });
                 if (extraction != null) {
-                    components.input = new Token({string:extraction})
-                    context = context.advancedBy(components.input)
+                    components.content = new Token({string:extraction})
                 }
             }
 
             // 
             // closeBracketWhitespace
             // 
-            var { remaining, extraction } = utils.extractFirst({ pattern: / */i, from: remaining }); if (extraction == null) { return null }
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */i, from: remaining }); if (extraction == null) { return null }
             components.closeBracketWhitespace = new Token({string:extraction})
-            context = context.advancedBy(components.closeBracketWhitespace)
 
             // 
             // closeBracket
             // 
-            var { remaining, extraction } = utils.extractFirst({ pattern: /\]/i, from: remaining }); if (extraction == null) { return null }
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: /\]/i, from: remaining }); if (extraction == null) { return null }
             components.closeBracket = new Token({string:extraction})
-            context = context.advancedBy(components.closeBracket)
         }
         
         // 
         // postWhitespace
         // 
-        if (context.name != "keyDefinition" && context.name != "stringFigurative") {
-            var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+        if (context.name != "mapKey" && context.name != "stringFigurative") {
+            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.postWhitespace = new Token({string:extraction})
-            context = context.advancedBy(components.postWhitespace)
         }
         
         // 
         // postWhitespace
         // 
-        if (context.name != "keyDefinition" && context.name != "stringFigurative") {
+        if (context.name != "mapKey" && context.name != "stringFigurative") {
             components.comment = converters.Comment.xdataStringToNode({
                 string: remaining,
                 context: context,
@@ -141,7 +124,7 @@ export const SystemCharacter = createConverter({
         })
     },
     nodeToXdataString({node, contextName}) {
-        if (contextName == "keyDefinition") {
+        if (contextName == "mapKey") {
             node.childComponents.preWhitespace = null
             node.childComponents.comment = null
         } else if (contextName == "stringLiteral") {

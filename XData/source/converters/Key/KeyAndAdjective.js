@@ -3,7 +3,7 @@ import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
 // context.name
-    // checks for: []
+    // checks for: ["mapKey"]
     // creates: []
 
 export const KeyAndAdjective = createConverter({
@@ -21,7 +21,7 @@ export const KeyAndAdjective = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "keyDefinition") {
+        if (context.name != "mapKey") {
             var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining, context }); if (extraction == null) { return null }
             components.preWhitespace = new Token({string:extraction})
         }

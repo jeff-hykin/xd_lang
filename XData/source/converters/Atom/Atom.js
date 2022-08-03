@@ -3,7 +3,7 @@ import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
 // context.name
-    // checks for: [ "keyDefinition" ]
+    // checks for: [ "mapKey" ]
     // creates: []
 
 export const Atom = createConverter({
@@ -21,7 +21,7 @@ export const Atom = createConverter({
         // 
         // preWhitespace
         // 
-        if (context.name != "keyDefinition") {
+        if (context.name != "mapKey") {
             var { remaining, extraction } = utils.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             components.preWhitespace = new Token({string:extraction})
         }
@@ -29,7 +29,7 @@ export const Atom = createConverter({
         // 
         // symbol
         // 
-        if (context.name != "keyDefinition" && remaining.length && remaining[0] != "@") {
+        if (context.name != "mapKey" && remaining.length && remaining[0] != "@") {
             var { remaining, extraction } = utils.extractFirst({ pattern: /@/i, from: remaining }); if (extraction == null) { return null }
             components.symbol = new Token({string:extraction})
         }
@@ -49,7 +49,7 @@ export const Atom = createConverter({
         // 
         // comment
         // 
-        if (context.name != "keyDefinition") {
+        if (context.name != "mapKey") {
             components.comment = converters.Comment.xdataStringToNode({
                 string: remaining,
                 context: context.advancedBy(
@@ -69,7 +69,7 @@ export const Atom = createConverter({
         })
     },
     nodeToXdataString({node, contextName}) {
-        if (contextName == "keyDefinition") {
+        if (contextName == "mapKey") {
             node.childComponents.preWhitespace = null
             node.childComponents.comment = null
             node.childComponents.symbol = null
