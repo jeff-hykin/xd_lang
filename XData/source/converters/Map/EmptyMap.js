@@ -12,9 +12,9 @@ export const EmptyMap = createConverter({
         var remaining = string
         let components = {
             preWhitespace: null, // token
-            openBracket: null, // token
+            openingBracket: null, // token
             whitespace: null, // token
-            closeBracket: null, // token
+            closingBracket: null, // token
             postWhitespace: null, // token
             comment: null, // node
         }
@@ -26,10 +26,10 @@ export const EmptyMap = createConverter({
         components.preWhitespace = new Token({string:extraction})
         
         // 
-        // openBracket
+        // openingBracket
         // 
         var { remaining, extraction } = utils.extractFirst({ pattern: /\{/, from: remaining }); if (extraction == null) { return null }
-        components.openBracket = new Token({string:extraction})
+        components.openingBracket = new Token({string:extraction})
         
         // 
         // preWhitespace
@@ -39,10 +39,10 @@ export const EmptyMap = createConverter({
 
         
         // 
-        // openBracket
+        // openingBracket
         // 
         var { remaining, extraction } = utils.extractFirst({ pattern: /\}/, from: remaining }); if (extraction == null) { return null }
-        components.closeBracket = new Token({string:extraction})
+        components.closingBracket = new Token({string:extraction})
         
         // 
         // postWhitespace
@@ -56,7 +56,7 @@ export const EmptyMap = createConverter({
         components.comment = converters.Comment.xdataStringToNode({
             string: remaining,
             context: context.advancedBy(
-                (components.preWhitespace||'')+(components.openBracket||'')+(components.whitespace||'')+(components.closeBracket||'')+(components.postWhitespace||'')
+                (components.preWhitespace||'')+(components.openingBracket||'')+(components.whitespace||'')+(components.closingBracket||'')+(components.postWhitespace||'')
             ),
         })
         

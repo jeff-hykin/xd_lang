@@ -28,9 +28,9 @@ export const Reference = createConverter({
         let components = {
             preWhitespace: null,
             systemToken: null,
-            openBracket: null,
+            openingBracket: null,
             content: [],
-            closeBracket: null,
+            closingBracket: null,
             postWhitespace: null,
             comment: null,
         }
@@ -50,10 +50,10 @@ export const Reference = createConverter({
         components.systemToken = new Token({string:extraction})
 
         // 
-        // openBracket
+        // openingBracket
         // 
         var { remaining, extraction, context } = tools.extractFirst({ pattern: /\[/, from: remaining }); if (extraction == null) { return null }
-        components.openBracket = new Token({string:extraction})
+        components.openingBracket = new Token({string:extraction})
         
         // 
         // content
@@ -103,10 +103,10 @@ export const Reference = createConverter({
         }
 
         // 
-        // closeBracket
+        // closingBracket
         // 
         var { remaining, extraction, context } = tools.extractFirst({ pattern: /\]/i, from: remaining }); if (extraction == null) { return null }
-        components.closeBracket = new Token({string:extraction})
+        components.closingBracket = new Token({string:extraction})
         
         // 
         // postWhitespace

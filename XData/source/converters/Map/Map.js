@@ -12,9 +12,9 @@ export const Map = createConverter({
         var remaining = string
         let components = {
             preWhitespace: null, // token
-            openBracket: null, // token
+            openingBracket: null, // token
             whitespace: null, // token
-            closeBracket: null, // token
+            closingBracket: null, // token
             postWhitespace: null, // token
             comment: null, // node
         }

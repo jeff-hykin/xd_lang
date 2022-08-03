@@ -6,40 +6,21 @@ import * as tools from "../../xdataTools.js"
     // checks for: [ "mapKey", ]
     // creates: []
 
-export const StringFigurative = createConverter({
-    decoderName: "StringFigurative",
+export const StringFigurativeInlineChunk = createConverter({
+    decoderName: "StringFigurativeInlineChunk",
     xdataStringToNode({ string, context }) {
         var remaining = string
         let childComponents = {
-            preWhitespace: null, // token
-            openingQuote: null, // token
             content: null, // token
-            closingQuote: null, // token
-            postWhitespace: null, // token
         }
-        
-        // 
-        // leading whitespace
-        // 
-        if (context.name != "mapKey") {
-            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining, context }); if (extraction == null) { return null }
-            childComponents.preWhitespace = new Token({string:extraction})
-        }
-
-        // 
-        // first quote
-        // 
-        var { remaining, extraction } = utils.extractFirst({ pattern: /'+/, from: remaining })               ; if (extraction == null) { return null }
-        var { remaining: remainingQuotes, extraction: openingQuote } = tools.extractStartingQuote(extraction); if (openingQuote.length == 0) { return null }
-        childComponents.openingQuote = new Token({string:openingQuote})
-        context = context.advancedBy(childComponents.openingQuote)
-        // put some back because we possibly grabbed more than just the start
-        remaining = remainingQuotes+remaining
         
         // 
         // content
         // 
         while (1) {
+            // cannot contain newline literals
+            // can contain escapes
+
             var { node, remaining, context } = tools.oneOf({
                 remaining,
                 context,
@@ -56,23 +37,11 @@ export const StringFigurative = createConverter({
             childComponents.closingQuote = new Token({string:extraction.slice(-childComponents.openingQuote.length, extraction.length)})
         }
 
-
-
-        // 
-        // trailing whitespace
-        // 
-        if (context.name != "mapKey") {
-            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining, context }); if (extraction == null) { return null }
-            childComponents.postWhitespace = new Token({string:extraction})
-        }
-
         return new Node({
-            decodeAs: "String", // NOTE: this is intentional, "String" not "StringFigurative"
+            decodeAs: "StringFigurativeInlineChunk",
             originalContext: context,
             childComponents,
-            formattingInfo: {
-                quoteSize: childComponents.openingQuote.string.length,
-            },  
+            formattingInfo: {},  
         })
     },
     nodeToXdataString({node, contextName}) {
@@ -81,7 +50,7 @@ export const StringFigurative = createConverter({
         if (containsNewlines) {
             throw Exception(`\n\n
                 This is probably an internal issue
-                    called converters.StringFigurative.nodeToXdataString()
+                    called converters.StringFigurativeInlineChunk.nodeToXdataString()
                     probably should've called the slightly different
                     converters.String.nodeToXdataString()
                     because the string content contained a newline, which cannot 
