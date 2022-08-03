@@ -6,8 +6,8 @@ import * as tools from "../../xdataTools.js"
     // checks for: [ "keyDefinition" ]
     // creates: []
 
-export const AtomValue = createConverter({
-    decoderName: "AtomValue",
+export const Atom = createConverter({
+    decoderName: "Atom",
     xdataStringToNode({ string, context }) {
         var remaining = string
         let components = {
@@ -62,7 +62,7 @@ export const AtomValue = createConverter({
         // return
         // 
         return new Node({
-            decodeAs: "AtomValue",
+            decodeAs: "Atom",
             originalContext: context,
             childComponents: components,
             formattingInfo: {},  

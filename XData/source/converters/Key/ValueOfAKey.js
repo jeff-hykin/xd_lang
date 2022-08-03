@@ -10,7 +10,7 @@ import * as tools from "../../xdataTools.js"
 //     oneOf:
 //         (specialValuesToNode):
 //         (NumberToNode):
-//         (atomValueToNode):
+//         (AtomToNode):
 //         (systemCharacterToNode):
 //         (stringLiteralKeyToNode):
 //         (stringFigurativeKeyToNode): #recursion
@@ -24,7 +24,7 @@ export const ValueOfAKey = createConverter({
             converters: [
                 converters.SpecialValues,
                 converters.Number,
-                converters.AtomValue,
+                converters.Atom,
                 converters.SystemCharacter,
                 converters.String,
                 converters.Reference,

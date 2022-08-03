@@ -10,7 +10,7 @@ import * as tools from "../../xdataTools.js"
 //     oneOf:
 //         (specialValuesToNode):
 //         (NumberToNode):
-//         (atomValueToNode):
+//         (AtomToNode):
 //         (systemCharacterToNode):
 //         (stringLiteralKeyToNode):
 //         (stringFigurativeKeyToNode): #recursion
