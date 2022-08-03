@@ -115,7 +115,7 @@ export class Node extends Component {
     childComponents = {} // the order of the items in this object is significant
     formattingInfo = {}
     originalContext = null
-    constructor({decodeAs, childComponents, formattingInfo, originalContext}) {
+    constructor({decodeAs, childComponents, formattingInfo={}, originalContext}) {
         super()
         this.decodeAs = decodeAs
         this.childComponents = childComponents
@@ -158,7 +158,7 @@ export class Node extends Component {
     // TODO: add a getComments() that recursively calls getComments() on childComponents
 }
 
-export function convertComponent({component, parent, contextName}) {
+export function convertComponentToString({component, parent, contextName}) {
     // base case 1
     if (typeof component == 'string') {
         return component
@@ -170,7 +170,7 @@ export function convertComponent({component, parent, contextName}) {
         return ""
     // recursive case 1
     } else if (component instanceof Array) {
-        return component.map(each=>convertComponent({component: each, contextName, parent})).join("")
+        return component.map(each=>convertComponentToString({component: each, contextName, parent})).join("")
     // recursive case 2 // if it is a proper node
     } else if (converters[component.decodeAs]) {
         const converter = converters[component.decodeAs]
@@ -213,7 +213,7 @@ export const createConverter = function ({
         nodeToXdataString = function({node, contextName}) {
             let outputString = ""
             for (const [key, component] of Object.entries(node.childComponents)) {
-                outputString += convertComponent({component, parent: node, contextName})
+                outputString += convertComponentToString({component, parent: node, contextName})
             }
             return outputString
         }

@@ -1,4 +1,4 @@
-import { Token, Node, createConverter, converters, convertComponent } from "../../structure.js"
+import { Token, Node, createConverter, converters, convertComponentToString } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
@@ -132,7 +132,7 @@ export const SystemCharacter = createConverter({
             node.childComponents.postWhitespace = null
             node.childComponents.comment = null
         }
-        return convertComponent({
+        return convertComponentToString({
             component: Object.values(node.childComponents),
             parent:node,
             contextName

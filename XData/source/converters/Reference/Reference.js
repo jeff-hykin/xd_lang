@@ -1,4 +1,4 @@
-import { Token, Node, createConverter, converters, convertComponent, Context } from "../../structure.js"
+import { Token, Node, createConverter, converters, convertComponentToString, Context } from "../../structure.js"
 import * as utils from "../../utils.js"
 import * as tools from "../../xdataTools.js"
 
@@ -15,6 +15,7 @@ import * as tools from "../../xdataTools.js"
 //             (Key): #DONE
 //             regex: / */
 //             regex: /,/
+//             regex: / */
 //     regex: "/ */"
 //     regex: "/\]/"
 //     regex: "/ */"
@@ -58,20 +59,35 @@ export const Reference = createConverter({
         // content
         //
         while (1) {
-            const item = {
-                preWhitespace: null,
-                content: null,
-                preCommaWhitespace: null,
-                comma: null,
-                postWhitespace: null,
-            }
+            const item = Node({
+                decodeAs: "Anonymous",
+                originalContext: context,
+                childComponents: {
+                    preWhitespace: null,
+                    content: null,
+                    preCommaWhitespace: null,
+                    comma: null,
+                    postWhitespace: null,
+                },
+            })
             components.content.push(item)
+
+
 
             var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             item.preWhitespace = new Token({string:extraction})
             
-            var { node, remaining, context, } = converters.Key.xdataStringToParsed({ remaining, context }); if (node == null) { return null }
+
+            // 
+            // element content
+            // 
+            var { node, remaining, context, } = converters.Key.xdataStringToParsed({
+                remaining,
+                context: new Context({...context, name: "referencePath" }) 
+            })
+            if (node == null) { return null }
             item.content = node
+
             
             var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
             item.preCommaWhitespace = new Token({string:extraction})
@@ -95,10 +111,8 @@ export const Reference = createConverter({
         // 
         // postWhitespace
         // 
-        if (context.name != "mapKey") {
-            var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
-            components.postWhitespace = new Token({string:extraction})
-        }
+        var { remaining, extraction, context } = tools.extractFirst({ pattern: / */, from: remaining }); if (extraction == null) { return null }
+        components.postWhitespace = new Token({string:extraction})
         
         // 
         // comment
@@ -125,12 +139,8 @@ export const Reference = createConverter({
         if (contextName == "mapKey") {
             node.childComponents.preWhitespace = null
             node.childComponents.comment = null
-        } else if (contextName == "stringLiteral") {
-            node.childComponents.preWhitespace = null
-            node.childComponents.postWhitespace = null
-            node.childComponents.comment = null
         }
-        return convertComponent({
+        return convertComponentToString({
             component: Object.values(node.childComponents),
             parent:node,
             contextName
