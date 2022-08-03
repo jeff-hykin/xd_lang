@@ -21,14 +21,14 @@
                         regex: "/- /"
                         (Definition):
                             oneOf:
-                                (inlineValueToNode):
-                                    (EmptyMap): #DONE
+                                (inlineValueToNode)[inline]:
+                                    (Map)<inline>: #DONE
                                         regex: "/ */"
                                         regex: "/\{/"
                                         regex: "/ */"
                                         regex: "/\}/"
                                         regex: "/ */"
-                                    (EmptyList): #DONE
+                                    (List)<inline>: #DONE
                                         regex: "/ */"
                                         regex: "/\[/"
                                         regex: "/ */"
@@ -46,8 +46,8 @@
                                             regex: "/#tab|#newline/"
                                             regex: "/#unicode\[\w+\]/"
                                             regex: "/#ascii\[\w+\]/"
-                                    (String):
-                                        (StringLiteral): #DONE
+                                    (String)<inline>:
+                                        (StringLiteral)<inline>: #DONE
                                             oneOf:
                                                 regex: '/"/'
                                                 regex: '/[^\n"]*/'
@@ -59,17 +59,17 @@
                                                             a sequence of double quotes thats smaller than the starting quote: 
                                                             as many characters as possible that don't have the quote or newline:
                                                     findMatchingDoubleQuotesThatAreAPerfectCube:
-                                        (StringFigurative):
+                                        (StringFigurative)[stringFigurative]<inline>:
                                             findSingleQuotesThatAreAPerfectCube:
                                             loop:
                                                 stop_if:
                                                     findMatchingSingleQuotesThatAreAPerfectCube:
                                                 oneOf:
                                                     regex: /[^{]+/ # note: exclude \n as well when in a key or reference context
-                                                    (escapeSectionToNode):
+                                                    (escapeSectionToNode): # TODO NEXT
                                                         regex: /{/
                                                         (SystemCharacter):
-                                                        (Reference)[referencePath]:
+                                                        (Reference)[referencePath]: # DONE
                                                             regex: "/#valueOf/"
                                                             regex: "/\[/"
                                                                 loop:
