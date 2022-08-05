@@ -1,6 +1,10 @@
 import * as structure from "./new_structure.js"
 import * as utils from "./utils.js" 
+import { capitalize, indent, toCamelCase, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString } from "https://deno.land/x/good@0.5.15/string.js"
 
+const options = {
+    debuggingSnippetAmount: 100, // characters
+}
 
 export function defaultToString({node, parentNode, context}) {
     // base case 1
@@ -45,7 +49,18 @@ export const Token = structure.Converter({
 })
 
 const advancedBy = (stringOrNode, context) => {
-    let newContext = { ...context }
+    let newContext = {
+        ...context,
+        adjectives: {
+            ...context.adjectives
+        },
+        debugInfo: {
+            stringIndex: 0,
+            lineIndex: 0,
+            columnIndex: 0,
+            ...context.debugInfo
+        },
+    }
     if (stringOrNode == null) {
         return newContext
     } else  if (stringOrNode instanceof Array) {
@@ -67,17 +82,50 @@ const advancedBy = (stringOrNode, context) => {
     return newContext
 }
 
-
-export const extractFirst = ({ pattern, from, context }) => {
-    const { remaining, extraction } = utils.extractFirst({ pattern, from })
-    const node = new Node({
-        encoder: "Token",
-        childComponents
-        formattingPreferences
-    })
-    return {
-        remaining,
-        extraction: node,
-        context: advancedBy(node, context),
+export const extract = ({ pattern, oneOf, from, context }) => {
+    // 
+    // simple string or regex
+    // 
+    if (pattern instanceof RegExp || typeof pattern == 'string') {
+        
+        const { remaining, extraction } = utils.extractFirst({ pattern, from })
+        const node = new Node({
+            encoder: "Token",
+            childComponents
+            formattingPreferences
+        })
+        return {
+            remaining,
+            extraction: node,
+            context: advancedBy(node, context),
+        }
+    } else if (pattern instanceof Object) {
+        if (pattern[structure.isDecoder]) {
+            const decoder = pattern[structure.isDecoder]
+            const node = decoder({ string: from, context })
+            const newContext = advancedBy(node, context)
+            const numberOfCharactersAdvanced = newContext.debugInfo.stringIndex - (context.debugInfo.stringIndex||0)
+            const remaining = from.slice(numberOfCharactersAdvanced)
+            return {
+                remaining,
+                extraction: node,
+                context: newContext,
+            }
+        }
+        throw Error(`There was a problem when calling:\n    extract({ pattern, from, context })\nThe pattern was an object, but not an encoder/decoder. Instead it was:\n    ${toRepresentation(pattern)} `)
+    } else if (oneOf instanceof Array) {
+        // just try all of them
+        for (const each of oneOf) {
+            try {
+                return extract({ pattern: each, from, context })
+            } catch (error) {
+                // only catch parse errors
+                if (!(error instanceof structure.ParserError)) {
+                    throw error
+                }
+            }
+        }
+        
+        throw structure.ParserError(`Had a string starting with:\n    ${toRepresentation(from.slice(0, options.debuggingSnippetAmount))}\nI tried to match one of the following but failed:\n${oneOf.map(each=>indent(toRepresentation(each))+'\n')}`)
     }
 }

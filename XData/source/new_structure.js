@@ -39,23 +39,27 @@ export class Context {
     }
 }
 
+
 const decoders = []
+export const isDecoder = Symbol("decoder")
 export const Decoder = ({decodesFor}) => {
     // decoders accept {string, context} and return Nodes
     for (const [key, eachFunction] of Object.entries(decodesFor)) {
-        decoders.push(
-            (...args)=>new Node({
-                ...eachFunction(...args),
-                encoder: key,
-            })
-        )
+        const coder = (...args)=>new Node({
+            ...eachFunction(...args),
+            encoder: key,
+        })
+        coder[isDecoder] = true
+        decoders.push(coder)
     }
 }
 
 const encoders = {}
+export const isEncoder = Symbol("encoder")
 export const Encoder = ({name, encode}) => {
     // encoders accept {node, context} and return a formatted string
     encoders[name] = encode
+    encode[isEncoder] = true
 }
 
 const converters = {}
