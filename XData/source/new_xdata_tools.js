@@ -39,11 +39,11 @@ export function childComponentsToString({node, context}) {
 // 
 structure.Converter({
     decoders: {
-        Token: ({string, context})=>{
+        Token: ({remaining, context})=>{
             // throw ParserError({ message, context }) if parse error
             return new structure.Node({
                 encoder: "Token",
-                childComponents: string,
+                childComponents: remaining,
                 formattingPreferences: {},
             })
         }
@@ -113,7 +113,7 @@ export const extract = ({ pattern, oneOf, from, context }) => {
     } else if (pattern instanceof Object) {
         if (pattern[structure.isDecoder]) {
             const decoder = pattern[structure.isDecoder]
-            const node = decoder({ string: from, context })
+            const node = decoder({ remaining: from, context })
             const newContext = advancedBy(node, context)
             const numberOfCharactersAdvanced = newContext.debugInfo.stringIndex - (context.debugInfo.stringIndex||0)
             const remaining = from.slice(numberOfCharactersAdvanced)

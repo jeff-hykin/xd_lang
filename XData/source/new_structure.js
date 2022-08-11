@@ -42,7 +42,7 @@ export class Context {
 const decoders = {}
 export const isDecoder = Symbol("decoder")
 export const Decoders = (decodersObject) => {
-    // decoders accept {string, context} and return Nodes
+    // decoders accept {remaining, context} and return Nodes
     for (const [key, eachFunction] of Object.entries(decodersObject)) {
         if (eachFunction instanceof Function) {
             eachFunction[isDecoder] = true
@@ -54,7 +54,7 @@ export const Decoders = (decodersObject) => {
 const encoders = {}
 export const isEncoder = Symbol("encoder")
 export const Encoders = (encodersObject) => {
-    // encoders accept {string, context} and return Nodes
+    // encoders accept {node, context} and return Nodes
     for (const [key, eachFunction] of Object.entries(encodersObject)) {
         if (eachFunction instanceof Function) {
             eachFunction[isEncoder] = true

@@ -4,8 +4,7 @@ import * as utils from "../utils.js"
 
 structure.Converter({
     decoders: {
-        BlankLine: ({string, context})=>{
-            var remaining = string
+        BlankLine: ({remaining, context})=>{
             const childComponents = {
                 whitespace: null,
                 newline: null,
@@ -28,8 +27,7 @@ structure.Converter({
                 formattingPreferences: {},
             })
         },
-        Comment: ({string, context})=>{
-            var remaining = string
+        Comment: ({remaining, context})=>{
             const childComponents = {
                 preWhitespace: null,
                 commentSymbol: null,
@@ -67,7 +65,7 @@ structure.Converter({
                 formattingPreferences: {},
             })
         },
-        CommentOrBlankLine:({string, context})=>{
+        CommentOrBlankLine:({remaining, context})=>{
             var { remaining, extraction, context } = tools.extract({
                 oneOf: [
                     structure.decoders.Comment,
