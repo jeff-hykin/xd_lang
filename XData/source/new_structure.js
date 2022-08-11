@@ -23,7 +23,6 @@ export class ParserError extends Error {
 // 
 export class Node {
     constructor({encoder=null, childComponents={}, formattingPreferences={}}) {
-        super()
         this.encoder = encoder
         this.childComponents = childComponents
         this.formattingPreferences = formattingPreferences
@@ -40,34 +39,34 @@ export class Context {
 }
 
 
-const decoders = []
+const decoders = {}
 export const isDecoder = Symbol("decoder")
-export const Decoder = ({decodesFor}) => {
+export const Decoders = (decodersObject) => {
     // decoders accept {string, context} and return Nodes
-    for (const [key, eachFunction] of Object.entries(decodesFor)) {
-        const coder = (...args)=>new Node({
-            ...eachFunction(...args),
-            encoder: key,
-        })
-        coder[isDecoder] = true
-        decoders.push(coder)
+    for (const [key, eachFunction] of Object.entries(decodersObject)) {
+        if (eachFunction instanceof Function) {
+            eachFunction[isDecoder] = true
+            decoders[key] = eachFunction
+        }
     }
 }
 
 const encoders = {}
 export const isEncoder = Symbol("encoder")
-export const Encoder = ({name, encode}) => {
-    // encoders accept {node, context} and return a formatted string
-    encoders[name] = encode
-    encode[isEncoder] = true
+export const Encoders = (encodersObject) => {
+    // encoders accept {string, context} and return Nodes
+    for (const [key, eachFunction] of Object.entries(encodersObject)) {
+        if (eachFunction instanceof Function) {
+            eachFunction[isEncoder] = true
+            encoders[key] = eachFunction
+        }
+    }
 }
 
 const converters = {}
-export const Converter = ({decodesFor, encoders}) => {
-    // create the encoders
-    for (const [key, value] of Object.entries(encoders)) {
-        Encoder(key, value)
-    }
-    // create the encoder(s)
-    Decoder({encodesFor})
+export const Converter = ({decoders, encoders}) => {
+    return [
+        Encoders(encoders),
+        Decoders(decoders),
+    ]
 }

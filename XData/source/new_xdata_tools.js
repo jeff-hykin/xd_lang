@@ -26,13 +26,24 @@ export function defaultToString({node, parentNode, context}) {
     throw Error(`I don't know how to convert \n${utils.toString(node)}\nof\n${utils.toString(parentNode)}\n into an XData string. It doesnt have a .encode property that is in the available encoders:\n${utils.toString(Object.keys(structure.encoders))}`)
 }
 
-export const Token = structure.Converter({
-    decodesFor: {
+export function childComponentsToString({node, context}) {
+    let string = ""
+    for (const [key, value] of Object.entries(node.childComponents)) {
+        string += defaultToString(value)
+    }
+    return string
+}
+
+// 
+// Token
+// 
+structure.Converter({
+    decoders: {
         Token: ({string, context})=>{
             // throw ParserError({ message, context }) if parse error
-
             return new structure.Node({
-                childComponents: {},
+                encoder: "Token",
+                childComponents: string,
                 formattingPreferences: {},
             })
         }
@@ -91,8 +102,8 @@ export const extract = ({ pattern, oneOf, from, context }) => {
         const { remaining, extraction } = utils.extractFirst({ pattern, from })
         const node = new Node({
             encoder: "Token",
-            childComponents
-            formattingPreferences
+            childComponents,
+            formattingPreferences,
         })
         return {
             remaining,
