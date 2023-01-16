@@ -142,7 +142,7 @@
                                                     oneOf:
                                                         (CommentOrBlankLine):
                                                         group:
-                                                            (DefinitionKey):
+                                                            (DefinitionKey)[mapKey]:
                                                                 (Key):
                                                                 regex: "/ */"
                                                                 regex: "/:/"

@@ -70,12 +70,17 @@ structure.Converter({
     },
     encoders: {
         Map: ({node, context})=>{
-            // TODO: only works for empty maps
-            return structure.childComponentsToString({node, context})
-            
-            if (context.adjectives.inline) {
-                // Only empty maps are allowed in an inline context, try to force a context change if not an empty map
+            const isEmptyMap = node.childComponents.openingBracket || !!node.childComponents?.contents?.length
+            if (isEmptyMap) {
+                return structure.childComponentsToString({node, context})
+            } else {
+                if (context.adjectives.inline) {
+                    // TODO: throw a ContextRequirement error because a non-empty map needs multiple lines
+                    // then other parts of the code should catch and retry with a different context
+                }
+                // FIXME: only works for empty maps
             }
+            
         },
     },
 })
