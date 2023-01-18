@@ -1,6 +1,6 @@
-import * as structure from "./new_structure.js"
+import * as structure from "./structure.js"
 import * as utils from "./utils.js" 
-import { capitalize, indent, toCamelCase, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString } from "https://deno.land/x/good@0.5.15/string.js"
+import { capitalize, indent, toCamelCase, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString } from "https://deno.land/x/good@0.7.8/string.js"
 
 const options = {
     debuggingSnippetAmount: 100, // characters

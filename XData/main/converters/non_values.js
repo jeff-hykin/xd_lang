@@ -1,5 +1,5 @@
-import * as structure from "../new_structure.js"
-import * as tools from "../new_xdata_tools.js"
+import * as structure from "../structure.js"
+import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
 structure.Converter({
