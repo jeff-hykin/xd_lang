@@ -1,4 +1,4 @@
-import { toString } from "https://deno.land/x/good@0.5.13/string.js"
+import { toString } from "https://deno.land/x/good@0.7.8/string.js"
 
 export {
     toString as toString

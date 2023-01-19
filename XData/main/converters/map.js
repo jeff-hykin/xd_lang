@@ -1,10 +1,16 @@
 import * as structure from "../structure.js"
+import { ParserError, CantDecodeContext, ContextId }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
+
+new ContextId("mapKey")
+new ContextId("mapValue")
 
 structure.Converter({
     decoders: {
         Map: ({remaining, context})=>{
+
+            // only empty maps are valid inline
             if (context.adjectives.inline) {
                 const childComponents = {
                     preWhitespace: null, // token
@@ -64,7 +70,8 @@ structure.Converter({
                     formattingPreferences: {},
                 })
             } else {
-                // TODO: non-empty ma
+
+                // TODO: non-empty map
             }
         },
     },

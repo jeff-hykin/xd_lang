@@ -1,3 +1,6 @@
+- TODO:
+    - maybe redo how context adjectives work; force them to be declared, force decoders to specify each 
+
 - everything centers around nodes:
     - every value (including comments) are nodes
     - every node must have a json representation that doesn't loose any information

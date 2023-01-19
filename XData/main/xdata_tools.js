@@ -137,6 +137,6 @@ export const extract = ({ pattern, oneOf, from, context }) => {
             }
         }
         
-        throw structure.ParserError(`Had a string starting with:\n    ${toRepresentation(from.slice(0, options.debuggingSnippetAmount))}\nI tried to match one of the following but failed:\n${oneOf.map(each=>indent(toRepresentation(each))+'\n')}`)
+        throw new structure.ParserError({ message: `Had a string starting with:\n    ${toRepresentation(from.slice(0, options.debuggingSnippetAmount))}\nI tried to match one of the following but failed:\n${oneOf.map(each=>indent(toRepresentation(each))+'\n')}`, context })
     }
 }

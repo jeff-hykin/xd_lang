@@ -1,3 +1,9 @@
+contexts:
+    root
+    mapKey
+    inlineValue (listValue, mapValue, interpolation)
+    block
+    referencePath
 
 (documentToNode): # given string
     loop:
@@ -21,14 +27,14 @@
                         regex: "/- /"
                         (Definition):
                             oneOf:
-                                (inlineValueToNode)[inline]:
-                                    (Map)<inline>: #DONE
+                                (inlineValueToNode)[inlineValue]:
+                                    (Map)<inlineValue>: #DONE
                                         regex: "/ */"
                                         regex: "/\{/"
                                         regex: "/ */"
                                         regex: "/\}/"
                                         regex: "/ */"
-                                    (List)<inline>: #DONE
+                                    (List)<inlineValue>: #DONE
                                         regex: "/ */"
                                         regex: "/\[/"
                                         regex: "/ */"
@@ -46,8 +52,8 @@
                                             regex: "/#tab|#newline/"
                                             regex: "/#unicode\[\w+\]/"
                                             regex: "/#ascii\[\w+\]/"
-                                    (String)<inline>:
-                                        (StringLiteral)<inline>: #DONE
+                                    (String)<inlineValue>:
+                                        (StringLiteral)<inlineValue>: #DONE
                                             oneOf:
                                                 regex: '/"/'
                                                 regex: '/[^\n"]*/'
@@ -59,7 +65,7 @@
                                                             a sequence of double quotes thats smaller than the starting quote: 
                                                             as many characters as possible that don't have the quote or newline:
                                                     findMatchingDoubleQuotesThatAreAPerfectCube:
-                                        (StringFigurative)[stringFigurative]<inline>:
+                                        (StringFigurative)[stringFigurative]<inlineValue>:
                                             findSingleQuotesThatAreAPerfectCube:
                                             loop:
                                                 stop_if:

@@ -15,6 +15,13 @@ export class ParserError extends Error {
     }
 }
 
+export class CantDecodeContext extends ParserError {
+    constructor({ message, context }) {
+        super(message)
+        this.context = context
+    }
+}
+
 
 // 
 // 
@@ -29,11 +36,21 @@ export class Node {
     }
 }
 
+// this is basically registry
+export class ContextId {
+    constructor(name) {
+        this.name = name
+        ContextId[name] = this
+    }
+}
+const rootContextId = new ContextId("root")
+
 export class Context {
-    constructor(adjectives={}, debugInfo={}, parentContext=null) {
+    constructor(adjectives={}, debugInfo={}, parentContext=null, id=rootContextId) {
         this.adjectives    = adjectives
         this.debugInfo     = debugInfo
         this.parentContext = parentContext
+        this.id            = id
         Object.freeze(this)
     }
 }
@@ -69,4 +86,36 @@ export const Converter = ({decoders, encoders}) => {
         Encoders(encoders),
         Decoders(decoders),
     ]
+}
+
+export const decode = (remaining)=>{
+    const context = new Context()
+    let remainingCharCount = remaining.length
+    let prevRemainingCharCount = remainingCharCount
+    let nodes = []
+    while (remainingCharCount) {
+        for (const [name, decoder] of Object.entries(decoders)) {
+            try {
+                var { remaining, extraction, context } = utils.extract({ oneOf: Object.values(decoders), from: remaining, context })
+            } catch (error) {
+                if (error instanceof ParserError) {
+                    // ignore
+                } else {
+                    throw error
+                }
+            }
+            remainingCharCount = remaining.length
+            // break as soon as something was extracted
+            if (extraction && remainingCharCount < prevRemainingCharCount) {
+                break
+            }
+        }
+        
+        // make sure at least one match had a non-0 extraction
+        remainingCharCount = remaining.length
+        if (remainingCharCount == prevRemainingCharCount) {
+            throw Error(`Got stuck trying to parse this remaining string: \n${remaining}`)
+        }
+        prevRemainingCharCount = remaining.length
+    }
 }

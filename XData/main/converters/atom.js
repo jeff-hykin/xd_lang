@@ -1,4 +1,5 @@
 import * as structure from "../structure.js"
+import { ParserError, CantDecodeContext, ContextId }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
@@ -11,6 +12,12 @@ structure.Converter({
                 content: null, // token
                 postWhitespace: null, // token
                 comment: null, // node
+            }
+
+            if (context.id == ContextId.root) {
+                throw new CantDecodeContext({})
+            } else if (context.id == ContextId.mapKey) {
+                
             }
             
             // 
