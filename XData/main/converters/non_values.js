@@ -38,25 +38,25 @@ export const commentToNode = ({remaining, context})=>{
     // 
     // leading whitespace
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context })
+    var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context })
     childComponents.preWhitespace = extraction
 
     // 
     // comment symbol
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /# |#(?=\n)/, from: remaining, context })
+    var { remaining, extraction, context } = tools.extract({ pattern: /^# |#(?=\n)/, from: remaining, context })
     childComponents.commentSymbol = extraction
 
     // 
     // content
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /.*/, from: remaining, context })
+    var { remaining, extraction, context } = tools.extract({ pattern: /^.*/, from: remaining, context })
     childComponents.content = extraction
 
     // 
     // newline
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /\n?/, from: remaining, context })
+    var { remaining, extraction, context } = tools.extract({ pattern: /^\n?/, from: remaining, context })
     childComponents.newline = extraction
     
     return new structure.Node({

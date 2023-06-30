@@ -34,7 +34,7 @@ contexts:
                                         regex: "/ */"
                                         regex: "/\}/"
                                         regex: "/ */"
-                                    (List)<inlineValue>: #DONE
+                                    (List)<inlineValue>: #REDONE
                                         regex: "/ */"
                                         regex: "/\[/"
                                         regex: "/ */"

@@ -1,0 +1,129 @@
+new Node({
+  "toStringifier": "SpecialValue",
+  "childComponents": {
+    "preWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "content": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "infinite",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "postWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "SpecialValue",
+  "childComponents": {
+    "preWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "content": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "nan",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "postWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "SpecialValue",
+  "childComponents": {
+    "preWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "content": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "True",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "postWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "SpecialValue",
+  "childComponents": {
+    "preWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "content": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "fAlsE",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "postWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+"fAlsE"

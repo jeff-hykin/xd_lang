@@ -17,31 +17,31 @@ export const emptyMapToNode = ({remaining, context})=>{
     // 
     // preWhitespace
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context})
+    var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context})
     childComponents.preWhitespace = extraction
     
     // 
     // openingBracket
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /\{/, from: remaining, context})
+    var { remaining, extraction, context } = tools.extract({ pattern: /^\{/, from: remaining, context})
     childComponents.openingBracket = extraction
     
     // 
     // preWhitespace
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context})
+    var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context})
     childComponents.whitespace = extraction
     
     // 
     // openingBracket
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /\}/, from: remaining, context})
+    var { remaining, extraction, context } = tools.extract({ pattern: /^\}/, from: remaining, context})
     childComponents.closingBracket = extraction
     
     // 
     // postWhitespace
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context})
+    var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context})
     childComponents.postWhitespace = extraction
     
     // 

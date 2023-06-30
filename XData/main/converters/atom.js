@@ -16,25 +16,25 @@ export const atomWithAtSymbolToNode = ({remaining, context})=>{
     // 
     // preWhitespace
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context })
+    var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context })
     childComponents.preWhitespace = extraction
     
     // 
     // @-symbol itself
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /@/i, from: remaining, context }); if (extraction == null) { return null }
+    var { remaining, extraction, context } = tools.extract({ pattern: /^@/i, from: remaining, context })
     childComponents.symbol = extraction
 
     // 
     // content
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /-?[a-zA-Z_][a-zA-Z_0-9]*/, from: remaining, context }); if (extraction == null) { return null }
+    var { remaining, extraction, context } = tools.extract({ pattern: /^-?[a-zA-Z_][a-zA-Z_0-9]*/, from: remaining, context })
     childComponents.content = extraction
     
     // 
     // postWhitespace
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context })
+    var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context })
     childComponents.postWhitespace = extraction
     
     // 
