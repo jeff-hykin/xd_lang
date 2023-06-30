@@ -3,7 +3,7 @@ import { ParserError, ContextIds }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
-export const specialValueToNode = ({remaining, context, commentEnabled})=>{
+export const specialValueToNode = ({remaining, context})=>{
     const childComponents = {
         preWhitespace: null, // token
         content: null, // token
