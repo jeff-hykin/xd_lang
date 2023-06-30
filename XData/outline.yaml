@@ -7,13 +7,13 @@ contexts:
 
 (documentToNode): # given string
     loop:
-        (CommentOrBlankLine): #DONE
-            (Comment): #DONE
+        (CommentOrBlankLine): #REDONE
+            (Comment): #REDONE
                 regex: "/ */"
                 regex: "/# /"
                 regex: "/.+/"
                 regex: "/\n|\z/"
-            (BlankLine): #DONE
+            (BlankLine): #REDONE
                 regex: "/ *(\n|\z)/"
         
     oneOf:
@@ -28,7 +28,7 @@ contexts:
                         (Definition):
                             oneOf:
                                 (inlineValueToNode)[inlineValue]:
-                                    (Map)<inlineValue>: #DONE
+                                    (Map)<inlineValue>: #REDONE
                                         regex: "/ */"
                                         regex: "/\{/"
                                         regex: "/ */"

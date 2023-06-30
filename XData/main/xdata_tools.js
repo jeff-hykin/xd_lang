@@ -42,7 +42,7 @@ structure.Converter({
         Token: ({remaining, context})=>{
             // throw ParserError({ message, context }) if parse error
             return new structure.Node({
-                encoder: "Token",
+                decoder: "Token",
                 childComponents: remaining,
                 formattingPreferences: {},
             })
@@ -97,7 +97,7 @@ export const extract = ({ pattern, oneOf, from, context }) => {
     if (pattern instanceof RegExp || typeof pattern == 'string') {
         const { remaining, extraction } = utils.extractFirst({ pattern, from })
         const node = new structure.Node({
-            encoder: "Token",
+            decoder: "Token",
             childComponents: extraction,
             formattingPreferences: {},
         })

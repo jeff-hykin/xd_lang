@@ -1,84 +1,93 @@
 import * as structure from "../structure.js"
-import { ParserError, CantDecodeContext, ContextId }   from "../structure.js"
+import { ParserError, CantDecodeContext, ContextIds }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
-new ContextId("mapKey")
-new ContextId("mapValue")
+const encodeEmptyMap = ({remaining, context})=>{
+    // NOTE: no context restrictions beacuse this is a helper, and the main one should check context
+    const childComponents = {
+        preWhitespace: null, // token
+        openingBracket: null, // token
+        whitespace: null, // token
+        closingBracket: null, // token
+        postWhitespace: null, // token
+        comment: null, // node
+    }
+
+    // 
+    // preWhitespace
+    // 
+    var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context})
+    components.preWhitespace = extraction
+    
+    // 
+    // openingBracket
+    // 
+    var { remaining, extraction, context } = tools.extract({ pattern: /\{/, from: remaining, context})
+    components.openingBracket = extraction
+    
+    // 
+    // preWhitespace
+    // 
+    var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context})
+    components.whitespace = extraction
+    
+    // 
+    // openingBracket
+    // 
+    var { remaining, extraction, context } = tools.extract({ pattern: /\}/, from: remaining, context})
+    components.closingBracket = extraction
+    
+    // 
+    // postWhitespace
+    // 
+    var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context})
+    components.postWhitespace = extraction
+    
+    // 
+    // comment is optional
+    // 
+    try {
+        components.comment = structure.decoders.Comment({ remaining, context })
+    } catch (error) {
+        // only catch parse errors
+        if (!(error instanceof structure.ParserError)) {
+            throw error
+        }
+    }
+    
+    return new structure.Node({
+        decoder: "Map",
+        childComponents,
+        formattingPreferences: {},
+    })
+}
 
 structure.Converter({
-    decoders: {
+    xdataStringToNode: {
         Map: ({remaining, context})=>{
-
-            // only empty maps are valid inline
-            if (context.adjectives.inline) {
-                const childComponents = {
-                    preWhitespace: null, // token
-                    openingBracket: null, // token
-                    whitespace: null, // token
-                    closingBracket: null, // token
-                    postWhitespace: null, // token
-                    comment: null, // node
-                }
-
-                // 
-                // preWhitespace
-                // 
-                var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context})
-                components.preWhitespace = extraction
-                
-                // 
-                // openingBracket
-                // 
-                var { remaining, extraction, context } = tools.extract({ pattern: /\{/, from: remaining, context})
-                components.openingBracket = extraction
-                
-                // 
-                // preWhitespace
-                // 
-                var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context})
-                components.whitespace = extraction
-
-                
-                // 
-                // openingBracket
-                // 
-                var { remaining, extraction, context } = tools.extract({ pattern: /\}/, from: remaining, context})
-                components.closingBracket = extraction
-                
-                // 
-                // postWhitespace
-                // 
-                var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context})
-                components.postWhitespace = extraction
-                
-                // 
-                // comment is optional
-                // 
+            // <inlineValue>
+            if (context.id == ContextIds.inlineValue) {
+                return encodeEmptyMap({ remaining, context })
+            } else {
                 try {
-                    components.comment = structure.decoders.Comment({ remaining, context })
+                    return encodeEmptyMap({ remaining, context })
                 } catch (error) {
                     // only catch parse errors
                     if (!(error instanceof structure.ParserError)) {
                         throw error
                     }
                 }
-                
-                return new structure.Node({
-                    encoder: "Map",
-                    childComponents,
-                    formattingPreferences: {},
-                })
-            } else {
-
-                // TODO: non-empty map
+                throw new Error(`Unimplemented`)
             }
         },
     },
-    encoders: {
+    nodeToXdataString: {
         Map: ({node, context})=>{
+            // FIXME: chopping comments
             const isEmptyMap = node.childComponents.openingBracket || !!node.childComponents?.contents?.length
             if (isEmptyMap) {
+                // trivial convertion, context doesn't matter
                 return structure.childComponentsToString({node, context})
             } else {
                 if (context.adjectives.inline) {
