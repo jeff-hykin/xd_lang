@@ -1,6 +1,6 @@
 import * as structure from "./structure.js"
 import * as utils from "./utils.js" 
-import { capitalize, indent, toCamelCase, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString } from "https://deno.land/x/good@0.7.8/string.js"
+import { capitalize, indent, toCamelCase, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString } from "https://deno.land/x/good@1.3.0.4/string.js"
 
 const options = {
     debuggingSnippetAmount: 100, // characters
@@ -62,9 +62,6 @@ structure.Converter({
 const advancedBy = (stringOrNode, context) => {
     let newContext = {
         ...context,
-        adjectives: {
-            ...context.adjectives
-        },
         debugInfo: {
             stringIndex: 0,
             lineIndex: 0,
@@ -85,8 +82,8 @@ const advancedBy = (stringOrNode, context) => {
         newContext.debugInfo.stringIndex = context.debugInfo.stringIndex + string.length
         newContext.debugInfo.lineIndex   = context.debugInfo.lineIndex + lines.length - 1
         newContext.debugInfo.columnIndex = lines.slice(-1)[0].length
-    } else if (stringOrNode instanceof Node) {
-        for (const [key, subComponent] of Object.entries(node.childComponents)) {
+    } else if (stringOrNode instanceof structure.Node) {
+        for (const [key, subComponent] of Object.entries(stringOrNode.childComponents)) {
             newContext = advancedBy(subComponent, newContext)
         }
     }
@@ -98,12 +95,11 @@ export const extract = ({ pattern, oneOf, from, context }) => {
     // simple string or regex
     // 
     if (pattern instanceof RegExp || typeof pattern == 'string') {
-        
         const { remaining, extraction } = utils.extractFirst({ pattern, from })
-        const node = new Node({
+        const node = new structure.Node({
             encoder: "Token",
-            childComponents,
-            formattingPreferences,
+            childComponents: extraction,
+            formattingPreferences: {},
         })
         return {
             remaining,
@@ -138,5 +134,7 @@ export const extract = ({ pattern, oneOf, from, context }) => {
         }
         
         throw new structure.ParserError({ message: `Had a string starting with:\n    ${toRepresentation(from.slice(0, options.debuggingSnippetAmount))}\nI tried to match one of the following but failed:\n${oneOf.map(each=>indent(toRepresentation(each))+'\n')}`, context })
+    } else {
+        throw Error(`Unrecognized arguments for extract() ${toRepresentation({pattern, oneOf, from, context})}`)
     }
 }

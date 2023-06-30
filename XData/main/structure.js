@@ -29,25 +29,24 @@ export class CantDecodeContext extends ParserError {
 // 
 // 
 export class Node {
-    constructor({encoder=null, childComponents={}, formattingPreferences={}}) {
-        this.encoder = encoder
+    constructor({decoder=null, childComponents={}, formattingPreferences={}}) {
+        this.decoder = decoder
         this.childComponents = childComponents
         this.formattingPreferences = formattingPreferences
     }
 }
 
 // this is basically registry
-export class ContextId {
-    constructor(name) {
-        this.name = name
-        ContextId[name] = this
-    }
+export class ContextIds {
+    static root = Symbol("rootContext")
+    static mapKey = Symbol("mapKeyContext")
+    static inlineValue = Symbol("inlineValueContext")
+    static block = Symbol("blockContext")
+    static referencePath = Symbol("referencePathContext")
 }
-const rootContextId = new ContextId("root")
 
 export class Context {
-    constructor(adjectives={}, debugInfo={}, parentContext=null, id=rootContextId) {
-        this.adjectives    = adjectives
+    constructor(debugInfo={}, parentContext=null, id=ContextIds.root) {
         this.debugInfo     = debugInfo
         this.parentContext = parentContext
         this.id            = id
@@ -60,7 +59,7 @@ const decoders = {}
 export const isDecoder = Symbol("decoder")
 export const Decoders = (decodersObject) => {
     // decoders accept {remaining, context} and return Nodes
-    for (const [key, eachFunction] of Object.entries(decodersObject)) {
+    for (const [key, eachFunction] of Object.entries(decodersObject||{})) {
         if (eachFunction instanceof Function) {
             eachFunction[isDecoder] = true
             decoders[key] = eachFunction
@@ -72,7 +71,7 @@ const encoders = {}
 export const isEncoder = Symbol("encoder")
 export const Encoders = (encodersObject) => {
     // encoders accept {node, context} and return Nodes
-    for (const [key, eachFunction] of Object.entries(encodersObject)) {
+    for (const [key, eachFunction] of Object.entries(encodersObject||{})) {
         if (eachFunction instanceof Function) {
             eachFunction[isEncoder] = true
             encoders[key] = eachFunction
@@ -81,15 +80,15 @@ export const Encoders = (encodersObject) => {
 }
 
 const converters = {}
-export const Converter = ({decoders, encoders}) => {
+export const Converter = ({xdataStringToNode, nodeToXdataString}) => {
     return [
-        Encoders(encoders),
-        Decoders(decoders),
+        Encoders(nodeToXdataString),
+        Decoders(xdataStringToNode),
     ]
 }
 
 export const decode = (remaining)=>{
-    const context = new Context()
+    var context = new Context()
     let remainingCharCount = remaining.length
     let prevRemainingCharCount = remainingCharCount
     let nodes = []
