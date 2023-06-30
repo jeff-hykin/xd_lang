@@ -1,9 +1,9 @@
 import * as structure from "../structure.js"
-import { ParserError, CantDecodeContext, ContextIds }   from "../structure.js"
+import { ParserError, ContextIds }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
-export const encodeAtomWithAtSymbol = ({remaining, context})=>{
+export const atomWithAtSymbolToNode = ({remaining, context})=>{
     // NOTE: no context restrictions beacuse this is a helper, and the main one should check context
     const childComponents = {
         preWhitespace: null, // token
@@ -41,7 +41,7 @@ export const encodeAtomWithAtSymbol = ({remaining, context})=>{
     // comment is optional
     // 
     try {
-        components.comment = structure.decoders.Comment({ remaining, context })
+        components.comment = structure.toNodeifiers.Comment({ remaining, context })
     } catch (error) {
         // only catch parse errors
         if (!(error instanceof structure.ParserError)) {
@@ -53,13 +53,13 @@ export const encodeAtomWithAtSymbol = ({remaining, context})=>{
     // return
     // 
     return new structure.Node({
-        decoder: "Atom",
+        toStringifier: "Atom",
         childComponents,
         formattingPreferences: {},
     })
 }
 
-export const encodeAtom = ({remaining, context})=>{
+export const atomToNode = ({remaining, context})=>{
     const childComponents = {
         preWhitespace: null, // token
         symbol: null, // token
@@ -69,19 +69,19 @@ export const encodeAtom = ({remaining, context})=>{
     }
 
     if (context.id == ContextIds.root) {
-        return encodeAtomWithAtSymbol({ remaining, context })
+        return atomWithAtSymbolToNode({ remaining, context })
     } else if (context.id == ContextIds.inlineValue) {
-        return encodeAtomWithAtSymbol({ remaining, context })
+        return atomWithAtSymbolToNode({ remaining, context })
     } else {
         throw new Error(`Unimplemented`)
     }
 }
 
-structure.Converter({
-    encoders: {
-        Atom: encodeAtom,
+structure.RegisterConverter({
+    toNode: {
+        Atom: atomToNode,
     },
-    decoders: {
+    toString: {
         Atom: ({node, context})=>{
             if (context.id == ContextIds.root) {
                 return structure.childComponentsToString({node, context})

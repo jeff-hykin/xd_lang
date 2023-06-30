@@ -1,9 +1,9 @@
 import * as structure from "../structure.js"
-import { ParserError, CantDecodeContext, ContextIds }   from "../structure.js"
+import { ParserError, ContextIds }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
-const encodeEmptyMap = ({remaining, context})=>{
+export const emptyMapToNode = ({remaining, context})=>{
     // NOTE: no context restrictions beacuse this is a helper, and the main one should check context
     const childComponents = {
         preWhitespace: null, // token
@@ -48,7 +48,7 @@ const encodeEmptyMap = ({remaining, context})=>{
     // comment is optional
     // 
     try {
-        components.comment = structure.decoders.Comment({ remaining, context })
+        components.comment = structure.toNodeifiers.Comment({ remaining, context })
     } catch (error) {
         // only catch parse errors
         if (!(error instanceof structure.ParserError)) {
@@ -57,32 +57,34 @@ const encodeEmptyMap = ({remaining, context})=>{
     }
     
     return new structure.Node({
-        decoder: "Map",
+        toStringifier: "Map",
         childComponents,
         formattingPreferences: {},
     })
 }
 
-structure.Converter({
-    encoders: {
-        Map: ({remaining, context})=>{
-            // <inlineValue>
-            if (context.id == ContextIds.inlineValue) {
-                return encodeEmptyMap({ remaining, context })
-            } else {
-                try {
-                    return encodeEmptyMap({ remaining, context })
-                } catch (error) {
-                    // only catch parse errors
-                    if (!(error instanceof structure.ParserError)) {
-                        throw error
-                    }
-                }
-                throw new Error(`Unimplemented`)
+export const mapToNode = ({remaining, context})=>{
+    // <inlineValue>
+    if (context.id == ContextIds.inlineValue) {
+        return emptyMapToNode({ remaining, context })
+    } else {
+        try {
+            return emptyMapToNode({ remaining, context })
+        } catch (error) {
+            // only catch parse errors
+            if (!(error instanceof structure.ParserError)) {
+                throw error
             }
-        },
+        }
+        throw new Error(`Unimplemented`)
+    }
+}
+
+structure.RegisterConverter({
+    toNode: {
+        Map: mapToNode,
     },
-    decoders: {
+    toString: {
         Map: ({node, context})=>{
             // FIXME: chopping comments
             const isEmptyMap = node.childComponents.openingBracket || !!node.childComponents?.contents?.length

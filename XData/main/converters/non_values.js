@@ -2,7 +2,7 @@ import * as structure from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
-export const encodeBlankLine = ({remaining, context})=>{
+export const blankLineToNode = ({remaining, context})=>{
     const childComponents = {
         whitespace: null,
         newline: null,
@@ -20,13 +20,13 @@ export const encodeBlankLine = ({remaining, context})=>{
     childComponents.newline = extraction
     
     return new structure.Node({
-        decoder: "BlankLine",
+        toStringifier: "BlankLine",
         childComponents,
         formattingPreferences: {},
     })
 }
 
-export const encodeComment = ({remaining, context})=>{
+export const commentToNode = ({remaining, context})=>{
     const childComponents = {
         preWhitespace: null,
         commentSymbol: null,
@@ -59,21 +59,21 @@ export const encodeComment = ({remaining, context})=>{
     childComponents.newline = extraction
     
     return new structure.Node({
-        decoder: "Comment",
+        toStringifier: "Comment",
         childComponents,
         formattingPreferences: {},
     })
 }
 
-structure.Converter({
-    encoders: {
-        BlankLine: encodeBlankLine,
-        Comment: encodeComment,
+structure.RegisterConverter({
+    toNode: {
+        BlankLine: blankLineToNode,
+        Comment: commentToNode,
         CommentOrBlankLine:({remaining, context})=>{
             var { remaining, extraction, context } = tools.extract({
                 oneOf: [
-                    encodeComment,
-                    encodeBlankLine,
+                    commentToNode,
+                    blankLineToNode,
                 ],
                 from: remaining,
                 context,
@@ -81,7 +81,7 @@ structure.Converter({
             return extraction
         },
     },
-    decoders: {
+    toString: {
         BlankLine: ({node, context})=>structure.childComponentsToString({node, context}),
         Comment: ({node, context})=>structure.childComponentsToString({node, context}),
     },

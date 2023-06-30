@@ -29,8 +29,8 @@ export class CantDecodeContext extends ParserError {
 // 
 // 
 export class Node {
-    constructor({decoder=null, childComponents={}, formattingPreferences={}}) {
-        this.decoder = decoder
+    constructor({toStringifier=null, childComponents={}, formattingPreferences={}}) {
+        this.toStringifier = toStringifier
         this.childComponents = childComponents
         this.formattingPreferences = formattingPreferences
     }
@@ -55,48 +55,46 @@ export class Context {
 }
 
 
-const decoders = {}
-export const isDecoder = Symbol("decoder")
-export const Decoders = (decodersObject) => {
-    // decoders accept {remaining, context} and return Nodes
-    for (const [key, eachFunction] of Object.entries(decodersObject||{})) {
+export const toNodeifiers = {}
+export const isXDataToNodeifier = Symbol("toNodeifiers")
+export const RegisterToNodeifier = (things) => {
+    // toNodeifiers accept {remaining, context} and return Nodes
+    for (const [key, eachFunction] of Object.entries(things||{})) {
         if (eachFunction instanceof Function) {
-            eachFunction[isDecoder] = true
-            decoders[key] = eachFunction
+            eachFunction[isXDataToNodeifier] = true
+            toNodeifiers[key] = eachFunction
         }
     }
 }
 
-const encoders = {}
-export const isEncoder = Symbol("encoder")
-export const Encoders = (encodersObject) => {
-    // encoders accept {node, context} and return Nodes
-    for (const [key, eachFunction] of Object.entries(encodersObject||{})) {
+export const toStringifiers = {}
+export const isXDataToStringifier = Symbol("toStringifiers")
+export const RegisterToStringifier = (things) => {
+    // toStringifiers accept {node, context} and return Nodes
+    for (const [key, eachFunction] of Object.entries(things||{})) {
         if (eachFunction instanceof Function) {
-            eachFunction[isEncoder] = true
-            encoders[key] = eachFunction
+            eachFunction[isXDataToStringifier] = true
+            toStringifiers[key] = eachFunction
         }
     }
 }
 
 const converters = {}
-export const Converter = ({encoders, decoders}) => {
-    return [
-        Encoders(decoders),
-        Decoders(encoders),
-    ]
+export const RegisterConverter = ({toNode, toString}) => {
+    RegisterToNodeifier(toNode)
+    RegisterToStringifier(toString)
 }
 
 /**
  * convert XData string into node tree
  *
  * @example
- *     decode("10")
- *     decode({ remaining: "10", context: new Context() })
+ *     toNode("10")
+ *     toNode({ remaining: "10", context: new Context() })
  * @returns {[Node]} output - list of nodes
  *
  */
-export const decode = (remaining)=>{
+export const toNode = (remaining)=>{
     if (typeof remaining != 'string' && remaining instanceof Object) {
         var { remaining, context } = remaining
     }
@@ -105,9 +103,9 @@ export const decode = (remaining)=>{
     let prevRemainingCharCount = remainingCharCount
     let nodes = []
     while (remainingCharCount > 0) {
-        for (const [name, decoder] of Object.entries(decoders)) {
+        for (const [name, toNodeifier] of Object.entries(xDataToNode)) {
             try {
-                var { remaining, extraction, context } = utils.extract({ oneOf: Object.values(decoders), from: remaining, context })
+                var { remaining, extraction, context } = utils.extract({ pattern: toNodeifier, from: remaining, context })
                 nodes.push(nodes)
             } catch (error) {
                 if (error instanceof ParserError) {
@@ -131,4 +129,9 @@ export const decode = (remaining)=>{
         prevRemainingCharCount = remaining.length
     }
     return nodes
+}
+
+export const toString = ({node, context})=> {
+    // simply call the correct toStringifier
+    return toStringifiers[node.toStringifier]({node, context})
 }
