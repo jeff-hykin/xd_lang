@@ -10,8 +10,9 @@ import { run, Timeout, Env, Cwd, Stdin, Stdout, Stderr, Out, Overwrite, AppendTo
 const argsWereGiven = Deno.args.length > 0
 const root = FileSystem.parentPath(FileSystem.thisFolder)
 
+FileSystem.pwd = root
 console.log("\nRunning tests")
-for (let each of await glob(/main\/.+\.test\..+/)) {
+for (let each of (await glob(/main\/.+\.test\.js/)).map(FileSystem.makeAbsolutePath)) {
     each = await FileSystem.info(each)
     if (each.isFile) {
         // if one is mentioned, only run mentioned ones
