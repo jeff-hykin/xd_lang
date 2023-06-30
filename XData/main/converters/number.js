@@ -4,7 +4,6 @@ import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
 export const numberToNode = ({remaining, context, commentEnabled})=>{
-    // NOTE: no context restrictions beacuse this is a helper, and the main one should check context
     const childComponents = {
         preWhitespace: null, // token
         content: null, // token
