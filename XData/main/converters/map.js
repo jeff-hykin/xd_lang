@@ -68,6 +68,7 @@ export const mapToNode = ({remaining, context})=>{
     if (context.id == ContextIds.inlineValue) {
         return emptyMapToNode({ remaining, context })
     } else {
+        // if its just an empty map
         try {
             return emptyMapToNode({ remaining, context })
         } catch (error) {
@@ -76,6 +77,7 @@ export const mapToNode = ({remaining, context})=>{
                 throw error
             }
         }
+        // if non-empty map
         throw new Error(`Unimplemented`)
     }
 }
