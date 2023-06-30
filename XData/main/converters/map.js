@@ -88,17 +88,19 @@ structure.RegisterConverter({
     },
     toString: {
         Map: ({node, context})=>{
-            // FIXME: chopping comments
-            const isEmptyMap = node.childComponents.openingBracket || !!node.childComponents?.contents?.length
+            // remove the comment if in a place where the comment isn't allowed
+            if (context.id == ContextIds.mapKey || context.id == ContextIds.referencePath) {
+                node = {...node}
+                node.childComponents = {...node.childComponents}
+                node.childComponents.comment = null
+            }
+
+            const isEmptyMap = node.childComponents.openingBracket != null
             if (isEmptyMap) {
                 // trivial convertion, context doesn't matter
                 return structure.childComponentsToString({node, context})
             } else {
-                if (context.adjectives.inline) {
-                    // TODO: throw a ContextRequirement error because a non-empty map needs multiple lines
-                    // then other parts of the code should catch and retry with a different context
-                }
-                // FIXME: only works for empty maps
+                throw new Error(`Unimplemented`)
             }
             
         },
