@@ -20,7 +20,7 @@ for (let each of await glob(/main\/.+\.test\..+/)) {
         }
         FileSystem.pwd = FileSystem.parentPath(each.path)
         const relativePart = FileSystem.makeRelativePath({ from: root, to: each.path })
-        const logPath = `${FileSystem.parentPath(each.path)}.test.log`
+        const logPath = `${FileSystem.parentPath(each.path)}/${each.name}.log`
         const logRelativeToProject = FileSystem.makeRelativePath({ from: root, to: logPath })
         await FileSystem.clearAPathFor(logPath, {overwrite: true})
         try {
