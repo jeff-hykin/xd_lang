@@ -1,0 +1,97 @@
+new Node({
+  "toStringifier": "Number",
+  "childComponents": {
+    "preWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "content": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "10.4",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "postWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "Number",
+  "childComponents": {
+    "preWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "content": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "-10",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "postWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "Number",
+  "childComponents": {
+    "preWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "content": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "+99.4",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "postWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+"0.249082"
