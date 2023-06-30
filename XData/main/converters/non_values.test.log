@@ -1,0 +1,81 @@
+new Node({
+  "decoder": "BlankLine",
+  "childComponents": {
+    "whitespace": new Node({
+      "decoder": "Token",
+      "childComponents": "",
+      "formattingPreferences": {
+      },
+    }),
+    "newline": new Node({
+      "decoder": "Token",
+      "childComponents": "\n",
+      "formattingPreferences": {
+      },
+    }),
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "decoder": "Comment",
+  "childComponents": {
+    "preWhitespace": new Node({
+      "decoder": "Token",
+      "childComponents": "",
+      "formattingPreferences": {
+      },
+    }),
+    "commentSymbol": new Node({
+      "decoder": "Token",
+      "childComponents": "# ",
+      "formattingPreferences": {
+      },
+    }),
+    "content": new Node({
+      "decoder": "Token",
+      "childComponents": "Howdy",
+      "formattingPreferences": {
+      },
+    }),
+    "newline": new Node({
+      "decoder": "Token",
+      "childComponents": "",
+      "formattingPreferences": {
+      },
+    }),
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "decoder": "Comment",
+  "childComponents": {
+    "preWhitespace": new Node({
+      "decoder": "Token",
+      "childComponents": "",
+      "formattingPreferences": {
+      },
+    }),
+    "commentSymbol": new Node({
+      "decoder": "Token",
+      "childComponents": "# ",
+      "formattingPreferences": {
+      },
+    }),
+    "content": new Node({
+      "decoder": "Token",
+      "childComponents": " Howdy",
+      "formattingPreferences": {
+      },
+    }),
+    "newline": new Node({
+      "decoder": "Token",
+      "childComponents": "\n",
+      "formattingPreferences": {
+      },
+    }),
+  },
+  "formattingPreferences": {
+  },
+})
