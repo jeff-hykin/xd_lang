@@ -132,7 +132,6 @@ export const toNode = (remaining)=>{
 }
 
 export function toString({node, parentNode, context}) {
-    console.debug(`{node, parentNode, context} is:`,{node, parentNode, context})
     // base case 1
     if (node == null) {
         return ""
@@ -155,7 +154,7 @@ export function toString({node, parentNode, context}) {
 export function childComponentsToString({node, context}) {
     let string = ""
     for (const [key, value] of Object.entries(node.childComponents)) {
-        string += toString(value)
+        string += toString({node: value, parentNode: node, context })
     }
     return string
 }

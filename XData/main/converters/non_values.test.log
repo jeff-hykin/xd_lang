@@ -79,26 +79,4 @@ new Node({
   "formattingPreferences": {
   },
 })
-{node, parentNode, context} is: {
-  node: Node {
-    toStringifier: "Comment",
-    childComponents: {
-      preWhitespace: Node { toStringifier: "Token", childComponents: "", formattingPreferences: [Object] },
-      commentSymbol: Node { toStringifier: "Token", childComponents: "# ", formattingPreferences: [Object] },
-      content: Node {
-        toStringifier: "Token",
-        childComponents: " Howdy",
-        formattingPreferences: [Object]
-      },
-      newline: Node { toStringifier: "Token", childComponents: "\n", formattingPreferences: [Object] }
-    },
-    formattingPreferences: {}
-  },
-  parentNode: undefined,
-  context: Context { debugInfo: {}, parentContext: null, id: Symbol(rootContext) }
-}
-{node, parentNode, context} is: { node: undefined, parentNode: undefined, context: undefined }
-{node, parentNode, context} is: { node: undefined, parentNode: undefined, context: undefined }
-{node, parentNode, context} is: { node: undefined, parentNode: undefined, context: undefined }
-{node, parentNode, context} is: { node: undefined, parentNode: undefined, context: undefined }
-""
+"#  Howdy\n"
