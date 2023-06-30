@@ -87,15 +87,28 @@ export const Converter = ({encoders, decoders}) => {
     ]
 }
 
+/**
+ * convert XData string into node tree
+ *
+ * @example
+ *     decode("10")
+ *     decode({ remaining: "10", context: new Context() })
+ * @returns {[Node]} output - list of nodes
+ *
+ */
 export const decode = (remaining)=>{
-    var context = new Context()
+    if (typeof remaining != 'string' && remaining instanceof Object) {
+        var { remaining, context } = remaining
+    }
+    context = context || new Context()
     let remainingCharCount = remaining.length
     let prevRemainingCharCount = remainingCharCount
     let nodes = []
-    while (remainingCharCount) {
+    while (remainingCharCount > 0) {
         for (const [name, decoder] of Object.entries(decoders)) {
             try {
                 var { remaining, extraction, context } = utils.extract({ oneOf: Object.values(decoders), from: remaining, context })
+                nodes.push(nodes)
             } catch (error) {
                 if (error instanceof ParserError) {
                     // ignore
@@ -117,4 +130,5 @@ export const decode = (remaining)=>{
         }
         prevRemainingCharCount = remaining.length
     }
+    return nodes
 }
