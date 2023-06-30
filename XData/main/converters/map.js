@@ -64,7 +64,7 @@ const encodeEmptyMap = ({remaining, context})=>{
 }
 
 structure.Converter({
-    xdataStringToNode: {
+    encoders: {
         Map: ({remaining, context})=>{
             // <inlineValue>
             if (context.id == ContextIds.inlineValue) {
@@ -82,7 +82,7 @@ structure.Converter({
             }
         },
     },
-    nodeToXdataString: {
+    decoders: {
         Map: ({node, context})=>{
             // FIXME: chopping comments
             const isEmptyMap = node.childComponents.openingBracket || !!node.childComponents?.contents?.length

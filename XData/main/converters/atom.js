@@ -3,7 +3,7 @@ import { ParserError, CantDecodeContext, ContextIds }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
-const encodeAtomWithAtSymbol = ({remaining, context})=>{
+export const encodeAtomWithAtSymbol = ({remaining, context})=>{
     // NOTE: no context restrictions beacuse this is a helper, and the main one should check context
     const childComponents = {
         preWhitespace: null, // token
@@ -59,27 +59,29 @@ const encodeAtomWithAtSymbol = ({remaining, context})=>{
     })
 }
 
-structure.Converter({
-    xdataStringToNode: {
-        Atom: ({remaining, context})=>{
-            const childComponents = {
-                preWhitespace: null, // token
-                symbol: null, // token
-                content: null, // token
-                postWhitespace: null, // token
-                comment: null, // node
-            }
+export const encodeAtom = ({remaining, context})=>{
+    const childComponents = {
+        preWhitespace: null, // token
+        symbol: null, // token
+        content: null, // token
+        postWhitespace: null, // token
+        comment: null, // node
+    }
 
-            if (context.id == ContextIds.root) {
-                return encodeAtomWithAtSymbol({ remaining, context })
-            } else if (context.id == ContextIds.inlineValue) {
-                return encodeAtomWithAtSymbol({ remaining, context })
-            } else {
-                throw new Error(`Unimplemented`)
-            }
-        },
+    if (context.id == ContextIds.root) {
+        return encodeAtomWithAtSymbol({ remaining, context })
+    } else if (context.id == ContextIds.inlineValue) {
+        return encodeAtomWithAtSymbol({ remaining, context })
+    } else {
+        throw new Error(`Unimplemented`)
+    }
+}
+
+structure.Converter({
+    encoders: {
+        Atom: encodeAtom,
     },
-    nodeToXdataString: {
+    decoders: {
         Atom: ({node, context})=>{
             if (context.id == ContextIds.root) {
                 return structure.childComponentsToString({node, context})

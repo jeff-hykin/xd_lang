@@ -1,21 +1,7 @@
-import { toString } from "https://deno.land/x/good@0.7.8/string.js"
+import { toString, findAll } from "https://deno.land/x/good@1.3.0.4/string.js"
 
 export {
     toString as toString
-}
-
-export const findAll = (regexPattern, sourceString) => {
-    let output = []
-    let match
-    // make sure the pattern has the global flag
-    let regexPatternWithGlobal = RegExp(regexPattern,[...new Set("g"+regexPattern.flags)].join(""))
-    while (match = regexPatternWithGlobal.exec(sourceString)) {
-        // get rid of the string copy
-        delete match.input
-        // store the match data
-        output.push(match)
-    } 
-    return output
 }
 
 export const indent = ({string, indent}) => {

@@ -80,10 +80,10 @@ export const Encoders = (encodersObject) => {
 }
 
 const converters = {}
-export const Converter = ({xdataStringToNode, nodeToXdataString}) => {
+export const Converter = ({encoders, decoders}) => {
     return [
-        Encoders(nodeToXdataString),
-        Decoders(xdataStringToNode),
+        Encoders(decoders),
+        Decoders(encoders),
     ]
 }
 

@@ -66,7 +66,7 @@ export const encodeComment = ({remaining, context})=>{
 }
 
 structure.Converter({
-    xdataStringToNode: {
+    encoders: {
         BlankLine: encodeBlankLine,
         Comment: encodeComment,
         CommentOrBlankLine:({remaining, context})=>{
@@ -81,7 +81,7 @@ structure.Converter({
             return extraction
         },
     },
-    nodeToXdataString: {
+    decoders: {
         BlankLine: ({node, context})=>structure.childComponentsToString({node, context}),
         Comment: ({node, context})=>structure.childComponentsToString({node, context}),
     },
