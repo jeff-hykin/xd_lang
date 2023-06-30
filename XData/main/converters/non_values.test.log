@@ -3,13 +3,17 @@ new Node({
   "childComponents": {
     "whitespace": new Node({
       "toStringifier": "Token",
-      "childComponents": "",
+      "childComponents": {
+        "content": "",
+      },
       "formattingPreferences": {
       },
     }),
     "newline": new Node({
       "toStringifier": "Token",
-      "childComponents": "\n",
+      "childComponents": {
+        "content": "\n",
+      },
       "formattingPreferences": {
       },
     }),
@@ -22,25 +26,33 @@ new Node({
   "childComponents": {
     "preWhitespace": new Node({
       "toStringifier": "Token",
-      "childComponents": "",
+      "childComponents": {
+        "content": "",
+      },
       "formattingPreferences": {
       },
     }),
     "commentSymbol": new Node({
       "toStringifier": "Token",
-      "childComponents": "# ",
+      "childComponents": {
+        "content": "# ",
+      },
       "formattingPreferences": {
       },
     }),
     "content": new Node({
       "toStringifier": "Token",
-      "childComponents": "Howdy",
+      "childComponents": {
+        "content": "Howdy",
+      },
       "formattingPreferences": {
       },
     }),
     "newline": new Node({
       "toStringifier": "Token",
-      "childComponents": "",
+      "childComponents": {
+        "content": "",
+      },
       "formattingPreferences": {
       },
     }),
@@ -53,25 +65,33 @@ new Node({
   "childComponents": {
     "preWhitespace": new Node({
       "toStringifier": "Token",
-      "childComponents": "",
+      "childComponents": {
+        "content": "",
+      },
       "formattingPreferences": {
       },
     }),
     "commentSymbol": new Node({
       "toStringifier": "Token",
-      "childComponents": "# ",
+      "childComponents": {
+        "content": "# ",
+      },
       "formattingPreferences": {
       },
     }),
     "content": new Node({
       "toStringifier": "Token",
-      "childComponents": " Howdy",
+      "childComponents": {
+        "content": " Howdy",
+      },
       "formattingPreferences": {
       },
     }),
     "newline": new Node({
       "toStringifier": "Token",
-      "childComponents": "\n",
+      "childComponents": {
+        "content": "\n",
+      },
       "formattingPreferences": {
       },
     }),

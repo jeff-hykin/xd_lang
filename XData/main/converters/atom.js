@@ -41,7 +41,7 @@ export const atomWithAtSymbolToNode = ({remaining, context})=>{
     // comment is optional
     // 
     try {
-        components.comment = structure.toNodeifiers.Comment({ remaining, context })
+        childComponents.comment = structure.toNodeifiers.Comment({ remaining, context })
     } catch (error) {
         // only catch parse errors
         if (!(error instanceof structure.ParserError)) {

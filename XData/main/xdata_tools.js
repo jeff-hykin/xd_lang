@@ -15,7 +15,9 @@ structure.RegisterConverter({
             // throw ParserError({ message, context }) if parse error
             return new structure.Node({
                 toStringifier: "Token",
-                childComponents: remaining,
+                childComponents: {
+                    content: remaining,
+                },
                 formattingPreferences: {},
             })
         }
@@ -25,7 +27,7 @@ structure.RegisterConverter({
             if (node.childComponents == null) {
                 return ``
             } else {
-                return `${node.childComponents}`
+                return `${node.childComponents.content}`
             }
         }
     }
@@ -68,9 +70,14 @@ export const extract = ({ pattern, oneOf, from, context }) => {
     // 
     if (pattern instanceof RegExp || typeof pattern == 'string') {
         const { remaining, extraction } = utils.extractFirst({ pattern, from })
+        if (extraction == null) {
+            throw new structure.ParserError({message: `Unable to extract: ${pattern} from ${from}`, context})
+        }
         const node = new structure.Node({
             toStringifier: "Token",
-            childComponents: extraction,
+            childComponents: {
+                content: extraction
+            },
             formattingPreferences: {},
         })
         return {

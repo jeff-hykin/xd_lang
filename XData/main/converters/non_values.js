@@ -14,6 +14,7 @@ export const blankLineToNode = ({remaining, context})=>{
     var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context })
     childComponents.whitespace = extraction
 
+    // 
     // newline
     // 
     var { remaining, extraction, context } = tools.extract({ pattern: /(\n|$)/, from: remaining, context })

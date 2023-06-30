@@ -18,37 +18,37 @@ export const emptyMapToNode = ({remaining, context})=>{
     // preWhitespace
     // 
     var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context})
-    components.preWhitespace = extraction
+    childComponents.preWhitespace = extraction
     
     // 
     // openingBracket
     // 
     var { remaining, extraction, context } = tools.extract({ pattern: /\{/, from: remaining, context})
-    components.openingBracket = extraction
+    childComponents.openingBracket = extraction
     
     // 
     // preWhitespace
     // 
     var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context})
-    components.whitespace = extraction
+    childComponents.whitespace = extraction
     
     // 
     // openingBracket
     // 
     var { remaining, extraction, context } = tools.extract({ pattern: /\}/, from: remaining, context})
-    components.closingBracket = extraction
+    childComponents.closingBracket = extraction
     
     // 
     // postWhitespace
     // 
     var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context})
-    components.postWhitespace = extraction
+    childComponents.postWhitespace = extraction
     
     // 
     // comment is optional
     // 
     try {
-        components.comment = structure.toNodeifiers.Comment({ remaining, context })
+        childComponents.comment = structure.toNodeifiers.Comment({ remaining, context })
     } catch (error) {
         // only catch parse errors
         if (!(error instanceof structure.ParserError)) {
