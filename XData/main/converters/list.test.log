@@ -1,0 +1,139 @@
+
+empty list
+new Node({
+  "toStringifier": "List",
+  "childComponents": {
+    "preWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "openingBracket": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "[",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "whitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "closingBracket": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "]",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "postWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+
+empty list with comment
+new Node({
+  "toStringifier": "List",
+  "childComponents": {
+    "preWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": " ",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "openingBracket": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "[",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "whitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "closingBracket": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": "]",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "postWhitespace": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "content": " ",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "comment": new Node({
+      "toStringifier": "Comment",
+      "childComponents": {
+        "preWhitespace": new Node({
+          "toStringifier": "Token",
+          "childComponents": {
+            "content": "",
+          },
+          "formattingPreferences": {
+          },
+        }),
+        "commentSymbol": new Node({
+          "toStringifier": "Token",
+          "childComponents": {
+            "content": "# ",
+          },
+          "formattingPreferences": {
+          },
+        }),
+        "content": new Node({
+          "toStringifier": "Token",
+          "childComponents": {
+            "content": "Howdy",
+          },
+          "formattingPreferences": {
+          },
+        }),
+        "newline": new Node({
+          "toStringifier": "Token",
+          "childComponents": {
+            "content": "",
+          },
+          "formattingPreferences": {
+          },
+        }),
+      },
+      "formattingPreferences": {
+      },
+    }),
+  },
+  "formattingPreferences": {
+  },
+})
+" [ ] "
