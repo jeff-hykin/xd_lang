@@ -83,6 +83,13 @@ structure.RegisterConverter({
     },
     toString: {
         Atom: ({node, context})=>{
+            // remove the comment if in a place where the comment isn't allowed
+            if (context.id == ContextIds.mapKey || context.id == ContextIds.referencePath) {
+                node = {...node}
+                node.childComponents = {...node.childComponents}
+                node.childComponents.comment = null
+            }
+
             if (context.id == ContextIds.root) {
                 return structure.childComponentsToString({node, context})
             } else if (context.id == ContextIds.inlineValue) {
