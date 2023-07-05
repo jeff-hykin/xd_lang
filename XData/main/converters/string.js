@@ -2,6 +2,7 @@ import * as structure from "../structure.js"
 import { ParserError, ContextIds }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
+import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString, regex, escapeRegexMatch, escapeRegexReplace, extractFirst, isValidIdentifier } from "https://deno.land/x/good@1.3.0.4/string.js"
 
 export const extractStartingQuote = ({from, context, quote}) => {
     let totalCount = 0
@@ -16,7 +17,11 @@ export const extractStartingQuote = ({from, context, quote}) => {
         throw new structure.ParserError({ message: `cant extract starting quote from: ${from}`, context })
     }
 
-    return tools.extract({ pattern: from.slice(0, startSize), from: from, context })
+    return tools.extract({
+        pattern: regex`^${from.slice(0, startSize)}`,
+        from,
+        context,
+    })
 }
 
 export const minimumViableQuoteSize = (stringContent, quote) => {
@@ -37,9 +42,11 @@ export const minimumViableQuoteSize = (stringContent, quote) => {
 
 export const inlineStringLiteralToNode = ({remaining, context})=>{
     const childComponents = {
-        preWhitespace: null, // token
-        content: null, // token
-        postWhitespace: null, // token
+        preWhitespace: null, // string
+        startQuote: null, // string
+        content: null, // string
+        endQuote: null, // string
+        postWhitespace: null, // string
         comment: null, // node
     }
 
@@ -50,7 +57,7 @@ export const inlineStringLiteralToNode = ({remaining, context})=>{
     childComponents.preWhitespace = extraction
     
     // 
-    // content
+    // startQuote
     // 
     var { remaining, extraction, context } = extractStartingQuote({ quote: `"`, from: remaining, context })
     childComponents.startQuote = extraction
@@ -58,9 +65,18 @@ export const inlineStringLiteralToNode = ({remaining, context})=>{
     // 
     // content
     // 
-        // FIXME: need to get content and end quote
-    var { remaining, extraction, context } = tools.extract({ pattern: /^(-|\+)?\d+(\.\d+)?/i, from: remaining, context })
-    childComponents.content = extraction
+    var { remaining, extraction, context } = tools.extract({
+        pattern: regex`${  /^[^\n]*/  }${  childComponents.startQuote  }`,
+        from: remaining,
+        context 
+    })
+    childComponents.content = extraction.slice(0,-childComponents.startQuote.length)
+
+    // 
+    // endQuote
+    // 
+    childComponents.endQuote = childComponents.startQuote
+    
 
     // 
     // postWhitespace
@@ -92,12 +108,28 @@ export const inlineStringLiteralToNode = ({remaining, context})=>{
     })
 }
 
+export const stringToNode = ({remaining, context})=>{
+    if (context.id == ContextIds.mapKey) {
+        // literal with no newlines
+        return inlineStringLiteralToNode({remaining, context})
+    } else {
+        // if inlineStringLiteralToNode matches, then all good in any context
+        try {
+            return inlineStringLiteralToNode({remaining, context})
+        } catch (error) {
+            console.debug(`error is:`,error)
+        }
+        throw Error(`not implemented`)
+    }
+}
+
 structure.RegisterConverter({
     toNode: {
         String: stringToNode,
     },
     toString: {
         String: ({node, context})=>{
+            // FIXME: determin number of quotes needed
             // remove the comment if in a place where the comment isn't allowed
             if (context.id == ContextIds.mapKey || context.id == ContextIds.referencePath) {
                 node = {...node}

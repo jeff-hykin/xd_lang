@@ -1,0 +1,65 @@
+new Node({
+  "toStringifier": "String",
+  "childComponents": {
+    "preWhitespace": "",
+    "startQuote": "\"",
+    "content": "testing",
+    "endQuote": "\"",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "String",
+  "childComponents": {
+    "preWhitespace": "",
+    "startQuote": "\"\"\"",
+    "content": "howdy",
+    "endQuote": "\"\"\"",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "String",
+  "childComponents": {
+    "preWhitespace": "",
+    "startQuote": "\"\"\"",
+    "content": " \"howdy\" ",
+    "endQuote": "\"\"\"",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "String",
+  "childComponents": {
+    "preWhitespace": "",
+    "startQuote": "\"",
+    "content": "",
+    "endQuote": "\"",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "String",
+  "childComponents": {
+    "preWhitespace": "",
+    "startQuote": "\"\"\"",
+    "content": "",
+    "endQuote": "\"\"\"",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
