@@ -1,6 +1,6 @@
 import * as structure from "../structure.js"
 import "./non_values.js" // need to load in Comment
-import { stringToNode } from "./string.js"
+import { stringToNode, stringNodeToString } from "./string.js"
 import { capitalize, indent, toCamelCase, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString } from "https://deno.land/x/good@1.3.0.4/string.js"
 
 console.log(
@@ -39,6 +39,17 @@ console.log(
     toRepresentation(
         stringToNode({
             remaining: `""""""`,
+            context: new structure.Context(),
+        })
+    )
+)
+console.log(
+    toRepresentation(
+        stringNodeToString({
+            node: stringToNode({
+                remaining: `""""""`,
+                context: new structure.Context(),
+            }),
             context: new structure.Context(),
         })
     )

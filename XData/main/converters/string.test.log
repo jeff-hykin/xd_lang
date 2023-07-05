@@ -63,3 +63,17 @@ new Node({
   "formattingPreferences": {
   },
 })
+numberOfQuotes is: 1
+node is: Node {
+  toStringifier: "String",
+  childComponents: {
+    preWhitespace: "",
+    startQuote: '"',
+    content: "",
+    endQuote: '"',
+    postWhitespace: "",
+    comment: null
+  },
+  formattingPreferences: {}
+}
+"\"\""

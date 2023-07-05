@@ -2,7 +2,7 @@ import * as structure from "../structure.js"
 import { ParserError, ContextIds }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
-import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString, regex, escapeRegexMatch, escapeRegexReplace, extractFirst, isValidIdentifier } from "https://deno.land/x/good@1.3.0.4/string.js"
+import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString, regex, escapeRegexMatch, escapeRegexReplace, extractFirst, isValidIdentifier, findAll } from "https://deno.land/x/good@1.3.0.4/string.js"
 
 export const extractStartingQuote = ({from, context, quote}) => {
     let totalCount = 0
@@ -28,7 +28,7 @@ export const minimumViableQuoteSize = (stringContent, quote) => {
     if (stringContent == null || quote == null) {
         return null
     }
-    let quotes = utils.findAll(RegExp(`${quote}+`), stringContent)
+    let quotes = findAll(new RegExp(`${quote}+`), stringContent)
     let maxQuoteSize = Math.max(...quotes.map(each=>each[0].length))
     let minViableQuoteSize = 1
     if (maxQuoteSize > 0) {
@@ -123,22 +123,32 @@ export const stringToNode = ({remaining, context})=>{
     }
 }
 
+// Assumes: context specific things have been handled (e.g. comment stripping)
+export const inlineStringNodeToString = ({node, context}) => {
+    const numberOfQuotes = minimumViableQuoteSize(node.childComponents.content, `"`)
+    node.childComponents.endQuote = node.childComponents.startQuote = `"`.repeat(numberOfQuotes)
+    return structure.childComponentsToString({node, context})
+}
+
+export const stringNodeToString = ({node, context})=>{
+    // TODO: automatically determine the best format, starting by defaulting to the given format, but falling back if needed depending on context and chosen formatting options
+    
+    // remove the comment if in a place where the comment isn't allowed
+    if (context.id == ContextIds.mapKey || context.id == ContextIds.referencePath) {
+        node = {...node}
+        node.childComponents = {...node.childComponents}
+        node.childComponents.comment = null
+    }
+    
+    // valid in all contexts
+    return inlineStringNodeToString({node, context})
+}
+
 structure.RegisterConverter({
     toNode: {
         String: stringToNode,
     },
     toString: {
-        String: ({node, context})=>{
-            // FIXME: determin number of quotes needed
-            // remove the comment if in a place where the comment isn't allowed
-            if (context.id == ContextIds.mapKey || context.id == ContextIds.referencePath) {
-                node = {...node}
-                node.childComponents = {...node.childComponents}
-                node.childComponents.comment = null
-            }
-            
-            // valid in all contexts
-            return structure.childComponentsToString({node, context})
-        },
+        String: stringToNode,
     },
 })
