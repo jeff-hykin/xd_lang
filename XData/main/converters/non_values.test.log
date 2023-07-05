@@ -1,22 +1,8 @@
 new Node({
   "toStringifier": "BlankLine",
   "childComponents": {
-    "whitespace": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "",
-      },
-      "formattingPreferences": {
-      },
-    }),
-    "newline": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "\n",
-      },
-      "formattingPreferences": {
-      },
-    }),
+    "whitespace": "",
+    "newline": "\n",
   },
   "formattingPreferences": {
   },
@@ -24,38 +10,10 @@ new Node({
 new Node({
   "toStringifier": "Comment",
   "childComponents": {
-    "preWhitespace": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "",
-      },
-      "formattingPreferences": {
-      },
-    }),
-    "commentSymbol": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "# ",
-      },
-      "formattingPreferences": {
-      },
-    }),
-    "content": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "Howdy",
-      },
-      "formattingPreferences": {
-      },
-    }),
-    "newline": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "",
-      },
-      "formattingPreferences": {
-      },
-    }),
+    "preWhitespace": "",
+    "commentSymbol": "# ",
+    "content": "Howdy",
+    "newline": "",
   },
   "formattingPreferences": {
   },
@@ -63,38 +21,10 @@ new Node({
 new Node({
   "toStringifier": "Comment",
   "childComponents": {
-    "preWhitespace": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "",
-      },
-      "formattingPreferences": {
-      },
-    }),
-    "commentSymbol": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "# ",
-      },
-      "formattingPreferences": {
-      },
-    }),
-    "content": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": " Howdy",
-      },
-      "formattingPreferences": {
-      },
-    }),
-    "newline": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "\n",
-      },
-      "formattingPreferences": {
-      },
-    }),
+    "preWhitespace": "",
+    "commentSymbol": "# ",
+    "content": " Howdy",
+    "newline": "\n",
   },
   "formattingPreferences": {
   },

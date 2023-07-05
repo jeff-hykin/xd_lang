@@ -1,38 +1,10 @@
 new Node({
   "toStringifier": "Atom",
   "childComponents": {
-    "preWhitespace": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "",
-      },
-      "formattingPreferences": {
-      },
-    }),
-    "symbol": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "@",
-      },
-      "formattingPreferences": {
-      },
-    }),
-    "content": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "imma_atom",
-      },
-      "formattingPreferences": {
-      },
-    }),
-    "postWhitespace": new Node({
-      "toStringifier": "Token",
-      "childComponents": {
-        "content": "",
-      },
-      "formattingPreferences": {
-      },
-    }),
+    "preWhitespace": "",
+    "symbol": "@",
+    "content": "imma_atom",
+    "postWhitespace": "",
     "comment": null,
   },
   "formattingPreferences": {

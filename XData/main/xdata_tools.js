@@ -82,7 +82,7 @@ export const extract = ({ pattern, oneOf, from, context }) => {
         })
         return {
             remaining,
-            extraction: node,
+            extraction: extraction,
             context: advancedBy(node, context),
         }
     } else if (pattern instanceof Object) {
