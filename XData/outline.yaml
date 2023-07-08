@@ -53,23 +53,23 @@ contexts:
                                             regex: "/#unicode\[\w+\]/"
                                             regex: "/#ascii\[\w+\]/"
                                     (String)<inlineValue>:
-                                        (StringLiteral)<inlineValue>: #DONE
+                                        (StringLiteral)<inlineValue>: #REDONE
                                             oneOf:
                                                 regex: '/"/'
                                                 regex: '/[^\n"]*/'
                                                 regex: '/"/'
                                                 group:
-                                                    findDoubleQuotesThatAreAPerfectCube:
+                                                    findDoubleQuotesThatAreAPowerOfThree:
                                                     loop:
                                                         oneOf:
                                                             a sequence of double quotes thats smaller than the starting quote: 
                                                             as many characters as possible that don't have the quote or newline:
-                                                    findMatchingDoubleQuotesThatAreAPerfectCube:
+                                                    findMatchingDoubleQuotesThatAreAPowerOfThree:
                                         (StringFigurative)[stringFigurative]<inlineValue>:
-                                            findSingleQuotesThatAreAPerfectCube:
+                                            findSingleQuotesThatAreAPowerOfThree:
                                             loop:
                                                 stop_if:
-                                                    findMatchingSingleQuotesThatAreAPerfectCube:
+                                                    findMatchingSingleQuotesThatAreAPowerOfThree:
                                                 oneOf:
                                                     regex: /[^{]+/ # note: exclude \n as well when in a key or reference context
                                                     (escapeSectionToNode): # TODO NEXT
@@ -113,17 +113,17 @@ contexts:
                                     oneOf:
                                         (stringBlockToNode):
                                             (stringLiteralMultilineQuoteToNode):
-                                                findDoubleQuotesThatAreAPerfectCube:
+                                                findDoubleQuotesThatAreAPowerOfThree:
                                                 (CommentOrBlankLine):
                                                 loop:
                                                     regex: '/ +[^"\n]*/'
                                                     regex: "/\n|\z/"
                                                     
-                                                findMatchingDoubleQuotesThatAreAPerfectCube:
+                                                findMatchingDoubleQuotesThatAreAPowerOfThree:
                                                 (CommentOrBlankLine):
                                             
                                             (stringFigurativeMultilineQuoteToNode):
-                                                findSingleQuotesThatAreAPerfectCube:
+                                                findSingleQuotesThatAreAPowerOfThree:
                                                 (CommentOrBlankLine):
                                                 loop:
                                                     regex: "/ +/" # make sure line is somewhat indented
@@ -131,7 +131,7 @@ contexts:
                                                         regex: "/[^\{\n]*/"
                                                         (escapeSectionToNode): # note: only single line escapes
                                                     regex: "/\n|\z/"
-                                                findMatchingSingleQuotesThatAreAPerfectCube:
+                                                findMatchingSingleQuotesThatAreAPowerOfThree:
                                                 (CommentOrBlankLine):
                                             
                                         (customValueToNode):

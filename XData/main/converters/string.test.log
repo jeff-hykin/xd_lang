@@ -63,17 +63,32 @@ new Node({
   "formattingPreferences": {
   },
 })
-numberOfQuotes is: 1
-node is: Node {
-  toStringifier: "String",
-  childComponents: {
-    preWhitespace: "",
-    startQuote: '"',
-    content: "",
-    endQuote: '"',
-    postWhitespace: "",
-    comment: null
-  },
-  formattingPreferences: {}
-}
 "\"\""
+new Node({
+  "toStringifier": "String",
+  "childComponents": {
+    "leadingComments": null,
+    "preWhitespace": "\n    ",
+    "startQuote": "    \"\"\"\n",
+    "content": "Howdy howdy howdy",
+    "endQuote": "\n    \"\"\"\n",
+    "postWhitespace": "",
+    "trailingComments": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "String",
+  "childComponents": {
+    "leadingComments": null,
+    "preWhitespace": "\n    ",
+    "startQuote": "    \"\"\"\n",
+    "content": "Howdy howdy howdy\nHowdy howdy howdy\nHowdy howdy howdy",
+    "endQuote": "\n    \"\"\"\n",
+    "postWhitespace": "",
+    "trailingComments": null,
+  },
+  "formattingPreferences": {
+  },
+})

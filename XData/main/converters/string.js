@@ -108,6 +108,96 @@ export const inlineStringLiteralToNode = ({remaining, context})=>{
     })
 }
 
+export const blockStringLiteralToNode = ({remaining, context})=>{
+    const childComponents = {
+        leadingComments: null, // array of nodes
+        preWhitespace: null, // string
+        startQuote: null, // string
+        content: null, // string
+        endQuote: null, // string
+        postWhitespace: null, // string
+        trailingComments: null, // array of nodes
+    }
+
+    // 
+    // comments are optional before first quote
+    // 
+        // TODO^ 
+        // if (context.id != ContextIds.mapKey && context.id != ContextIds.referencePath) {
+        //     try {
+        //         childComponents.comment = structure.toNodeifiers.Comment({ remaining, context })
+        //     } catch (error) {
+        //         // only catch parse errors
+        //         if (!(error instanceof structure.ParserError)) {
+        //             throw error
+        //         }
+        //     }
+        // }
+
+    // 
+    // preWhitespace
+    // 
+    var { remaining, extraction, context } = tools.extract({ pattern: /^[ \n]*/, from: remaining, context })
+    childComponents.preWhitespace = extraction
+    // figure out indent
+    const indent = childComponents.preWhitespace.split("\n").slice(-1)[0]
+    childComponents.startQuote = indent
+    
+    // 
+    // startQuote
+    // 
+    var { remaining, extraction, context } = extractStartingQuote({ quote: `"`, from: remaining, context })
+    const startQuote = extraction
+    childComponents.startQuote += extraction
+    var { remaining, extraction, context } = tools.extract({ pattern: /^\n/, from: remaining, context })
+    childComponents.startQuote += extraction
+    
+    // 
+    // content
+    // 
+    var { remaining, extraction, context } = tools.extract({
+        pattern: regex`${/(.|\s)*?\n/}${indent}${startQuote}`,
+        from: remaining,
+        context 
+    })
+    childComponents.content = extraction.slice(0,-(childComponents.startQuote.length)).replace(regex`^${indent}`.mg, "")
+
+    // 
+    // endQuote
+    // 
+    childComponents.endQuote = "\n"+childComponents.startQuote
+    
+    // 
+    // postWhitespace
+    // 
+    var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context })
+    childComponents.postWhitespace = extraction
+    
+    // 
+    // comments are optional after newline of last quote
+    // 
+        // TODO^ 
+        // if (context.id != ContextIds.mapKey && context.id != ContextIds.referencePath) {
+        //     try {
+        //         childComponents.comment = structure.toNodeifiers.Comment({ remaining, context })
+        //     } catch (error) {
+        //         // only catch parse errors
+        //         if (!(error instanceof structure.ParserError)) {
+        //             throw error
+        //         }
+        //     }
+        // }
+
+    // 
+    // return
+    // 
+    return new structure.Node({
+        toStringifier: "String",
+        childComponents,
+        formattingPreferences: {},
+    })
+}
+
 export const stringToNode = ({remaining, context})=>{
     if (context.id == ContextIds.mapKey) {
         // literal with no newlines
