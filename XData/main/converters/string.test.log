@@ -92,3 +92,17 @@ new Node({
   "formattingPreferences": {
   },
 })
+new Node({
+  "toStringifier": "String",
+  "childComponents": {
+    "leadingComments": null,
+    "preWhitespace": "\n    ",
+    "startQuote": "    \"\"\"\n",
+    "content": "Howdy howdy howdy\nHowdy howdy howdy\nHowdy howdy howdy",
+    "endQuote": "\n    \"\"\"\n",
+    "postWhitespace": "",
+    "trailingComments": null,
+  },
+  "formattingPreferences": {
+  },
+})
