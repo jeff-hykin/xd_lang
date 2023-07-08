@@ -7,7 +7,7 @@ console.log(
     toRepresentation(
         stringToNode({
             remaining: `"testing"`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -15,7 +15,7 @@ console.log(
     toRepresentation(
         stringToNode({
             remaining: `"""howdy"""`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -23,7 +23,7 @@ console.log(
     toRepresentation(
         stringToNode({
             remaining: `""" "howdy" """`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -31,7 +31,7 @@ console.log(
     toRepresentation(
         stringToNode({
             remaining: `""`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -39,7 +39,7 @@ console.log(
     toRepresentation(
         stringToNode({
             remaining: `""""""`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -48,9 +48,9 @@ console.log(
         stringNodeToString({
             node: stringToNode({
                 remaining: `""""""`,
-                context: new structure.Context(),
+                context: new structure.Context({}),
             }),
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -62,7 +62,7 @@ console.log(
     Howdy howdy howdy
     """
 `,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -76,7 +76,21 @@ console.log(
     Howdy howdy howdy
     """
 `,
-            context: new structure.Context(),
+            context: new structure.Context({}),
+        })
+    )
+)
+console.log(
+    toRepresentation(
+        stringToNode({
+            remaining: `
+    """
+    Howdy howdy howdy
+    Howdy howdy howdy
+    Howdy howdy howdy
+    """
+`,
+            context: new structure.Context({}),
         })
     )
 )

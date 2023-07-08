@@ -7,7 +7,7 @@ console.log(
     toRepresentation(
         specialValueToNode({
             remaining: `infinite`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -15,7 +15,7 @@ console.log(
     toRepresentation(
         specialValueToNode({
             remaining: `nan`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -23,7 +23,7 @@ console.log(
     toRepresentation(
         specialValueToNode({
             remaining: `True`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -31,17 +31,17 @@ console.log(
     toRepresentation(
         specialValueToNode({
             remaining: `fAlsE`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
 console.log(
     toRepresentation(
        structure.toString({
-            context: new structure.Context(),
+            context: new structure.Context({}),
             node: specialValueToNode({
                 remaining: `fAlsE`,
-                context: new structure.Context(),
+                context: new structure.Context({}),
             }),
        })
     )

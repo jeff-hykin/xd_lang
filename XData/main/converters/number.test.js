@@ -7,7 +7,7 @@ console.log(
     toRepresentation(
         numberToNode({
             remaining: `10.4`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -15,7 +15,7 @@ console.log(
     toRepresentation(
         numberToNode({
             remaining: `-10`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -23,17 +23,17 @@ console.log(
     toRepresentation(
         numberToNode({
             remaining: `+99.4`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
 console.log(
     toRepresentation(
        structure.toString({
-            context: new structure.Context(),
+            context: new structure.Context({}),
             node: numberToNode({
                 remaining: `0.249082`,
-                context: new structure.Context(),
+                context: new structure.Context({}),
             }),
        })
     )

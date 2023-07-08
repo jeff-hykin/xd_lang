@@ -6,7 +6,7 @@ console.log(
     toRepresentation(
         blankLineToNode({
             remaining: `\n\n`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -14,7 +14,7 @@ console.log(
     toRepresentation(
         commentToNode({
             remaining: `# Howdy`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -22,17 +22,17 @@ console.log(
     toRepresentation(
         commentToNode({
             remaining: `#  Howdy\n`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
 console.log(
     toRepresentation(
        structure.toString({
-            context: new structure.Context(),
+            context: new structure.Context({}),
             node: commentToNode({
                 remaining: `#  Howdy\n`,
-                context: new structure.Context(),
+                context: new structure.Context({}),
             }),
        })
     )

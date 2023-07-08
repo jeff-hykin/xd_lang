@@ -7,17 +7,17 @@ console.log(
     toRepresentation(
         atomWithAtSymbolToNode({
             remaining: `@imma_atom`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
 console.log(
     toRepresentation(
        structure.toString({
-            context: new structure.Context(),
+            context: new structure.Context({}),
             node: atomWithAtSymbolToNode({
                 remaining: `@imma_atom`,
-                context: new structure.Context(),
+                context: new structure.Context({}),
             }),
        })
     )

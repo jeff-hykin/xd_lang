@@ -46,7 +46,7 @@ export class ContextIds {
 }
 
 export class Context {
-    constructor(debugInfo={}, parentContext=null, id=ContextIds.root) {
+    constructor({debugInfo={}, parentContext=null, id=ContextIds.root}) {
         this.debugInfo     = debugInfo
         this.parentContext = parentContext
         this.id            = id
@@ -90,7 +90,7 @@ export const RegisterConverter = ({toNode, toString}) => {
  *
  * @example
  *     toNode("10")
- *     toNode({ remaining: "10", context: new Context() })
+ *     toNode({ remaining: "10", context: new Context({}) })
  * @returns {[Node]} output - list of nodes
  *
  */
@@ -98,7 +98,7 @@ export const toNode = (remaining)=>{
     if (typeof remaining != 'string' && remaining instanceof Object) {
         var { remaining, context } = remaining
     }
-    context = context || new Context()
+    context = context || new Context({})
     let remainingCharCount = remaining.length
     let prevRemainingCharCount = remainingCharCount
     let nodes = []

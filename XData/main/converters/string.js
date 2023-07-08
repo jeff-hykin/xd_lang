@@ -207,8 +207,12 @@ export const stringToNode = ({remaining, context})=>{
         try {
             return inlineStringLiteralToNode({remaining, context})
         } catch (error) {
-            console.debug(`error is:`,error)
         }
+
+        if (context.id == ContextIds.block) {
+            return blockStringLiteralToNode({remaining, context})
+        }
+
         throw Error(`not implemented`)
     }
 }
@@ -229,8 +233,7 @@ export const stringNodeToString = ({node, context})=>{
         node.childComponents = {...node.childComponents}
         node.childComponents.comment = null
     }
-    
-    // valid in all contexts
+
     return inlineStringNodeToString({node, context})
 }
 

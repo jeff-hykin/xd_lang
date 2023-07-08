@@ -9,7 +9,7 @@ console.log(
     toRepresentation(
         emptyMapToNode({
             remaining: `{}`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
@@ -18,17 +18,17 @@ console.log(
     toRepresentation(
         emptyMapToNode({
             remaining: ` {} # Howdy`,
-            context: new structure.Context(),
+            context: new structure.Context({}),
         })
     )
 )
 console.log(
     toRepresentation(
        structure.toString({
-            context: new structure.Context(),
+            context: new structure.Context({}),
             node: emptyMapToNode({
                 remaining: ` { } `,
-                context: new structure.Context(),
+                context: new structure.Context({}),
             }),
        })
     )
