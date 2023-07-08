@@ -2,7 +2,7 @@ import * as structure from "../structure.js"
 import { ParserError, ContextIds } from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
-import "./non_values.js"
+import "./0_0_non_values.js"
 import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString, regex, escapeRegexMatch, escapeRegexReplace, extractFirst, isValidIdentifier, findAll } from "https://deno.land/x/good@1.3.0.4/string.js"
 
 // 

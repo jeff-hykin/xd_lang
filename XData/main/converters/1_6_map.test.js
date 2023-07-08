@@ -1,36 +1,23 @@
 import * as structure from "../structure.js"
-import "./non_values.js" // need to load in Comment
-import { specialValueToNode } from "./special_value.js"
+import "./0_0_non_values.js" // need to load in Comment
+import "./1_2_atom.js"
+import { emptyMapToNode } from "./1_6_map.js"
 import { capitalize, indent, toCamelCase, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString } from "https://deno.land/x/good@1.3.0.4/string.js"
 
+console.log(`\nempty map`)
 console.log(
     toRepresentation(
-        specialValueToNode({
-            remaining: `infinite`,
+        emptyMapToNode({
+            remaining: `{}`,
             context: new structure.Context({}),
         })
     )
 )
+console.log(`\nempty map with comment`)
 console.log(
     toRepresentation(
-        specialValueToNode({
-            remaining: `nan`,
-            context: new structure.Context({}),
-        })
-    )
-)
-console.log(
-    toRepresentation(
-        specialValueToNode({
-            remaining: `True`,
-            context: new structure.Context({}),
-        })
-    )
-)
-console.log(
-    toRepresentation(
-        specialValueToNode({
-            remaining: `fAlsE`,
+        emptyMapToNode({
+            remaining: ` {} # Howdy`,
             context: new structure.Context({}),
         })
     )
@@ -39,8 +26,8 @@ console.log(
     toRepresentation(
        structure.toString({
             context: new structure.Context({}),
-            node: specialValueToNode({
-                remaining: `fAlsE`,
+            node: emptyMapToNode({
+                remaining: ` { } `,
                 context: new structure.Context({}),
             }),
        })
