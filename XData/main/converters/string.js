@@ -72,9 +72,9 @@ import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, to
         export const inlineStringLiteralToNode = ({remaining, context})=>{
             const childComponents = {
                 preWhitespace: null, // string
-                startQuote: null, // string
+                openingQuote: null, // string
                 content: null, // string
-                endQuote: null, // string
+                closingQuote: null, // string
                 postWhitespace: null, // string
                 comment: null, // node
             }
@@ -86,25 +86,25 @@ import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, to
             childComponents.preWhitespace = extraction
             
             // 
-            // startQuote
+            // openingQuote
             // 
             var { remaining, extraction, context } = extractStartingQuote({ quote: `"`, from: remaining, context })
-            childComponents.startQuote = extraction
+            childComponents.openingQuote = extraction
             
             // 
             // content
             // 
             var { remaining, extraction, context } = tools.extract({
-                pattern: regex`${  /^[^\n]*/  }${  childComponents.startQuote  }`,
+                pattern: regex`${  /^[^\n]*/  }${  childComponents.openingQuote  }`,
                 from: remaining,
                 context 
             })
-            childComponents.content = extraction.slice(0,-childComponents.startQuote.length)
+            childComponents.content = extraction.slice(0,-childComponents.openingQuote.length)
 
             // 
-            // endQuote
+            // closingQuote
             // 
-            childComponents.endQuote = childComponents.startQuote
+            childComponents.closingQuote = childComponents.openingQuote
             
 
             // 
@@ -140,9 +140,10 @@ import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, to
         export const blockStringLiteralToNode = ({remaining, context})=>{
             const childComponents = {
                 leadingCommentsAndLines: null, // array of nodes
-                startQuote: null, // string
+                openingQuote: null, // string
+                preWhitespace: null, // string
                 content: null, // string
-                endQuote: null, // string
+                closingQuote: null, // string
                 postWhitespace: null, // string
                 trailingCommentsAndLines: null, // array of nodes
             }
@@ -162,39 +163,39 @@ import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, to
             // figure out indent
             var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context })
             const indent = extraction
-            childComponents.startQuote = indent
+            childComponents.openingQuote = indent
             
             // 
-            // startQuote
+            // openingQuote
             // 
             var { remaining, extraction, context } = extractStartingQuote({ quote: `"`, from: remaining, context })
-            const startQuote = extraction
-            childComponents.startQuote += extraction
+            const openingQuote = extraction
+            childComponents.openingQuote += extraction
             var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context })
-            // NOTE: this whitespace is thrown away intentionally
+            childComponents.preWhitespace = extraction
             var { remaining, extraction, context } = tools.extract({ pattern: /^\n/, from: remaining, context })
-            childComponents.startQuote += extraction
+            childComponents.openingQuote += extraction
             
             // 
             // content
             // 
             var { remaining, extraction, context } = tools.extract({
-                pattern: regex`${/(.|\s)*?\n/}${indent}${startQuote}`,
+                pattern: regex`${/(.|\s)*?\n/}${indent}${openingQuote}`,
                 from: remaining,
                 context 
             })
-            childComponents.content = extraction.slice(0,-(childComponents.startQuote.length)).replace(regex`^${indent}`.mg, "")
+            childComponents.content = extraction.slice(0,-(childComponents.openingQuote.length)).replace(regex`^${indent}`.mg, "")
 
             // 
-            // endQuote
+            // closingQuote
             // 
-            childComponents.endQuote = "\n"+childComponents.startQuote
+            childComponents.closingQuote = "\n"+childComponents.openingQuote
             
             // 
             // postWhitespace
             // 
             var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context })
-            // NOTE: this whitespace is thrown away intentionally
+            childComponents.postWhitespace = extraction
             
             // 
             // comments are optional after newline of last quote
@@ -242,7 +243,7 @@ import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, to
     // 
         export const inlineStringNodeToString = ({node, context}) => {
             const numberOfQuotes = minimumViableQuoteSize(node.childComponents.content, `"`)
-            node.childComponents.endQuote = node.childComponents.startQuote = `"`.repeat(numberOfQuotes)
+            node.childComponents.closingQuote = node.childComponents.openingQuote = `"`.repeat(numberOfQuotes)
             return structure.childComponentsToString({node, context})
         }
 
