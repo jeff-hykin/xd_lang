@@ -10,4 +10,16 @@ new Node({
   "formattingPreferences": {
   },
 })
+new Node({
+  "toStringifier": "Atom",
+  "childComponents": {
+    "preWhitespace": "",
+    "symbol": "@",
+    "content": "imma_atom",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
 "@imma_atom"

@@ -37,6 +37,14 @@ console.log(
 )
 console.log(
     toRepresentation(
+        specialValueToNode({
+            remaining: `(int) fAlsE`,
+            context: new structure.Context({}),
+        })
+    )
+)
+console.log(
+    toRepresentation(
        structure.toString({
             context: new structure.Context({}),
             node: specialValueToNode({

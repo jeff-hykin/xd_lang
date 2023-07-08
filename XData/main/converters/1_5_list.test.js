@@ -22,6 +22,15 @@ console.log(
         })
     )
 )
+console.log(`\nempty list with comment and adjective`)
+console.log(
+    toRepresentation(
+        emptyListToNode({
+            remaining: `(names) [] # Howdy`,
+            context: new structure.Context({}),
+        })
+    )
+)
 console.log(
     toRepresentation(
        structure.toString({

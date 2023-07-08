@@ -3,13 +3,29 @@ import { ParserError, ContextIds }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
+import { adjectivesPrefixToNode } from "./0_1_adjectives.js"
+
 export const specialValueToNode = ({remaining, context})=>{
     const childComponents = {
-        preWhitespace: null, // token
-        content: null, // token
-        postWhitespace: null, // token
+        adjectivesPrefix: null, // token
+        preWhitespace: null, // string
+        content: null, // string
+        postWhitespace: null, // string
         comment: null, // node
     }
+
+    // 
+    // adjectivesPrefix
+    // 
+    try {
+        var { remaining, extraction, context } = tools.extract({ pattern: adjectivesPrefixToNode, from: remaining, context })
+        childComponents.adjectivesPrefix = extraction
+    } catch (error) {
+        if (!(error instanceof ParserError)) {
+            throw error
+        }
+    }
+    
 
     // 
     // preWhitespace

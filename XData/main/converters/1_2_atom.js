@@ -3,8 +3,41 @@ import { ParserError, ContextIds }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
+import { adjectivesPrefixToNode } from "./0_1_adjectives.js"
+
+export const atomToNode = ({remaining, context})=>{
+    const childComponents = {
+        adjectivesPrefix: null, // token
+        preWhitespace: null, // string
+        symbol: null, // string
+        content: null, // string
+        postWhitespace: null, // string
+        comment: null, // node
+    }
+
+    // 
+    // adjectivesPrefix
+    // 
+    try {
+        var { remaining, extraction, context } = tools.extract({ pattern: adjectivesPrefixToNode, from: remaining, context })
+        childComponents.adjectivesPrefix = extraction
+    } catch (error) {
+        if (!(error instanceof ParserError)) {
+            throw error
+        }
+    }
+
+    if (context.id == ContextIds.root) {
+        return atomWithAtSymbolToNode({ remaining, context })
+    } else if (context.id == ContextIds.inlineValue) {
+        return atomWithAtSymbolToNode({ remaining, context })
+    } else {
+        // FIXME: implement the mapKey option
+        throw new Error(`Unimplemented`)
+    }
+}
+
 export const atomWithAtSymbolToNode = ({remaining, context})=>{
-    // NOTE: no context restrictions beacuse this is a helper, and the main one should check context
     const childComponents = {
         preWhitespace: null, // token
         symbol: null, // token
@@ -57,24 +90,6 @@ export const atomWithAtSymbolToNode = ({remaining, context})=>{
         childComponents,
         formattingPreferences: {},
     })
-}
-
-export const atomToNode = ({remaining, context})=>{
-    const childComponents = {
-        preWhitespace: null, // token
-        symbol: null, // token
-        content: null, // token
-        postWhitespace: null, // token
-        comment: null, // node
-    }
-
-    if (context.id == ContextIds.root) {
-        return atomWithAtSymbolToNode({ remaining, context })
-    } else if (context.id == ContextIds.inlineValue) {
-        return atomWithAtSymbolToNode({ remaining, context })
-    } else {
-        throw new Error(`Unimplemented`)
-    }
 }
 
 structure.RegisterConverter({

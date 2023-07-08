@@ -29,6 +29,14 @@ console.log(
 )
 console.log(
     toRepresentation(
+        numberToNode({
+            remaining: `(degrees) 99.4`,
+            context: new structure.Context({}),
+        })
+    )
+)
+console.log(
+    toRepresentation(
        structure.toString({
             context: new structure.Context({}),
             node: numberToNode({

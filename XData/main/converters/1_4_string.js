@@ -5,6 +5,8 @@ import * as utils from "../utils.js"
 import "./0_0_non_values.js"
 import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString, regex, escapeRegexMatch, escapeRegexReplace, extractFirst, isValidIdentifier, findAll } from "https://deno.land/x/good@1.3.0.4/string.js"
 
+import { adjectivesPrefixToNode } from "./0_1_adjectives.js"
+
 // 
 // helpers
 // 
@@ -71,12 +73,25 @@ import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, to
     // 
         export const inlineStringLiteralToNode = ({remaining, context})=>{
             const childComponents = {
+                adjectivesPrefix: null, // token
                 preWhitespace: null, // string
                 openingQuote: null, // string
                 content: null, // string
                 closingQuote: null, // string
                 postWhitespace: null, // string
                 comment: null, // node
+            }
+
+            // 
+            // adjectivesPrefix
+            // 
+            try {
+                var { remaining, extraction, context } = tools.extract({ pattern: adjectivesPrefixToNode, from: remaining, context })
+                childComponents.adjectivesPrefix = extraction
+            } catch (error) {
+                if (!(error instanceof ParserError)) {
+                    throw error
+                }
             }
 
             // 
@@ -139,6 +154,7 @@ import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, to
 
         export const blockStringLiteralToNode = ({remaining, context})=>{
             const childComponents = {
+                adjectivesPrefix: null, // token
                 leadingCommentsAndLines: null, // array of nodes
                 openingQuote: null, // string
                 preWhitespace: null, // string
@@ -146,6 +162,18 @@ import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, to
                 closingQuote: null, // string
                 postWhitespace: null, // string
                 trailingCommentsAndLines: null, // array of nodes
+            }
+
+            // 
+            // adjectivesPrefix
+            // 
+            try {
+                var { remaining, extraction, context } = tools.extract({ pattern: adjectivesPrefixToNode, from: remaining, context })
+                childComponents.adjectivesPrefix = extraction
+            } catch (error) {
+                if (!(error instanceof ParserError)) {
+                    throw error
+                }
             }
 
             // 

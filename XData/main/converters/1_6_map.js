@@ -3,15 +3,30 @@ import { ParserError, ContextIds }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
+import { adjectivesPrefixToNode } from "./0_1_adjectives.js"
+
 export const emptyMapToNode = ({remaining, context})=>{
     // NOTE: no context restrictions beacuse this is a helper, and the main one should check context
     const childComponents = {
-        preWhitespace: null, // token
-        openingBracket: null, // token
-        whitespace: null, // token
-        closingBracket: null, // token
-        postWhitespace: null, // token
+        adjectivesPrefix: null, // token
+        preWhitespace: null, // string
+        openingBracket: null, // string
+        whitespace: null, // string
+        closingBracket: null, // string
+        postWhitespace: null, // string
         comment: null, // node
+    }
+
+    // 
+    // adjectivesPrefix
+    // 
+    try {
+        var { remaining, extraction, context } = tools.extract({ pattern: adjectivesPrefixToNode, from: remaining, context })
+        childComponents.adjectivesPrefix = extraction
+    } catch (error) {
+        if (!(error instanceof ParserError)) {
+            throw error
+        }
     }
 
     // 

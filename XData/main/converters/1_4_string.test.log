@@ -1,6 +1,7 @@
 new Node({
   "toStringifier": "String",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": "",
     "openingQuote": "\"",
     "content": "testing",
@@ -14,6 +15,7 @@ new Node({
 new Node({
   "toStringifier": "String",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": "",
     "openingQuote": "\"\"\"",
     "content": "howdy",
@@ -27,6 +29,7 @@ new Node({
 new Node({
   "toStringifier": "String",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": "",
     "openingQuote": "\"\"\"",
     "content": " \"howdy\" ",
@@ -40,6 +43,7 @@ new Node({
 new Node({
   "toStringifier": "String",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": "",
     "openingQuote": "\"",
     "content": "",
@@ -53,6 +57,7 @@ new Node({
 new Node({
   "toStringifier": "String",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": "",
     "openingQuote": "\"\"\"",
     "content": "",
@@ -67,6 +72,7 @@ new Node({
 new Node({
   "toStringifier": "String",
   "childComponents": {
+    "adjectivesPrefix": null,
     "leadingCommentsAndLines": [new Node({
       "toStringifier": "BlankLine",
       "childComponents": {
@@ -97,6 +103,7 @@ new Node({
 new Node({
   "toStringifier": "String",
   "childComponents": {
+    "adjectivesPrefix": null,
     "leadingCommentsAndLines": [new Node({
       "toStringifier": "BlankLine",
       "childComponents": {
@@ -127,6 +134,7 @@ new Node({
 new Node({
   "toStringifier": "String",
   "childComponents": {
+    "adjectivesPrefix": null,
     "leadingCommentsAndLines": [new Node({
       "toStringifier": "BlankLine",
       "childComponents": {
@@ -157,6 +165,7 @@ new Node({
 new Node({
   "toStringifier": "String",
   "childComponents": {
+    "adjectivesPrefix": null,
     "leadingCommentsAndLines": [new Node({
       "toStringifier": "BlankLine",
       "childComponents": {
@@ -195,6 +204,67 @@ new Node({
 new Node({
   "toStringifier": "String",
   "childComponents": {
+    "adjectivesPrefix": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "preWhitespace": "",
+        "openingParenthesis": "(",
+        "content": [new Node({
+          "toStringifier": "Token",
+          "childComponents": {
+            "preWhitespace": "",
+            "content": "markdown",
+            "postWhitespace": "",
+          },
+          "formattingPreferences": {
+          },
+        }),""],
+        "trailingWhitespace": null,
+        "closingParenthesis": ")",
+        "postWhitespace": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "leadingCommentsAndLines": [new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    }),new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "            ",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    })],
+    "openingQuote": "    \"\"\"\n",
+    "preWhitespace": "    ",
+    "content": "Howdy howdy howdy\nHowdy howdy howdy\nHowdy howdy howdy",
+    "closingQuote": "\n    \"\"\"\n",
+    "postWhitespace": "    ",
+    "trailingCommentsAndLines": [new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    })],
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "String",
+  "childComponents": {
+    "adjectivesPrefix": null,
     "leadingCommentsAndLines": [new Node({
       "toStringifier": "BlankLine",
       "childComponents": {

@@ -1,6 +1,7 @@
 new Node({
   "toStringifier": "SpecialValue",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": "",
     "content": "infinite",
     "postWhitespace": "",
@@ -12,6 +13,7 @@ new Node({
 new Node({
   "toStringifier": "SpecialValue",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": "",
     "content": "nan",
     "postWhitespace": "",
@@ -23,6 +25,7 @@ new Node({
 new Node({
   "toStringifier": "SpecialValue",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": "",
     "content": "True",
     "postWhitespace": "",
@@ -34,6 +37,40 @@ new Node({
 new Node({
   "toStringifier": "SpecialValue",
   "childComponents": {
+    "adjectivesPrefix": null,
+    "preWhitespace": "",
+    "content": "fAlsE",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "SpecialValue",
+  "childComponents": {
+    "adjectivesPrefix": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "preWhitespace": "",
+        "openingParenthesis": "(",
+        "content": [new Node({
+          "toStringifier": "Token",
+          "childComponents": {
+            "preWhitespace": "",
+            "content": "int",
+            "postWhitespace": "",
+          },
+          "formattingPreferences": {
+          },
+        }),""],
+        "trailingWhitespace": null,
+        "closingParenthesis": ")",
+        "postWhitespace": " ",
+      },
+      "formattingPreferences": {
+      },
+    }),
     "preWhitespace": "",
     "content": "fAlsE",
     "postWhitespace": "",

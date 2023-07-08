@@ -3,68 +3,9 @@ import { ParserError, ContextIds }   from "../structure.js"
 import * as tools from "../xdata_tools.js"
 import * as utils from "../utils.js"
 
-export const emptyListToNode = ({remaining, context})=>{
-    // NOTE: no context restrictions beacuse this is a helper, and the main one should check context
-    const childComponents = {
-        preWhitespace: null, // token
-        openingBracket: null, // token
-        whitespace: null, // token
-        closingBracket: null, // token
-        postWhitespace: null, // token
-        comment: null, // node
-    }
-
-    // 
-    // preWhitespace
-    // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context})
-    childComponents.preWhitespace = extraction
-    
-    // 
-    // openingBracket
-    // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /^\[/, from: remaining, context})
-    childComponents.openingBracket = extraction
-    
-    // 
-    // preWhitespace
-    // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context})
-    childComponents.whitespace = extraction
-    
-    // 
-    // openingBracket
-    // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /^\]/, from: remaining, context})
-    childComponents.closingBracket = extraction
-    
-    // 
-    // postWhitespace
-    // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context})
-    childComponents.postWhitespace = extraction
-    
-    // 
-    // comment is optional
-    // 
-    try {
-        childComponents.comment = structure.toNodeifiers.Comment({ remaining, context })
-    } catch (error) {
-        // only catch parse errors
-        if (!(error instanceof structure.ParserError)) {
-            throw error
-        }
-    }
-    
-    return new structure.Node({
-        toStringifier: "List",
-        childComponents,
-        formattingPreferences: {},
-    })
-}
+import { adjectivesPrefixToNode } from "./0_1_adjectives.js"
 
 export const listToNode = ({remaining, context})=>{
-    // <inlineValue>
     if (context.id == ContextIds.inlineValue) {
         return emptyListToNode({ remaining, context })
     } else {
@@ -81,6 +22,80 @@ export const listToNode = ({remaining, context})=>{
         throw new Error(`Unimplemented`)
     }
 }
+    
+    // 
+    // empty
+    // 
+    export const emptyListToNode = ({remaining, context})=>{
+        const childComponents = {
+            preWhitespace: null, // string
+            openingBracket: null, // string
+            whitespace: null, // string
+            closingBracket: null, // string
+            postWhitespace: null, // string
+            comment: null, // node
+        }
+
+        // 
+        // adjectivesPrefix
+        // 
+        try {
+            var { remaining, extraction, context } = tools.extract({ pattern: adjectivesPrefixToNode, from: remaining, context })
+            childComponents.adjectivesPrefix = extraction
+        } catch (error) {
+            if (!(error instanceof ParserError)) {
+                throw error
+            }
+        }
+
+        // 
+        // preWhitespace
+        // 
+        var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context})
+        childComponents.preWhitespace = extraction
+        
+        // 
+        // openingBracket
+        // 
+        var { remaining, extraction, context } = tools.extract({ pattern: /^\[/, from: remaining, context})
+        childComponents.openingBracket = extraction
+        
+        // 
+        // preWhitespace
+        // 
+        var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context})
+        childComponents.whitespace = extraction
+        
+        // 
+        // openingBracket
+        // 
+        var { remaining, extraction, context } = tools.extract({ pattern: /^\]/, from: remaining, context})
+        childComponents.closingBracket = extraction
+        
+        // 
+        // postWhitespace
+        // 
+        var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context})
+        childComponents.postWhitespace = extraction
+        
+        // 
+        // comment is optional
+        // 
+        try {
+            childComponents.comment = structure.toNodeifiers.Comment({ remaining, context })
+        } catch (error) {
+            // only catch parse errors
+            if (!(error instanceof structure.ParserError)) {
+                throw error
+            }
+        }
+        
+        return new structure.Node({
+            toStringifier: "List",
+            childComponents,
+            formattingPreferences: {},
+        })
+    }
 
 structure.RegisterConverter({
     toNode: {

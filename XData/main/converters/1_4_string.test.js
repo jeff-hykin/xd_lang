@@ -116,6 +116,23 @@ console.log(
 console.log(
     toRepresentation(
         stringToNode({
+            remaining: `(markdown)
+            
+    """    
+    Howdy howdy howdy
+    Howdy howdy howdy
+    Howdy howdy howdy
+    """    
+`,
+            context: new structure.Context({
+                id: structure.ContextIds.block,
+            }),
+        })
+    )
+)
+console.log(
+    toRepresentation(
+        stringToNode({
             remaining: `
 
     """    

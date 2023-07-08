@@ -1,6 +1,7 @@
 new Node({
   "toStringifier": "Number",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": "",
     "content": "10.4",
     "postWhitespace": "",
@@ -12,6 +13,7 @@ new Node({
 new Node({
   "toStringifier": "Number",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": "",
     "content": "-10",
     "postWhitespace": "",
@@ -23,8 +25,42 @@ new Node({
 new Node({
   "toStringifier": "Number",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": "",
     "content": "+99.4",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "Number",
+  "childComponents": {
+    "adjectivesPrefix": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "preWhitespace": "",
+        "openingParenthesis": "(",
+        "content": [new Node({
+          "toStringifier": "Token",
+          "childComponents": {
+            "preWhitespace": "",
+            "content": "degrees",
+            "postWhitespace": "",
+          },
+          "formattingPreferences": {
+          },
+        }),""],
+        "trailingWhitespace": null,
+        "closingParenthesis": ")",
+        "postWhitespace": " ",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "preWhitespace": "",
+    "content": "99.4",
     "postWhitespace": "",
     "comment": null,
   },

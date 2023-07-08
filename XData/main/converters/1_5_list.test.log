@@ -38,4 +38,51 @@ new Node({
   "formattingPreferences": {
   },
 })
+
+empty list with comment and adjective
+new Node({
+  "toStringifier": "List",
+  "childComponents": {
+    "preWhitespace": "",
+    "openingBracket": "[",
+    "whitespace": "",
+    "closingBracket": "]",
+    "postWhitespace": " ",
+    "comment": new Node({
+      "toStringifier": "Comment",
+      "childComponents": {
+        "preWhitespace": "",
+        "commentSymbol": "# ",
+        "content": "Howdy",
+        "newline": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "adjectivesPrefix": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "preWhitespace": "",
+        "openingParenthesis": "(",
+        "content": [new Node({
+          "toStringifier": "Token",
+          "childComponents": {
+            "preWhitespace": "",
+            "content": "names",
+            "postWhitespace": "",
+          },
+          "formattingPreferences": {
+          },
+        }),""],
+        "trailingWhitespace": null,
+        "closingParenthesis": ")",
+        "postWhitespace": " ",
+      },
+      "formattingPreferences": {
+      },
+    }),
+  },
+  "formattingPreferences": {
+  },
+})
 " [ ] "

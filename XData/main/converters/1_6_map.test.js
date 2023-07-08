@@ -22,6 +22,15 @@ console.log(
         })
     )
 )
+console.log(`\nempty map with comment and adjective`)
+console.log(
+    toRepresentation(
+        emptyMapToNode({
+            remaining: `(set) {} # Howdy`,
+            context: new structure.Context({}),
+        })
+    )
+)
 console.log(
     toRepresentation(
        structure.toString({

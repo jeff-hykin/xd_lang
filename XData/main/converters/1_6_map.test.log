@@ -3,6 +3,7 @@ empty map
 new Node({
   "toStringifier": "Map",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": "",
     "openingBracket": "{",
     "whitespace": "",
@@ -18,7 +19,55 @@ empty map with comment
 new Node({
   "toStringifier": "Map",
   "childComponents": {
+    "adjectivesPrefix": null,
     "preWhitespace": " ",
+    "openingBracket": "{",
+    "whitespace": "",
+    "closingBracket": "}",
+    "postWhitespace": " ",
+    "comment": new Node({
+      "toStringifier": "Comment",
+      "childComponents": {
+        "preWhitespace": "",
+        "commentSymbol": "# ",
+        "content": "Howdy",
+        "newline": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+  },
+  "formattingPreferences": {
+  },
+})
+
+empty map with comment and adjective
+new Node({
+  "toStringifier": "Map",
+  "childComponents": {
+    "adjectivesPrefix": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "preWhitespace": "",
+        "openingParenthesis": "(",
+        "content": [new Node({
+          "toStringifier": "Token",
+          "childComponents": {
+            "preWhitespace": "",
+            "content": "set",
+            "postWhitespace": "",
+          },
+          "formattingPreferences": {
+          },
+        }),""],
+        "trailingWhitespace": null,
+        "closingParenthesis": ")",
+        "postWhitespace": " ",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "preWhitespace": "",
     "openingBracket": "{",
     "whitespace": "",
     "closingBracket": "}",
