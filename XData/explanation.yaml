@@ -11,6 +11,14 @@
     - then work on the list pattern
     - then work on the map pattern
     - then make nextLineValueToNode check for maps first
+    - then make references
+    - then make figurative strings
+        - inline
+            - escape patterns
+            - unescape non-reference interpolated values
+        - block
+    - then make splat
+    - consider the problem of recursive references inside of string interpolation
 
 - everything centers around nodes:
     - every value (including comments) are nodes
