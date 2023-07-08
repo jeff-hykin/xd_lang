@@ -67,13 +67,28 @@ new Node({
 new Node({
   "toStringifier": "String",
   "childComponents": {
-    "leadingComments": null,
-    "preWhitespace": "\n    ",
+    "leadingCommentsAndLines": [new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    })],
     "startQuote": "    \"\"\"\n",
     "content": "Howdy howdy howdy",
     "endQuote": "\n    \"\"\"\n",
-    "postWhitespace": "",
-    "trailingComments": null,
+    "postWhitespace": null,
+    "trailingCommentsAndLines": [new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    })],
   },
   "formattingPreferences": {
   },
@@ -81,13 +96,28 @@ new Node({
 new Node({
   "toStringifier": "String",
   "childComponents": {
-    "leadingComments": null,
-    "preWhitespace": "\n    ",
+    "leadingCommentsAndLines": [new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    })],
     "startQuote": "    \"\"\"\n",
     "content": "Howdy howdy howdy\nHowdy howdy howdy\nHowdy howdy howdy",
     "endQuote": "\n    \"\"\"\n",
-    "postWhitespace": "",
-    "trailingComments": null,
+    "postWhitespace": null,
+    "trailingCommentsAndLines": [new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    })],
   },
   "formattingPreferences": {
   },
@@ -95,13 +125,112 @@ new Node({
 new Node({
   "toStringifier": "String",
   "childComponents": {
-    "leadingComments": null,
-    "preWhitespace": "\n    ",
+    "leadingCommentsAndLines": [new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    })],
     "startQuote": "    \"\"\"\n",
     "content": "Howdy howdy howdy\nHowdy howdy howdy\nHowdy howdy howdy",
     "endQuote": "\n    \"\"\"\n",
-    "postWhitespace": "",
-    "trailingComments": null,
+    "postWhitespace": null,
+    "trailingCommentsAndLines": [new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    })],
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "String",
+  "childComponents": {
+    "leadingCommentsAndLines": [new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    }),new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "            ",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    })],
+    "startQuote": "    \"\"\"\n",
+    "content": "Howdy howdy howdy\nHowdy howdy howdy\nHowdy howdy howdy",
+    "endQuote": "\n    \"\"\"\n",
+    "postWhitespace": null,
+    "trailingCommentsAndLines": [new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    })],
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "String",
+  "childComponents": {
+    "leadingCommentsAndLines": [new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    }),new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    })],
+    "startQuote": "    \"\"\"\n",
+    "content": "Howdy howdy howdy\nHowdy howdy howdy\nHowdy howdy howdy",
+    "endQuote": "\n    \"\"\"\n",
+    "postWhitespace": null,
+    "trailingCommentsAndLines": [new Node({
+      "toStringifier": "BlankLine",
+      "childComponents": {
+        "whitespace": "",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    }),new Node({
+      "toStringifier": "Comment",
+      "childComponents": {
+        "preWhitespace": "    ",
+        "commentSymbol": "# ",
+        "content": "testing    ",
+        "newline": "\n",
+      },
+      "formattingPreferences": {
+      },
+    })],
   },
   "formattingPreferences": {
   },

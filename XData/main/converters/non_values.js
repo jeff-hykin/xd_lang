@@ -11,13 +11,13 @@ export const blankLineToNode = ({remaining, context})=>{
     // 
     // whitespace
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: / */, from: remaining, context })
+    var { remaining, extraction, context } = tools.extract({ pattern: /^ */, from: remaining, context })
     childComponents.whitespace = extraction
 
     // 
     // newline
     // 
-    var { remaining, extraction, context } = tools.extract({ pattern: /(\n|$)/, from: remaining, context })
+    var { remaining, extraction, context } = tools.extract({ pattern: /^(\n|$)/, from: remaining, context })
     childComponents.newline = extraction
     
     return new structure.Node({

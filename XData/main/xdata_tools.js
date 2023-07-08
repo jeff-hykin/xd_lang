@@ -64,7 +64,42 @@ const advancedBy = (stringOrNode, context) => {
     return newContext
 }
 
-export const extract = ({ pattern, oneOf, from, context }) => {
+/**
+ * pull text out
+ *
+ * @example
+ *     var { remaining, extraction, context } = tools.extract({
+ *         pattern: /^[ \n]+/,
+ *         from: remaining,
+ *         context
+ *     })
+ *
+ * @returns {String} output.remaining 
+ * @returns {Node|String|Array} output.extraction 
+ * @returns {Context} output.context
+ *
+ */
+export const extract = ({ pattern, oneOf, repeat=false, from, context }) => {
+    // call self until failure
+    if (repeat) {
+        var remaining = from
+        var extractions = []
+        while (1) {
+            try {
+                const remainingBefore = remaining
+                var { remaining, extraction, context } = extract({ pattern, oneOf, from: remaining, context })
+                // 0-length extraction
+                if (remainingBefore == remaining) {
+                    break
+                }
+                extractions.push(extraction)
+            } catch (error) {
+                break
+            }
+        }
+        return { remaining, extraction: extractions, context }
+    }
+
     // 
     // simple string or regex
     // 
@@ -87,8 +122,7 @@ export const extract = ({ pattern, oneOf, from, context }) => {
         }
     } else if (pattern instanceof Object) {
         if (pattern[structure.isNodeifier]) {
-            const nodeifier = pattern[structure.isNodeifier]
-            const node = nodeifier({ remaining: from, context })
+            const node = pattern({ remaining: from, context })
             const newContext = advancedBy(node, context)
             const numberOfCharactersAdvanced = newContext.debugInfo.stringIndex - (context.debugInfo.stringIndex||0)
             const remaining = from.slice(numberOfCharactersAdvanced)
