@@ -1,0 +1,266 @@
+
+special values
+new Node({
+  "toStringifier": "SpecialValue",
+  "childComponents": {
+    "adjectivesPrefix": null,
+    "preWhitespace": "",
+    "content": "infinite",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "SpecialValue",
+  "childComponents": {
+    "adjectivesPrefix": null,
+    "preWhitespace": "",
+    "content": "false",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+
+atoms
+new Node({
+  "toStringifier": "Atom",
+  "childComponents": {
+    "preWhitespace": "",
+    "symbol": "@",
+    "content": "imma_atom",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+
+atoms
+new Node({
+  "toStringifier": "Atom",
+  "childComponents": {
+    "preWhitespace": "",
+    "symbol": "@",
+    "content": "red",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+
+numbers
+new Node({
+  "toStringifier": "Number",
+  "childComponents": {
+    "adjectivesPrefix": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "preWhitespace": "",
+        "openingParenthesis": "(",
+        "content": [new Node({
+          "toStringifier": "Token",
+          "childComponents": {
+            "preWhitespace": "",
+            "content": "color",
+            "postWhitespace": "",
+          },
+          "formattingPreferences": {
+          },
+        }),""],
+        "trailingWhitespace": null,
+        "closingParenthesis": ")",
+        "postWhitespace": " ",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "preWhitespace": "",
+    "content": "000",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+
+empty map
+new Node({
+  "toStringifier": "Map",
+  "childComponents": {
+    "adjectivesPrefix": null,
+    "preWhitespace": "",
+    "openingBracket": "{",
+    "whitespace": "",
+    "closingBracket": "}",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+
+empty map with comment
+new Node({
+  "toStringifier": "Map",
+  "childComponents": {
+    "adjectivesPrefix": null,
+    "preWhitespace": " ",
+    "openingBracket": "{",
+    "whitespace": "",
+    "closingBracket": "}",
+    "postWhitespace": " ",
+    "comment": new Node({
+      "toStringifier": "Comment",
+      "childComponents": {
+        "preWhitespace": "",
+        "commentSymbol": "# ",
+        "content": "Howdy",
+        "newline": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+  },
+  "formattingPreferences": {
+  },
+})
+
+empty map with comment and adjective
+new Node({
+  "toStringifier": "Map",
+  "childComponents": {
+    "adjectivesPrefix": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "preWhitespace": "",
+        "openingParenthesis": "(",
+        "content": [new Node({
+          "toStringifier": "Token",
+          "childComponents": {
+            "preWhitespace": "",
+            "content": "set",
+            "postWhitespace": "",
+          },
+          "formattingPreferences": {
+          },
+        }),""],
+        "trailingWhitespace": null,
+        "closingParenthesis": ")",
+        "postWhitespace": " ",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "preWhitespace": "",
+    "openingBracket": "{",
+    "whitespace": "",
+    "closingBracket": "}",
+    "postWhitespace": " ",
+    "comment": new Node({
+      "toStringifier": "Comment",
+      "childComponents": {
+        "preWhitespace": "",
+        "commentSymbol": "# ",
+        "content": "Howdy",
+        "newline": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+  },
+  "formattingPreferences": {
+  },
+})
+
+empty list
+new Node({
+  "toStringifier": "List",
+  "childComponents": {
+    "preWhitespace": "",
+    "openingBracket": "[",
+    "whitespace": "",
+    "closingBracket": "]",
+    "postWhitespace": "",
+    "comment": null,
+  },
+  "formattingPreferences": {
+  },
+})
+
+empty map with comment
+new Node({
+  "toStringifier": "List",
+  "childComponents": {
+    "preWhitespace": " ",
+    "openingBracket": "[",
+    "whitespace": "",
+    "closingBracket": "]",
+    "postWhitespace": " ",
+    "comment": new Node({
+      "toStringifier": "Comment",
+      "childComponents": {
+        "preWhitespace": "",
+        "commentSymbol": "# ",
+        "content": "Howdy",
+        "newline": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+  },
+  "formattingPreferences": {
+  },
+})
+
+empty map with comment and adjective
+new Node({
+  "toStringifier": "List",
+  "childComponents": {
+    "preWhitespace": "",
+    "openingBracket": "[",
+    "whitespace": "",
+    "closingBracket": "]",
+    "postWhitespace": " ",
+    "comment": new Node({
+      "toStringifier": "Comment",
+      "childComponents": {
+        "preWhitespace": "",
+        "commentSymbol": "# ",
+        "content": "Howdy",
+        "newline": "",
+      },
+      "formattingPreferences": {
+      },
+    }),
+    "adjectivesPrefix": new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "preWhitespace": "",
+        "openingParenthesis": "(",
+        "content": [new Node({
+          "toStringifier": "Token",
+          "childComponents": {
+            "preWhitespace": "",
+            "content": "set",
+            "postWhitespace": "",
+          },
+          "formattingPreferences": {
+          },
+        }),""],
+        "trailingWhitespace": null,
+        "closingParenthesis": ")",
+        "postWhitespace": " ",
+      },
+      "formattingPreferences": {
+      },
+    }),
+  },
+  "formattingPreferences": {
+  },
+})
+" { } "

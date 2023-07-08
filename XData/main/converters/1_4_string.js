@@ -54,14 +54,25 @@ import { adjectivesPrefixToNode } from "./0_1_adjectives.js"
             // literal with no newlines
             return inlineStringLiteralToNode({remaining, context})
         } else {
+            var theError
             // if inlineStringLiteralToNode matches, then all good in any context
             try {
                 return inlineStringLiteralToNode({remaining, context})
             } catch (error) {
+                theError = error
+                // only catch parse errors
+                if (!(error instanceof structure.ParserError)) {
+                    throw error
+                }
             }
 
             if (context.id == ContextIds.block) {
                 return blockStringLiteralToNode({remaining, context})
+            }
+
+            // FIXME: this is only because of not-implement stuff
+            if (theError) {
+                throw theError
             }
 
             throw Error(`not implemented`)

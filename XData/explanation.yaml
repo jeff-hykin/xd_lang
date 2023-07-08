@@ -1,11 +1,4 @@
 - TODO:
-    - add adjectives to all values
-        - special_value
-        - empty list
-        - empty map
-        - atom
-        - number
-        - string
     - finish inlineValueToNode (add adjective)
 
 - everything centers around nodes:
