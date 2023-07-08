@@ -1,5 +1,12 @@
 - TODO:
-    - maybe redo how context adjectives work; force them to be declared, force decoders to specify each 
+    - add adjectives to all values
+        - special_value
+        - empty list
+        - empty map
+        - atom
+        - number
+        - string
+    - finish inlineValueToNode (add adjective)
 
 - everything centers around nodes:
     - every value (including comments) are nodes

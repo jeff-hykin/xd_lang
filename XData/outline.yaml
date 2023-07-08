@@ -26,8 +26,9 @@ contexts:
                     group:
                         regex: "/- /"
                         (Definition):
+                            maybe: adjective
                             oneOf:
-                                (inlineValueToNode)[inlineValue]:
+                                (inlineValueToNode):
                                     (Map)<inlineValue>: #REDONE
                                         regex: "/ */"
                                         regex: "/\{/"
@@ -52,8 +53,8 @@ contexts:
                                             regex: "/#tab|#newline/"
                                             regex: "/#unicode\[\w+\]/"
                                             regex: "/#ascii\[\w+\]/"
-                                    (String)<inlineValue>:
-                                        (StringLiteral)<inlineValue>: #REDONE
+                                    (String):
+                                        (inlineStringLiteral): #REDONE
                                             oneOf:
                                                 regex: '/"/'
                                                 regex: '/[^\n"]*/'
@@ -65,7 +66,15 @@ contexts:
                                                             a sequence of double quotes thats smaller than the starting quote: 
                                                             as many characters as possible that don't have the quote or newline:
                                                     findMatchingDoubleQuotesThatAreAPowerOfThree:
-                                        (StringFigurative)[stringFigurative]<inlineValue>:
+                                        (blockStringLiteral): #REDONE
+                                            leadingCommentsAndLines: null, // array of nodes
+                                            startQuote: null, // string
+                                            content: null, // string
+                                            endQuote: null, // string
+                                            postWhitespace: null, // string
+                                            trailingCommentsAndLines: null, // array of nodes
+                                                
+                                        (StringFigurative):
                                             findSingleQuotesThatAreAPowerOfThree:
                                             loop:
                                                 stop_if:

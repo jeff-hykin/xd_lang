@@ -120,19 +120,16 @@ export const extract = ({ pattern, oneOf, repeat=false, from, context }) => {
             extraction: extraction,
             context: advancedBy(node, context),
         }
-    } else if (pattern instanceof Object) {
-        if (pattern[structure.isNodeifier]) {
-            const node = pattern({ remaining: from, context })
-            const newContext = advancedBy(node, context)
-            const numberOfCharactersAdvanced = newContext.debugInfo.stringIndex - (context.debugInfo.stringIndex||0)
-            const remaining = from.slice(numberOfCharactersAdvanced)
-            return {
-                remaining,
-                extraction: node,
-                context: newContext,
-            }
+    } else if (pattern instanceof Function) {
+        const node = pattern({ remaining: from, context })
+        const newContext = advancedBy(node, context)
+        const numberOfCharactersAdvanced = newContext.debugInfo.stringIndex - (context.debugInfo.stringIndex||0)
+        const remaining = from.slice(numberOfCharactersAdvanced)
+        return {
+            remaining,
+            extraction: node,
+            context: newContext,
         }
-        throw Error(`There was a problem when calling:\n    extract({ pattern, from, context })\nThe pattern was an object, but not a converter. Instead it was:\n    ${toRepresentation(pattern)} `)
     } else if (oneOf instanceof Array) {
         // just try all of them
         for (const each of oneOf) {
