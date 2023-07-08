@@ -1,0 +1,63 @@
+new Node({
+  "toStringifier": "Token",
+  "childComponents": {
+    "preWhitespace": "",
+    "content": "imma_adjective",
+    "postWhitespace": "",
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "Token",
+  "childComponents": {
+    "preWhitespace": "",
+    "openingParenthesis": "(",
+    "content": [new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "preWhitespace": "",
+        "content": "imma_adjective",
+        "postWhitespace": "",
+      },
+      "formattingPreferences": {
+      },
+    }),""],
+    "trailingWhitespace": null,
+    "closingParenthesis": ")",
+    "postWhitespace": "",
+  },
+  "formattingPreferences": {
+  },
+})
+new Node({
+  "toStringifier": "Token",
+  "childComponents": {
+    "preWhitespace": "  ",
+    "openingParenthesis": "(",
+    "content": [new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "preWhitespace": "",
+        "content": "imma_adjective",
+        "postWhitespace": "",
+      },
+      "formattingPreferences": {
+      },
+    }),", ",new Node({
+      "toStringifier": "Token",
+      "childComponents": {
+        "preWhitespace": "",
+        "content": "me_too",
+        "postWhitespace": "   ",
+      },
+      "formattingPreferences": {
+      },
+    }),""],
+    "trailingWhitespace": null,
+    "closingParenthesis": ")",
+    "postWhitespace": "  ",
+  },
+  "formattingPreferences": {
+  },
+})

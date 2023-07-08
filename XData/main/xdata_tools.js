@@ -10,39 +10,28 @@ const options = {
 // Token
 // 
 structure.RegisterConverter({
-    toNode: {
-        Token: ({remaining, context})=>{
-            // throw ParserError({ message, context }) if parse error
-            return new structure.Node({
-                toStringifier: "Token",
-                childComponents: {
-                    content: remaining,
-                },
-                formattingPreferences: {},
-            })
-        }
-    },
     toString: {
         Token: ({node, context})=>{
             if (node.childComponents == null) {
                 return ``
             } else {
-                return `${node.childComponents.content}`
+                // default recursive to-string
+                return structure.childComponentsToString({node, context})
             }
         }
     }
 })
 
 const advancedBy = (stringOrNode, context) => {
-    let newContext = {
+    let newContext = new structure.Context({
         ...context,
         debugInfo: {
             stringIndex: 0,
             lineIndex: 0,
             columnIndex: 0,
-            ...context.debugInfo
+            ...context.debugInfo,
         },
-    }
+    })
     if (stringOrNode == null) {
         return newContext
     } else  if (stringOrNode instanceof Array) {
@@ -53,10 +42,15 @@ const advancedBy = (stringOrNode, context) => {
         const string = stringOrNode
         const lines = string.split("\n")
         // TODO: write a unit test to confirm context actually works
-        newContext.debugInfo.stringIndex = context.debugInfo.stringIndex + string.length
-        newContext.debugInfo.lineIndex   = context.debugInfo.lineIndex + lines.length - 1
-        newContext.debugInfo.columnIndex = lines.slice(-1)[0].length
-    } else if (stringOrNode instanceof structure.Node) {
+        return new structure.Context({
+            ...newContext,
+            debugInfo: {
+                stringIndex: context.debugInfo.stringIndex + string.length,
+                lineIndex: context.debugInfo.lineIndex + lines.length - 1,
+                columnIndex: lines.slice(-1)[0].length,
+            },
+        })
+    } else if (stringOrNode instanceof Object && stringOrNode.childComponents instanceof Object) {
         for (const [key, subComponent] of Object.entries(stringOrNode.childComponents)) {
             newContext = advancedBy(subComponent, newContext)
         }
@@ -108,17 +102,10 @@ export const extract = ({ pattern, oneOf, repeat=false, from, context }) => {
         if (extraction == null) {
             throw new structure.ParserError({message: `Unable to extract: ${pattern} from ${from}`, context})
         }
-        const node = new structure.Node({
-            toStringifier: "Token",
-            childComponents: {
-                content: extraction
-            },
-            formattingPreferences: {},
-        })
         return {
             remaining,
             extraction: extraction,
-            context: advancedBy(node, context),
+            context: advancedBy(extraction, context),
         }
     } else if (pattern instanceof Function) {
         const node = pattern({ remaining: from, context })

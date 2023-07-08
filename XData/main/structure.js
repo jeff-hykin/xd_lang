@@ -48,7 +48,7 @@ import * as utils from "./utils.js"
     // contexts are immutable (auto-enforced/guaranteed)
     export class Context {
         constructor({debugInfo={}, parentContext=null, id=ContextIds.root}) {
-            this.debugInfo     = debugInfo
+            this.debugInfo     = { stringIndex: 0, lineIndex: 0, columnIndex: 0, ...debugInfo }
             this.parentContext = parentContext
             this.id            = id
             Object.freeze(this)
