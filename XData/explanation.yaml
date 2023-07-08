@@ -1,5 +1,16 @@
 - TODO:
-    - finish inlineValueToNode (add adjective)
+    - work on nextLineValueToNode
+        - change nodes to have leadingCommentsAndLines
+            - empty Map
+            - empty List
+            - SpecialValue
+            - Atom
+            - Number
+            - String
+    - then work on a block-extracter (un-indents)
+    - then work on the list pattern
+    - then work on the map pattern
+    - then make nextLineValueToNode check for maps first
 
 - everything centers around nodes:
     - every value (including comments) are nodes
