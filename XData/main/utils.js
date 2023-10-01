@@ -1,4 +1,5 @@
-import { toString, findAll } from "https://deno.land/x/good@1.3.0.4/string.js"
+import { capitalize, indent, toCamelCase, digitsToEnglishArray, toPascalCase, toKebabCase, toSnakeCase, toScreamingtoKebabCase, toScreamingtoSnakeCase, toRepresentation, toString, regex, findAll, iterativelyFindAll, escapeRegexMatch, escapeRegexReplace, extractFirst, isValidIdentifier } from "https://deno.land/x/good@1.5.0.0/string.js"
+import { iter, next, Stop, Iterable, map, filter, reduce, frequencyCount, zip, count, enumerate, permute, combinations, slices, asyncIteratorToList, concurrentlyTransform, forkBy } from "https://deno.land/x/good@1.5.0.0/iterable.js"
 
 export {
     toString as toString
@@ -23,4 +24,33 @@ export const extractFirst = ({ pattern, from }) => {
     }
 }
 
-// TODO: extract block
+// FIXME: untested
+export const extractBlock = (string)=>{
+    let baseIndent = null
+    const chunks = []
+    let charIncrement = 0
+    for (const eachMatch of iterativelyFindAll(/.*/, string)) {
+        const eachLine = eachMatch[0]
+        // havent initialized
+        if (baseIndent == null) {
+            baseIndent = eachLine.match(/^[ \t]*/)
+            chunks.push(eachLine.slice(baseIndent.length,))
+            charIncrement += eachLine.length
+        } else {
+            const eachMatch = eachLine.match(/^([ \t]*)(.*)/)
+            const eachIndent = eachMatch[1]
+            const eachContent = eachMatch[2]
+            if (eachIndent.length < baseIndent) {
+                break
+            } else {
+                chunks.push(eachIndent.slice(baseIndent.length,)+eachContent)
+                charIncrement += eachLine.length
+            }
+        }
+    }
+    charIncrement += chunks.length-1 // +1 for each newline
+    return {
+        extraction: "\n".join(chunks),
+        remaining: string.slice(charIncrement,),
+    }
+}
